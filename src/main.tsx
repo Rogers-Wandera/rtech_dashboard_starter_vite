@@ -14,9 +14,9 @@ import "@/assets/scss/rtl.scss";
 import "@/assets/scss/customizer.scss";
 
 import App from "./App.tsx";
-import Providers from "./lib/providers/provider.main.tsx";
+import Providers from "./lib/providers/provider.main";
 import { RouterProvider } from "react-router-dom";
-import { router } from "./lib/router/main.router.ts";
+import { router } from "./lib/router/main.router";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

@@ -9,7 +9,7 @@ import {
   ServerErrorResponse,
   UserModuleRes,
 } from "@/types/server/server.main.types";
-import { LoginResponse } from "@/types/app/auth/auth.types";
+import { LoginResponse, ServerResponse } from "@/types/app/auth/auth.types";
 
 export const AuthApi = createApi({
   reducerPath: "authapi",
@@ -57,7 +57,76 @@ export const AuthApi = createApi({
         return response;
       },
     }),
+    ResetPassword: builder.mutation({
+      query: (payload: {
+        userId: string;
+        password: string;
+        confirmpassword: string;
+      }) => ({
+        url: `${AuthEndpoint}/user/reset/${payload.userId}`,
+        method: "POST",
+        body: {
+          password: payload.password,
+          confirmpassword: payload.confirmpassword,
+        },
+      }),
+      transformErrorResponse: (error: FetchBaseQueryError) => {
+        if (error.data) {
+          return error.data as ServerErrorResponse;
+        }
+        return error;
+      },
+      transformResponse: (response: ServerResponse) => {
+        return response;
+      },
+    }),
+    ResetPasswordLink: builder.mutation({
+      query: (payload: { email: string }) => ({
+        url: `${AuthEndpoint}/user/resetlink`,
+        method: "POST",
+        body: payload,
+      }),
+      transformErrorResponse: (error: FetchBaseQueryError) => {
+        if (error.data) {
+          return error.data as ServerErrorResponse;
+        }
+        return error;
+      },
+      transformResponse: (response: ServerResponse) => {
+        return response;
+      },
+    }),
+    FromLinkResetPassword: builder.mutation({
+      query: (payload: {
+        userId: string;
+        token: string;
+        confirmpassword: string;
+        password: string;
+      }) => ({
+        url: `${AuthEndpoint}/user/resetpassword/${payload.userId}/${payload.token}`,
+        method: "POST",
+        body: {
+          password: payload.password,
+          confirmpassword: payload.confirmpassword,
+        },
+      }),
+      transformErrorResponse: (error: FetchBaseQueryError) => {
+        if (error.data) {
+          return error.data as ServerErrorResponse;
+        }
+        return error;
+      },
+      transformResponse: (response: ServerResponse) => {
+        return response;
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation, useGetUserModulesQuery } = AuthApi;
+export const {
+  useLoginMutation,
+  useGetUserModulesQuery,
+  useResetPasswordMutation,
+  useResetPasswordLinkMutation,
+  useFromLinkResetPasswordMutation,
+} = AuthApi;

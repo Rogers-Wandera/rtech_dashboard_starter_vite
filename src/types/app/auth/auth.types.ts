@@ -5,8 +5,11 @@ export interface ILoginValues {
   email: string;
   password: string;
 }
-export type LoginResponse = {
+export type ServerResponse = {
   msg: string;
+  data?: any;
+};
+export type LoginResponse = ServerResponse & {
   accessToken: string;
 };
 
@@ -27,3 +30,8 @@ export interface TypeToken {
 export interface WithRolesProps {
   roles: ROLES[];
 }
+
+export type ResetPasswordValues = {
+  confirmpassword: string;
+  password: string;
+};

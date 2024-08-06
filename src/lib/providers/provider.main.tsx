@@ -30,7 +30,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
                 position="top-right"
                 zIndex={1000}
                 limit={5}
-                autoClose={3000}
+                autoClose={4000}
               />
               <AuthProvider> {children}</AuthProvider>
             </PersistGate>

@@ -1,5 +1,6 @@
-import ChangePassword from "@/app/views/auth/changepassword/changepassword";
+import ForgotPassword from "@/app/views/auth/forgotpassword/forgot";
 import AuthLogin from "@/app/views/auth/login/login";
+import ResetPassword from "@/app/views/auth/resetpassword/reset";
 import { RouteObject } from "react-router-dom";
 
 export const NoAuthRouter: RouteObject[] = [
@@ -8,7 +9,11 @@ export const NoAuthRouter: RouteObject[] = [
     element: <AuthLogin />,
   },
   {
-    path: "/changepword",
-    element: <ChangePassword />,
+    path: "/pwreset",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/resetpassword/:userId/:token",
+    element: <ResetPassword />,
   },
 ];

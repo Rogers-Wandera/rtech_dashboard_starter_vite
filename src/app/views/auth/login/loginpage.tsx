@@ -15,8 +15,16 @@ type props = {
   app_name: string | null | undefined;
   form: UseFormReturnType<ILoginValues, (values: ILoginValues) => ILoginValues>;
   handleSubmit: (values: ILoginValues) => void;
+  rememberMe: boolean;
+  setRememberMe: React.Dispatch<React.SetStateAction<boolean>>;
 };
-const LoginPage = ({ app_name, form, handleSubmit }: props) => {
+const LoginPage = ({
+  app_name,
+  form,
+  handleSubmit,
+  rememberMe,
+  setRememberMe,
+}: props) => {
   const [popoverOpened, setPopoverOpened] = useState(false);
   const checks = withoutuppercase.map((requirement, index) => (
     <PasswordRequirement
@@ -155,7 +163,12 @@ const LoginPage = ({ app_name, form, handleSubmit }: props) => {
                       </Col>
                       <Col lg="12" className="d-flex justify-content-between">
                         <Form.Check className="form-check mb-3">
-                          <Form.Check.Input type="checkbox" id="customCheck1" />
+                          <Form.Check.Input
+                            checked={rememberMe}
+                            onChange={() => setRememberMe(!rememberMe)}
+                            type="checkbox"
+                            id="customCheck1"
+                          />
                           <Form.Check.Label htmlFor="customCheck1">
                             Remember Me
                           </Form.Check.Label>

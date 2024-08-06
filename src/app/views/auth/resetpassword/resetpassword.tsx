@@ -22,7 +22,7 @@ type props = {
   >;
   HandleSubmit: (values: ResetPasswordValues) => void;
 };
-const ChangePasswordPage = ({ form, HandleSubmit }: props) => {
+const ResetPasswordPage = ({ form, HandleSubmit }: props) => {
   const app_name = useSelector(
     (state: RootState) => state.setting.setting.app_name.value
   );
@@ -132,9 +132,17 @@ const ChangePasswordPage = ({ form, HandleSubmit }: props) => {
               </Link>
               <h2 className="mb-2">Change Password</h2>
               <p>
-                Your seeing this because your account was created by an admin,
-                and it requires you to change your password, Enter your new
-                password to access your dashboard.
+                Your seeing this because you requested a password reset, Please
+                fill in all fields to reset your password and access the
+                dashboard. <br />
+                <span>
+                  Note:{" "}
+                  <b>
+                    If you did not request a password reset, please safely
+                    ignore this, and u can report this through your dashboard on
+                    the help center icon
+                  </b>
+                </span>
               </p>
               <Form onSubmit={form.onSubmit(HandleSubmit)}>
                 <Row>
@@ -297,4 +305,4 @@ const ChangePasswordPage = ({ form, HandleSubmit }: props) => {
   );
 };
 
-export default ChangePasswordPage;
+export default ResetPasswordPage;
