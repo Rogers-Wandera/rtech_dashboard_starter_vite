@@ -62,3 +62,5 @@ export class HelperClass {
     return ciphedInput;
   };
 }
+
+export const helpers = new HelperClass();

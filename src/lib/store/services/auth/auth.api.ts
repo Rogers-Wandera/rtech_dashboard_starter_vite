@@ -120,6 +120,38 @@ export const AuthApi = createApi({
         return response;
       },
     }),
+    verifyAccount: builder.mutation({
+      query: (payload: { userId: string; token: string }) => ({
+        url: `${AuthEndpoint}/user/verification/verify/${payload.userId}/${payload.token}`,
+        method: "POST",
+        body: {},
+      }),
+      transformErrorResponse: (error: FetchBaseQueryError) => {
+        if (error.data) {
+          return error.data as ServerErrorResponse;
+        }
+        return error;
+      },
+      transformResponse: (response: ServerResponse) => {
+        return response;
+      },
+    }),
+    resendVerificationLink: builder.mutation({
+      query: (payload: { userId: string }) => ({
+        url: `${AuthEndpoint}/user/verification/resend/${payload.userId}`,
+        method: "POST",
+        body: {},
+      }),
+      transformErrorResponse: (error: FetchBaseQueryError) => {
+        if (error.data) {
+          return error.data as ServerErrorResponse;
+        }
+        return error;
+      },
+      transformResponse: (response: ServerResponse & { emailsent: string }) => {
+        return response;
+      },
+    }),
   }),
 });
 
@@ -129,4 +161,6 @@ export const {
   useResetPasswordMutation,
   useResetPasswordLinkMutation,
   useFromLinkResetPasswordMutation,
+  useVerifyAccountMutation,
+  useResendVerificationLinkMutation,
 } = AuthApi;

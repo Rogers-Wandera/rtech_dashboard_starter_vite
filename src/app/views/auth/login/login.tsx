@@ -23,6 +23,8 @@ const AuthLogin = () => {
   const [rememberMe, setRemember] = useState(email !== "" && password !== "");
   const location = useLocation();
   const originalRoute = (location.state?.from as string) || "/dashboard";
+  const route =
+    originalRoute === "/unauthorized" ? "/dashboard" : originalRoute;
 
   const form = useForm<ILoginValues>({
     initialValues: {
@@ -48,7 +50,7 @@ const AuthLogin = () => {
       if (rememberMe) {
         dispatch(setRememberMe({ ...values }));
       }
-      router(originalRoute, { replace: true });
+      router(route, { replace: true });
       form.reset();
     } catch (error) {
       HandleError(error as ServerErrorResponse);
@@ -62,7 +64,7 @@ const AuthLogin = () => {
   }, [rememberMe]);
 
   if (isLoggedIn && token && token !== "") {
-    return <Navigate to={originalRoute} replace />;
+    return <Navigate to={route} replace />;
   }
   return (
     <>

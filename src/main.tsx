@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import "./globals.css";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
@@ -12,6 +11,8 @@ import "@/assets/scss/custom.scss";
 import "@/assets/scss/dark.scss";
 import "@/assets/scss/rtl.scss";
 import "@/assets/scss/customizer.scss";
+
+import "./index.css";
 
 import App from "./App.tsx";
 import Providers from "./lib/providers/provider.main";

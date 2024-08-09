@@ -1,5 +1,7 @@
 import { useAuth } from "@/hooks/auth.hooks";
+import { RootState } from "@/lib/store/store";
 import { UserModuleRes } from "@/types/server/server.main.types";
+import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 const urlexcludes: string[] = ["/dashboard"];
@@ -24,9 +26,12 @@ function WithRouteRole<P extends Object>(
   Component: React.ComponentType<P>
 ): React.ComponentType<P> {
   return function RouteRole(props) {
+    const loading = useSelector(
+      (state: RootState) => state.appState.defaultstate.isLoading
+    );
     const { modules } = useAuth();
     const path = location.pathname;
-    if (!modules && !urlexcludes.includes(path)) {
+    if (!loading && !modules && !urlexcludes.includes(path)) {
       return <Navigate to="/unauthorized" replace />;
     }
     if (!hasRouteRole(modules, path)) {
