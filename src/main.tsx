@@ -18,13 +18,18 @@ import App from "./App.tsx";
 import Providers from "./lib/providers/provider.main";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./lib/router/main.router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Providers>
-      <App>
-        <RouterProvider router={router} />
-      </App>
-    </Providers>
+    <QueryClientProvider client={queryClient}>
+      <Providers>
+        <App>
+          <RouterProvider router={router} />
+        </App>
+      </Providers>
+    </QueryClientProvider>
   </React.StrictMode>
 );

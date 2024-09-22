@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 function WithAuth<P extends Object>(
   Component: React.ComponentType<P>
 ): React.ComponentType<P> {
-  return function WithAuth(props) {
+  return function withAuth(props) {
     const { isLoggedIn, token, user } = useAuth();
 
     if (!isLoggedIn && !token && token !== "") {

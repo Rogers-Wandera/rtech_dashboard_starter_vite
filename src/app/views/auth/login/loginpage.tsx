@@ -10,6 +10,10 @@ import { PasswordInput, Popover, Progress, TextInput } from "@mantine/core";
 import auth1 from "@/assets/images/auth/01.png";
 import { ILoginValues } from "@/types/app/auth/auth.types";
 import { Link } from "react-router-dom";
+import logodark from "@/assets/logos/logo2.png";
+import logolight from "@/assets/logos/logo.png";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 
 type props = {
   app_name: string | null | undefined;
@@ -37,6 +41,10 @@ const LoginPage = ({
   const strength = getStrength(form.getValues().password, 8, withoutuppercase);
   const color = strength === 100 ? "teal" : strength > 50 ? "yellow" : "red";
 
+  const theme = useSelector(
+    (state: RootState) => state.setting.setting.theme_scheme.value
+  );
+
   useEffect(() => {
     if (strength === 100) {
       setPopoverOpened(false);
@@ -55,49 +63,19 @@ const LoginPage = ({
                     className="navbar-brand d-flex align-items-center mb-3"
                   >
                     <svg
-                      width="30"
+                      width="80"
                       className="text-primary"
-                      viewBox="0 0 30 30"
+                      viewBox="0 0 90 80"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <rect
-                        x="-0.757324"
-                        y="19.2427"
-                        width="28"
-                        height="4"
-                        rx="2"
-                        transform="rotate(-45 -0.757324 19.2427)"
-                        fill="currentColor"
-                      />
-                      <rect
-                        x="7.72803"
-                        y="27.728"
-                        width="28"
-                        height="4"
-                        rx="2"
-                        transform="rotate(-45 7.72803 27.728)"
-                        fill="currentColor"
-                      />
-                      <rect
-                        x="10.5366"
-                        y="16.3945"
-                        width="16"
-                        height="4"
-                        rx="2"
-                        transform="rotate(45 10.5366 16.3945)"
-                        fill="currentColor"
-                      />
-                      <rect
-                        x="10.5562"
-                        y="-0.556152"
-                        width="28"
-                        height="4"
-                        rx="2"
-                        transform="rotate(45 10.5562 -0.556152)"
-                        fill="currentColor"
+                      <image
+                        height="100"
+                        width="100"
+                        href={theme === "light" ? logolight : logodark}
                       />
                     </svg>
+
                     <h4 className="logo-title ms-3">{app_name}</h4>
                   </Link>
                   <h2 className="mb-2 text-center">Sign In</h2>
@@ -197,29 +175,11 @@ const LoginPage = ({
               <g opacity="0.05">
                 <rect
                   x="-157.085"
-                  y="193.773"
+                  y="198.773"
                   width="543"
                   height="77.5714"
                   rx="38.7857"
                   transform="rotate(-45 -157.085 193.773)"
-                  fill="#3B8AFF"
-                />
-                <rect
-                  x="7.46875"
-                  y="358.327"
-                  width="543"
-                  height="77.5714"
-                  rx="38.7857"
-                  transform="rotate(-45 7.46875 358.327)"
-                  fill="#3B8AFF"
-                />
-                <rect
-                  x="61.9355"
-                  y="138.545"
-                  width="310.286"
-                  height="77.5714"
-                  rx="38.7857"
-                  transform="rotate(45 61.9355 138.545)"
                   fill="#3B8AFF"
                 />
                 <rect

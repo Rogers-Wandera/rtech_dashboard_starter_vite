@@ -1,4 +1,4 @@
-import { Box, rem } from "@mantine/core";
+import { rem } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconCheck, IconThumbDown, IconInfoHexagon } from "@tabler/icons-react";
 

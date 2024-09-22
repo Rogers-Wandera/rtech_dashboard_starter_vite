@@ -7,6 +7,7 @@ export interface DefaultState {
   headerText: string;
   isLoading: boolean;
   session: boolean;
+  nextRoute: null | string;
   rememberMe: { email: string; password: string };
 }
 
@@ -14,6 +15,7 @@ const defaultState: DefaultState = {
   headerText: "",
   isLoading: false,
   session: false,
+  nextRoute: null,
   rememberMe: { email: "", password: "" },
 };
 const defaultSlice = createSlice({
@@ -28,6 +30,9 @@ const defaultSlice = createSlice({
     },
     setSession: (state, action: { payload: boolean }) => {
       state.session = action.payload;
+    },
+    setNextRoute: (state, action: { payload: null | string }) => {
+      state.nextRoute = action.payload;
     },
     setRememberMe: (state, action: { payload: typeof state.rememberMe }) => {
       const helper = new HelperClass();
@@ -60,5 +65,10 @@ const defaultSlice = createSlice({
       ),
 });
 export const defaultReducer = defaultSlice.reducer;
-export const { setHeaderText, setLoading, setSession, setRememberMe } =
-  defaultSlice.actions;
+export const {
+  setHeaderText,
+  setLoading,
+  setSession,
+  setRememberMe,
+  setNextRoute,
+} = defaultSlice.actions;

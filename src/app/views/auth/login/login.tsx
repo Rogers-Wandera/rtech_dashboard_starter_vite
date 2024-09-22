@@ -11,7 +11,10 @@ import { useAuth } from "@/hooks/auth.hooks";
 import { useEffect, useState } from "react";
 import { HelperClass } from "@/lib/utils/helpers/helper";
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { setRememberMe } from "@/lib/store/services/defaults/defaults";
+import {
+  setNextRoute,
+  setRememberMe,
+} from "@/lib/store/services/defaults/defaults";
 
 const AuthLogin = () => {
   const helper = new HelperClass();
@@ -20,6 +23,7 @@ const AuthLogin = () => {
   const { email, password } = useSelector(
     (state: RootState) => state.appState.defaultstate.rememberMe
   );
+  const router = useNavigate();
   const [rememberMe, setRemember] = useState(email !== "" && password !== "");
   const location = useLocation();
   const originalRoute = (location.state?.from as string) || "/dashboard";
@@ -37,7 +41,6 @@ const AuthLogin = () => {
     },
   });
   const [Login] = useLoginMutation({});
-  const router = useNavigate();
   const app_name = useSelector(
     (state: RootState) => state.setting.setting.app_name.value
   );
@@ -50,8 +53,9 @@ const AuthLogin = () => {
       if (rememberMe) {
         dispatch(setRememberMe({ ...values }));
       }
-      router(route, { replace: true });
+      dispatch(setNextRoute(route));
       form.reset();
+      router("/dashboard");
     } catch (error) {
       HandleError(error as ServerErrorResponse);
     }

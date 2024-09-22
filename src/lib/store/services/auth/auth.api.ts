@@ -7,9 +7,10 @@ import { RootState } from "../../store";
 import { AuthEndpoint } from "@/lib/endpoints/server.core.endpoints";
 import {
   ServerErrorResponse,
+  ServerResponse,
   UserModuleRes,
 } from "@/types/server/server.main.types";
-import { LoginResponse, ServerResponse } from "@/types/app/auth/auth.types";
+import { LoginResponse } from "@/types/app/auth/auth.types";
 
 export const AuthApi = createApi({
   reducerPath: "authapi",

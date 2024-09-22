@@ -36,7 +36,7 @@ export const settingSlice = createSlice({
   name: "setting",
   initialState,
   reducers: {
-    setSetting: (state, _) => {
+    setSetting: (state) => {
       const json = getStorage(state.storeKey);
       if (json === "none") state.saveLocal = "none";
       if (json !== null && json !== "none") {

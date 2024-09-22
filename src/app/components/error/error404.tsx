@@ -2,13 +2,16 @@ import { Container, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
 // img
 import error404 from "@/assets/images/error/404.png";
+import { Center } from "@mantine/core";
 
 const Error404 = () => {
   return (
     <>
       <div className="gradient">
         <Container>
-          <Image src={error404} className="img-fluid mb-4 w-50" alt="" />
+          <Center>
+            <Image src={error404} className="img-fluid mb-4 w-50" alt="" />
+          </Center>
           <h2 className="mb-0 mt-4 text-white">
             Oops! This Page is Not Found.
           </h2>

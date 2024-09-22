@@ -53,3 +53,16 @@ export interface IAuthState {
   user: IAuthUser | null;
   modules: UserModuleRes;
 }
+
+type fetchType<T = any> = {
+  type: "GET";
+  data: T;
+  msg?: string;
+};
+
+type NoFetchType<T = any> = {
+  type: "POST" | "PATCH" | "PUT" | "DELETE";
+  data?: T;
+  msg: string;
+};
+export type ServerResponse<T = any> = fetchType<T> | NoFetchType<T>;

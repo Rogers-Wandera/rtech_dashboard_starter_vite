@@ -9,28 +9,37 @@ import { Button } from "react-bootstrap";
 import SubHeader from "@/components/partials/HeaderStyle/sub-header";
 import Sidebar from "@/components/partials/SidebarStyle/sidebar";
 import { RootState } from "@/lib/store/store";
-import { useGetUserModulesQuery } from "@/lib/store/services/auth/auth.api";
 import { LoadingOverlay } from "@mantine/core";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import WithAuth from "@/hocs/auth.hoc";
-import { useAuth } from "@/hooks/auth.hooks";
 import WithRouteRole from "@/hocs/routerole.hoc";
 import WithSession from "@/hocs/session.hoc";
+import WithUserModules from "@/hocs/withmodules.hoc";
+import { useAppDispatch } from "@/hooks/store.hooks";
+import { setNextRoute } from "@/lib/store/services/defaults/defaults";
 
 function DashboardLayout() {
-  const { isLoggedIn, user } = useAuth();
   const loading = useSelector(
     (state: RootState) => state.appState.defaultstate.isLoading
   );
-  const { refetch } = useGetUserModulesQuery(String(user?.id), {
-    skip: !isLoggedIn,
-  });
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const appName = useSelector(SettingSelector.app_name);
-  useEffect(() => {
-    if (isLoggedIn) {
-      refetch();
+  const nextroute = useSelector(
+    (state: RootState) => state.appState.defaultstate.nextRoute
+  );
+
+  const HandleNextRoute = () => {
+    if (nextroute && nextroute !== location.pathname) {
+      navigate(nextroute, { replace: true });
     }
-  }, [isLoggedIn]);
+  };
+
+  useEffect(() => {
+    HandleNextRoute();
+    dispatch(setNextRoute(null));
+  }, [nextroute]);
   return (
     <Fragment>
       <LoadingOverlay
@@ -60,4 +69,7 @@ function DashboardLayout() {
   );
 }
 
-export default WithAuth(WithRouteRole(WithSession(DashboardLayout)));
+const DashBoardWithSession = WithAuth(WithSession(DashboardLayout));
+const DashboardWithModules = WithUserModules(DashBoardWithSession);
+const DashboardWithRoles = WithRouteRole(DashboardWithModules);
+export default DashboardWithRoles;

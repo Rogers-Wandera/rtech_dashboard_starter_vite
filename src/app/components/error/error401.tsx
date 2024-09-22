@@ -1,7 +1,13 @@
+import { useAuth } from "@/hooks/auth.hooks";
 import { Container } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 // img
 const Error401 = () => {
+  const { token, isLoggedIn } = useAuth();
+
+  if (!isLoggedIn && !token) {
+    return <Navigate to="/" />;
+  }
   return (
     <>
       <div className="gradient">

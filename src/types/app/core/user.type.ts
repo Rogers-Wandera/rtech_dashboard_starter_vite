@@ -1,0 +1,21 @@
+export type User = {
+  id: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
+  tel: string;
+  verified: number;
+  creationDate: Date;
+  lastloginDate: Date;
+  isLocked: number;
+  isActive: number;
+  deleted_at: Date;
+  adminCreated: number;
+  position: string;
+  positionId: number;
+  gender: string;
+  userName: string;
+  image: string;
+  online: string;
+};

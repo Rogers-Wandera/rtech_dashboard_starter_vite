@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import AuthProvider from "../context/auth/auth.context";
+import MRT_TableContextProvider from "../context/table/mrttable.context";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -32,7 +33,9 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
                 limit={5}
                 autoClose={4000}
               />
-              <AuthProvider> {children}</AuthProvider>
+              <AuthProvider>
+                <MRT_TableContextProvider>{children}</MRT_TableContextProvider>
+              </AuthProvider>
             </PersistGate>
           </Provider>
         </Suspense>

@@ -15,7 +15,7 @@ const RouteRoles = <P extends WithRolesProps>(
     const results = user?.roles.map((role) => roles.includes(role));
     const checkResults = results.find((result) => result === true);
     if (!checkResults) {
-      return <Navigate to="/unauthorized" replace />;
+      return <Navigate to="/unauthorized" />;
     }
     return <Component {...(rest as P)} />;
   };

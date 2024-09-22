@@ -2,8 +2,8 @@ import { SettingState, SettingDefaultState } from "./interface";
 
 // Initial Setting State
 export const initialState: SettingState = {
-  saveLocal: "sessionStorage",
-  storeKey: "huisetting-react",
+  saveLocal: "localStorage",
+  storeKey: "rtech-setting-store",
   setting: {
     app_name: {
       value: import.meta.env.VITE_APP_NAME,
@@ -71,8 +71,8 @@ export const initialState: SettingState = {
 
 // Default Setting State
 export const defaultState: SettingDefaultState = {
-  saveLocal: "sessionStorage",
-  storeKey: "huisetting",
+  saveLocal: "localStorage",
+  storeKey: "rtechsettings",
   setting: {
     app_name: {
       target: '[data-setting="app_name"]',

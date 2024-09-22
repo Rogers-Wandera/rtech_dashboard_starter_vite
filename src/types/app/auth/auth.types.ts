@@ -1,14 +1,15 @@
 import { ROLES } from "@/types/enums/enum.types";
-import { IAuthUser, UserModuleRes } from "../../server/server.main.types";
+import {
+  IAuthUser,
+  ServerResponse,
+  UserModuleRes,
+} from "../../server/server.main.types";
 
 export interface ILoginValues {
   email: string;
   password: string;
 }
-export type ServerResponse = {
-  msg: string;
-  data?: any;
-};
+
 export type LoginResponse = ServerResponse & {
   accessToken: string;
 };

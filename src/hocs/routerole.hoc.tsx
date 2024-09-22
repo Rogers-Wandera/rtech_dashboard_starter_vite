@@ -1,10 +1,9 @@
+import { urlexcludes } from "@/assets/app/urlexcludes";
 import { useAuth } from "@/hooks/auth.hooks";
 import { RootState } from "@/lib/store/store";
 import { UserModuleRes } from "@/types/server/server.main.types";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-
-const urlexcludes: string[] = ["/dashboard"];
 
 const hasRouteRole = (modules: UserModuleRes, pathname: string): boolean => {
   if (urlexcludes.includes(pathname)) {
@@ -32,10 +31,10 @@ function WithRouteRole<P extends Object>(
     const { modules } = useAuth();
     const path = location.pathname;
     if (!loading && !modules && !urlexcludes.includes(path)) {
-      return <Navigate to="/unauthorized" replace />;
+      return <Navigate to="/unauthorized" />;
     }
     if (!hasRouteRole(modules, path)) {
-      return <Navigate to="/unauthorized" replace />;
+      return <Navigate to="/unauthorized" />;
     }
     return <Component {...props} />;
   };
