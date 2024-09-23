@@ -1,4 +1,4 @@
-import { MRT_ColumnDef } from "material-react-table";
+import { MRT_ColumnDef, MRT_Row, MRT_TableOptions } from "material-react-table";
 
 export type TableColumnConfigs<T extends Record<string, any>> = Omit<
   MRT_ColumnDef<T>,
@@ -28,7 +28,28 @@ export type TableColumns<T extends Record<string, any>> = {
   header?: string;
 };
 
+export type OtherTableOptions<T extends Record<string, any>> = Omit<
+  MRT_TableOptions<T>,
+  | "columns"
+  | "data"
+  | "enableEditing"
+  | "rowCount"
+  | "getRowId"
+  | "onRowSelectionChange"
+  | "onColumnFiltersChange"
+  | "onGlobalFilterChange"
+  | "onPaginationChange"
+  | "onSortingChange"
+  | "renderTopToolbarCustomActions"
+  | "muiToolbarAlertBannerProps"
+  | "state"
+>;
 export interface ServerSideProps<T extends Record<string, any>> {
   tablecolumns: TableColumns<T>[];
   columnConfigs?: TableColumnConfigs<T>[];
+  refetch?: () => void;
+  enableEditing?: boolean;
+  idField?: string | null;
+  otherTableOptions?: OtherTableOptions<T>;
+  enableRowSelection?: boolean | ((row: MRT_Row<T>) => boolean);
 }

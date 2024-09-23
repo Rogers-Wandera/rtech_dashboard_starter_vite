@@ -1,5 +1,7 @@
-import { MRT_ColumnDef } from "material-react-table";
+import { MRT_ColumnDef, MRT_TableInstance } from "material-react-table";
 import { TableColumnConfigs, TableColumns } from "./mrtserverside.configs";
+import { IconButton, Tooltip } from "@mui/material";
+import { Refresh } from "@mui/icons-material";
 
 export function GenerateColumns<TData extends Record<string, any>>(
   tablecolumns: TableColumns<TData>[],
@@ -25,4 +27,25 @@ export function GenerateColumns<TData extends Record<string, any>>(
     return columns;
   }
   return [];
+}
+
+export function RenderTopBarComponents<T extends Record<string, any>>({
+  table,
+  refetch = () => {},
+}: {
+  table: MRT_TableInstance<T>;
+  refetch?: () => void;
+}) {
+  return (
+    <Tooltip arrow title="Refresh Data">
+      <IconButton
+        onClick={() => {
+          table.setColumnFilters([]);
+          refetch();
+        }}
+      >
+        <Refresh />
+      </IconButton>
+    </Tooltip>
+  );
 }

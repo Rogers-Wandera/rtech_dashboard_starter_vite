@@ -1,8 +1,8 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import {
+  PaginateResponse,
   ServerErrorResponse,
-  ServerResponse,
 } from "@/types/server/server.main.types";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import { useAuth } from "./auth.hooks";
@@ -102,14 +102,23 @@ type tablegetprops = {
   onlyAuth?: boolean;
 };
 
-export function useFetchMrtTableData<T>({
+export function useMRTPaginateTable<T extends Record<string, any>>({
   queryKey,
   endPoint,
   onlyAuth = true,
   headers = {},
 }: tablegetprops) {
-  const { pagination, columnFilters, globalFilter, sorting } =
-    useMRTTableContext();
+  const {
+    pagination,
+    columnFilters,
+    globalFilter,
+    sorting,
+    setIsLoading,
+    setData,
+    setError,
+    setIsError,
+    setIsFetching,
+  } = useMRTTableContext<T>();
   const { token } = useAuth();
   const setUrlOptions = (url: URL) => {
     url.searchParams.set("page", JSON.stringify(pagination.pageIndex));
@@ -137,8 +146,9 @@ export function useFetchMrtTableData<T>({
     globalFilter,
     sorting,
   ];
+
   const { data, isError, isRefetching, isLoading, refetch, isFetching, error } =
-    useFetch<ServerResponse<T>>({
+    useFetch<PaginateResponse<T>>({
       endPoint,
       queryKey: newqueryKey,
       headers,
@@ -152,7 +162,12 @@ export function useFetchMrtTableData<T>({
         notifier.error({ message: error.message });
       }
     }
-  }, [error, isError]);
+    setIsError(isError);
+    setIsLoading(isLoading);
+    setIsFetching(isFetching);
+    setData(data);
+    setError(error);
+  }, [isLoading, data, isError, error, onlyAuth, token, isFetching]);
   return {
     data,
     isError,
