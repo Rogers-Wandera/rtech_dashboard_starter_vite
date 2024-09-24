@@ -1,24 +1,29 @@
-import { persistor, store } from "@/lib/store/store";
+import { persistor } from "@/lib/store/store";
 import { Loader, MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { Suspense } from "react";
-import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import AuthProvider from "../context/auth/auth.context";
 import MRT_TableContextProvider from "../context/table/mrttable.context";
+import { useMaterialTheme } from "../themes/material.theme";
+import { ThemeProvider } from "@mui/material";
+import { ModalsProvider } from "@mantine/modals";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
+  const MaterialTheme = useMaterialTheme();
   return (
     <>
-      <MantineProvider>
-        <Suspense
-          fallback={
-            <div className="centered-loader">
-              <Loader type="bars" color="blue" />
-            </div>
-          }
-        >
-          <Provider store={store}>
+      <ThemeProvider theme={MaterialTheme}>
+        <MantineProvider>
+          <Suspense
+            fallback={
+              <div className="centered-loader">
+                <Loader type="bars" color="blue" />
+              </div>
+            }
+          >
             <PersistGate
               persistor={persistor}
               loading={
@@ -34,12 +39,18 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
                 autoClose={4000}
               />
               <AuthProvider>
-                <MRT_TableContextProvider>{children}</MRT_TableContextProvider>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <ModalsProvider>
+                    <MRT_TableContextProvider>
+                      {children}
+                    </MRT_TableContextProvider>
+                  </ModalsProvider>
+                </LocalizationProvider>
               </AuthProvider>
             </PersistGate>
-          </Provider>
-        </Suspense>
-      </MantineProvider>
+          </Suspense>
+        </MantineProvider>
+      </ThemeProvider>
     </>
   );
 };

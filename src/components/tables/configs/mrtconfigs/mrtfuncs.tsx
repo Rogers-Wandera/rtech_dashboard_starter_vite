@@ -1,7 +1,13 @@
-import { MRT_ColumnDef, MRT_TableInstance } from "material-react-table";
-import { TableColumnConfigs, TableColumns } from "./mrtserverside.configs";
-import { IconButton, Tooltip } from "@mui/material";
-import { Refresh } from "@mui/icons-material";
+import { MRT_ColumnDef } from "material-react-table";
+import {
+  TableColumnConfigs,
+  TableColumns,
+  TopToolBarProps,
+} from "./mrtserverside.configs";
+import { Box, IconButton, Tooltip } from "@mui/material";
+import { ArrowBack, Refresh } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 
 export function GenerateColumns<TData extends Record<string, any>>(
   tablecolumns: TableColumns<TData>[],
@@ -32,20 +38,51 @@ export function GenerateColumns<TData extends Record<string, any>>(
 export function RenderTopBarComponents<T extends Record<string, any>>({
   table,
   refetch = () => {},
-}: {
-  table: MRT_TableInstance<T>;
-  refetch?: () => void;
-}) {
+  showback = false,
+  showCreateBtn = true,
+  otherTableOptions = {},
+}: TopToolBarProps<T>) {
+  const navigate = useNavigate();
   return (
-    <Tooltip arrow title="Refresh Data">
-      <IconButton
-        onClick={() => {
-          table.setColumnFilters([]);
-          refetch();
-        }}
-      >
-        <Refresh />
-      </IconButton>
-    </Tooltip>
+    <Box>
+      {showback && (
+        <Tooltip arrow title="Go back">
+          <IconButton
+            onClick={() => {
+              navigate(-1);
+            }}
+            color="secondary"
+          >
+            <ArrowBack />
+          </IconButton>
+        </Tooltip>
+      )}
+      <Tooltip arrow title="Refresh Data">
+        <IconButton
+          onClick={() => {
+            table.setColumnFilters([]);
+            refetch();
+          }}
+        >
+          <Refresh />
+        </IconButton>
+      </Tooltip>
+      {showCreateBtn && (
+        <Tooltip arrow title={"Add New"}>
+          <IconButton
+            onClick={() => {
+              table.setCreatingRow(true);
+              if (otherTableOptions?.createDisplayMode === "custom") {
+                // if (customCallback) {
+                //   customCallback(table);
+                // }
+              }
+            }}
+          >
+            <AddBoxIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Box>
   );
 }

@@ -1,25 +1,24 @@
-import {
-  MaterialReactTable,
-  MRT_ColumnDef,
-  useMaterialReactTable,
-} from "material-react-table";
-import { useEffect, useMemo } from "react";
-import { ServerSideProps } from "./configs/mrtconfigs/mrtserverside.configs";
-import {
-  GenerateColumns,
-  RenderTopBarComponents,
-} from "./configs/mrtconfigs/mrtfuncs";
+import { MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
+import { ServerSideProps } from "../configs/mrtconfigs/mrtserverside.configs";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
+import { RenderTopBarComponents } from "../configs/mrtconfigs/mrtfuncs";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 
-export const MRT_ServerTable = <TData extends Record<string, any>>({
-  tablecolumns,
-  columnConfigs = [],
+type tableProps<TData extends Record<string, any>> = ServerSideProps<TData> & {
+  columns: MRT_ColumnDef<TData, any>[];
+};
+
+export function RenderTable<TData extends Record<string, any>>({
+  columns,
   refetch = () => {},
   enableEditing = false,
   idField = "id",
   otherTableOptions = {},
   enableRowSelection = false,
-}: ServerSideProps<TData>) => {
+  showback = false,
+  showCreateBtn = true,
+}: tableProps<TData>) {
   const {
     columnFilters,
     globalFilter,
@@ -27,7 +26,6 @@ export const MRT_ServerTable = <TData extends Record<string, any>>({
     pagination,
     setColumnFilters,
     setGlobalFilter,
-    setManual,
     setPagination,
     setRowSelection,
     setSorting,
@@ -40,12 +38,9 @@ export const MRT_ServerTable = <TData extends Record<string, any>>({
     setColumnVisibility,
     columnVisibility,
   } = useMRTTableContext<TData>();
-
-  const columns = useMemo<MRT_ColumnDef<TData>[]>(
-    () => GenerateColumns(tablecolumns, columnConfigs),
-    [columnConfigs, tablecolumns]
+  const theme = useSelector(
+    (state: RootState) => state.setting.setting.theme_scheme.value
   );
-
   const table = useMaterialReactTable({
     columns,
     enableEditing,
@@ -61,7 +56,13 @@ export const MRT_ServerTable = <TData extends Record<string, any>>({
     enableRowActions: enableEditing,
     enableRowSelection,
     renderTopToolbarCustomActions: ({ table }) =>
-      RenderTopBarComponents({ table, refetch }),
+      RenderTopBarComponents({
+        table,
+        refetch,
+        showback,
+        showCreateBtn,
+        otherTableOptions,
+      }),
     muiToolbarAlertBannerProps: isError
       ? {
           color: "error",
@@ -69,6 +70,18 @@ export const MRT_ServerTable = <TData extends Record<string, any>>({
         }
       : undefined,
     ...otherTableOptions,
+    muiTableBodyRowProps: ({ row }) => ({
+      sx: {
+        fontWeight: row.getIsSelected() ? "bold" : "normal",
+      },
+    }),
+    muiTableBodyProps: {
+      sx: {
+        "& tr:nth-of-type(odd) > td": {
+          backgroundColor: theme === "light" ? "#f5f5f5" : "#222738",
+        },
+      },
+    },
     state: {
       isLoading,
       showAlertBanner: isError,
@@ -81,13 +94,5 @@ export const MRT_ServerTable = <TData extends Record<string, any>>({
       columnVisibility,
     },
   });
-
-  useEffect(() => {
-    setManual(true);
-  }, [pagination, sorting, globalFilter]);
-  return (
-    <div>
-      <MaterialReactTable table={table} />
-    </div>
-  );
-};
+  return table;
+}

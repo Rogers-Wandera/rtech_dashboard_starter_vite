@@ -1,4 +1,9 @@
-import { MRT_ColumnDef, MRT_Row, MRT_TableOptions } from "material-react-table";
+import {
+  MRT_ColumnDef,
+  MRT_Row,
+  MRT_TableInstance,
+  MRT_TableOptions,
+} from "material-react-table";
 
 export type TableColumnConfigs<T extends Record<string, any>> = Omit<
   MRT_ColumnDef<T>,
@@ -52,4 +57,14 @@ export interface ServerSideProps<T extends Record<string, any>> {
   idField?: string | null;
   otherTableOptions?: OtherTableOptions<T>;
   enableRowSelection?: boolean | ((row: MRT_Row<T>) => boolean);
+  showback?: boolean;
+  showCreateBtn?: boolean;
 }
+
+export type TopToolBarProps<T extends Record<string, any>> = {
+  table: MRT_TableInstance<T>;
+  refetch?: () => void;
+  showback?: boolean;
+  showCreateBtn?: boolean;
+  otherTableOptions?: OtherTableOptions<T>;
+};
