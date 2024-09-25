@@ -1,16 +1,26 @@
-import { MRT_ColumnDef, useMaterialReactTable } from "material-react-table";
+import {
+  MRT_ColumnDef,
+  MRT_Row,
+  useMaterialReactTable,
+} from "material-react-table";
 import { ServerSideProps } from "../configs/mrtconfigs/mrtserverside.configs";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
-import { RenderTopBarComponents } from "../configs/mrtconfigs/mrtfuncs";
+import {
+  HandleRenderAddEditDialogs,
+  HandleRenderRowActionMenus,
+  RenderTopBarComponents,
+} from "../configs/mrtconfigs/mrtfuncs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 
 type tableProps<TData extends Record<string, any>> = ServerSideProps<TData> & {
   columns: MRT_ColumnDef<TData, any>[];
+  HandleDeleteData?: (row: MRT_Row<TData>) => void;
 };
 
 export function RenderTable<TData extends Record<string, any>>({
   columns,
+  title,
   refetch = () => {},
   enableEditing = false,
   idField = "id",
@@ -18,6 +28,11 @@ export function RenderTable<TData extends Record<string, any>>({
   enableRowSelection = false,
   showback = false,
   showCreateBtn = true,
+  additionaltopbaractions = [],
+  addeditprops = {},
+  menuitems = [],
+  rowactions = undefined,
+  HandleDeleteData = () => {},
 }: tableProps<TData>) {
   const {
     columnFilters,
@@ -55,6 +70,13 @@ export function RenderTable<TData extends Record<string, any>>({
     onColumnVisibilityChange: setColumnVisibility,
     enableRowActions: enableEditing,
     enableRowSelection,
+    ...HandleRenderAddEditDialogs<TData>({ ...addeditprops }),
+    ...HandleRenderRowActionMenus({
+      title,
+      menuitems,
+      rowactions,
+      HandleDeleteData,
+    }),
     renderTopToolbarCustomActions: ({ table }) =>
       RenderTopBarComponents({
         table,
@@ -62,6 +84,7 @@ export function RenderTable<TData extends Record<string, any>>({
         showback,
         showCreateBtn,
         otherTableOptions,
+        additionaltopbaractions,
       }),
     muiToolbarAlertBannerProps: isError
       ? {

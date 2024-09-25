@@ -4,6 +4,7 @@ import RouteRoles from "@/hocs/verifyroles";
 import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
 import { User } from "@/types/app/core/user.type";
 import { PaginateResponse } from "@/types/server/server.main.types";
+import { Edit, Delete } from "@mui/icons-material";
 
 const ManageUsers = () => {
   const moretableconfigs: TableColumnConfigs<User>[] = [
@@ -24,6 +25,16 @@ const ManageUsers = () => {
         ]}
         columnConfigs={moretableconfigs}
         refetch={refetch}
+        title="User"
+        enableEditing={true}
+        rowactions={{
+          editrender: true,
+          deleterender: true,
+          actiontype: "menu",
+        }}
+        menuitems={[
+          { label: "Lock", icon: <Delete />, onClick: () => {}, render: false },
+        ]}
       />
     </div>
   );
