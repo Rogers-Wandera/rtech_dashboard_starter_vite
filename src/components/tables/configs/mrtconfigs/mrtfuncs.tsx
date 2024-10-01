@@ -208,7 +208,7 @@ export function HandleRenderAddEditDialogs<T extends Record<string, any>>({
 }
 
 type rowactions<T extends Record<string, any>> = {
-  rowactions?: rowactionconfigs;
+  rowactions?: rowactionconfigs<T>;
   HandleDeleteData?: (row: MRT_Row<T>) => void;
   menuitems?: RowMenuItems<T>[];
   title: string;
@@ -231,24 +231,44 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
         table,
         closeMenu = () => {},
       }: actiontypeprops<T>) => {
+        const editrender =
+          typeof rowactions.editrender === "function"
+            ? rowactions.editrender(row)
+            : rowactions.editrender;
+        const deleterender =
+          typeof rowactions.deleterender === "function"
+            ? rowactions.deleterender(row)
+            : rowactions.deleterender;
         const additionalcolumns = menuitems.map((item, index) => {
-          const render = item.render === undefined ? true : item.render;
+          const render =
+            item.render === undefined
+              ? true
+              : typeof item.render === "function"
+              ? item.render(row)
+              : item.render;
           if (render) {
             return (
               <MRT_ActionMenuItem
                 key={`${item.label}-${index}`}
-                icon={item.icon}
-                label={item.label}
+                icon={
+                  typeof item.icon === "function" ? item.icon(row) : item.icon
+                }
+                label={
+                  typeof item.label === "function"
+                    ? item.label(row)
+                    : item.label
+                }
                 table={table}
                 onClick={() => {
-                  item.onClick(row, table, closeMenu);
+                  item.onClick(row, table);
+                  closeMenu();
                 }}
               />
             );
           }
         });
         return [
-          rowactions.editrender && (
+          editrender && (
             <MRT_ActionMenuItem
               icon={<Edit sx={{ color: "green" }} />}
               key="edit"
@@ -260,7 +280,7 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
               table={table}
             />
           ),
-          rowactions.deleterender && (
+          deleterender && (
             <MRT_ActionMenuItem
               icon={<Delete sx={{ color: "red" }} />}
               key="delete"
@@ -279,18 +299,38 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
   } else {
     return {
       renderRowActions: ({ row, table }: actiontypeprops<T>) => {
+        const editrender =
+          typeof rowactions.editrender === "function"
+            ? rowactions.editrender(row)
+            : rowactions.editrender;
+        const deleterender =
+          typeof rowactions.deleterender === "function"
+            ? rowactions.deleterender(row)
+            : rowactions.deleterender;
         const additionalcolumns = menuitems.map((item, index) => {
-          const render = item.render === undefined ? true : item.render;
+          const render =
+            item.render === undefined
+              ? true
+              : typeof item.render === "function"
+              ? item.render(row)
+              : item.render;
           if (render) {
             return (
-              <Tooltip key={`${item.label}-${index}`} title={item.label}>
+              <Tooltip
+                key={`${item.label}-${index}`}
+                title={
+                  typeof item.label === "function"
+                    ? item.label(row)
+                    : item.label
+                }
+              >
                 <IconButton
                   color="primary"
                   onClick={() => {
                     item.onClick(row, table);
                   }}
                 >
-                  {item.icon}
+                  {typeof item.icon === "function" ? item.icon(row) : item.icon}
                 </IconButton>
               </Tooltip>
             );
@@ -298,14 +338,14 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
         });
         return (
           <Box sx={{ display: "flex", gap: "1rem" }}>
-            {rowactions && (
+            {editrender && (
               <Tooltip title={"Edit " + title}>
                 <IconButton onClick={() => table.setEditingRow(row)}>
                   <Edit />
                 </IconButton>
               </Tooltip>
             )}
-            {rowactions && (
+            {deleterender && (
               <Tooltip title={"Delete " + title}>
                 <IconButton color="error" onClick={() => HandleDeleteData(row)}>
                   <Delete />

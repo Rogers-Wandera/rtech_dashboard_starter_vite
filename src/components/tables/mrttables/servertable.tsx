@@ -22,7 +22,6 @@ export function RenderTable<TData extends Record<string, any>>({
   columns,
   title,
   refetch = () => {},
-  enableEditing = false,
   idField = "id",
   otherTableOptions = {},
   enableRowSelection = false,
@@ -56,9 +55,15 @@ export function RenderTable<TData extends Record<string, any>>({
   const theme = useSelector(
     (state: RootState) => state.setting.setting.theme_scheme.value
   );
+
+  const rowmenuactions = HandleRenderRowActionMenus({
+    title,
+    menuitems,
+    rowactions,
+    HandleDeleteData,
+  });
   const table = useMaterialReactTable({
     columns,
-    enableEditing,
     data: data?.docs || [],
     rowCount: data?.totalDocs || 0,
     getRowId: (row) => row[idField as string],
@@ -68,15 +73,10 @@ export function RenderTable<TData extends Record<string, any>>({
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
-    enableRowActions: enableEditing,
+    enableRowActions: true,
     enableRowSelection,
     ...HandleRenderAddEditDialogs<TData>({ ...addeditprops }),
-    ...HandleRenderRowActionMenus({
-      title,
-      menuitems,
-      rowactions,
-      HandleDeleteData,
-    }),
+    ...rowmenuactions,
     renderTopToolbarCustomActions: ({ table }) =>
       RenderTopBarComponents({
         table,

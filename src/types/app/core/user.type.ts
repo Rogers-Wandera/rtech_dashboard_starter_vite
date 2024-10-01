@@ -18,4 +18,5 @@ export type User = {
   userName: string;
   image: string;
   online: string;
+  last_active: number;
 };

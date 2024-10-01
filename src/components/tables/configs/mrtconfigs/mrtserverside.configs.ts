@@ -95,6 +95,9 @@ export type OtherTableOptions<T extends Record<string, any>> = Omit<
   | "renderTopToolbarCustomActions"
   | "muiToolbarAlertBannerProps"
   | "state"
+  | "enableRowActions"
+  | "renderRowActions"
+  | "renderRowActionMenuItems"
 >;
 export interface ServerSideProps<T extends Record<string, any>> {
   tablecolumns: TableColumns<T>[];
@@ -110,7 +113,7 @@ export interface ServerSideProps<T extends Record<string, any>> {
   addeditprops?: addeditprops;
   title: string;
   menuitems?: RowMenuItems<T>[];
-  rowactions?: rowactionconfigs;
+  rowactions?: rowactionconfigs<T>;
 }
 
 export type TopToolBarProps<T extends Record<string, any>> = {
@@ -129,18 +132,14 @@ export type actiontypeprops<T extends Record<string, any>> = {
 };
 
 export type RowMenuItems<T extends Record<string, any>> = {
-  label: string;
-  icon: React.ReactNode;
-  onClick: (
-    row: MRT_Row<T>,
-    table: MRT_TableInstance<T>,
-    closeMenu?: () => void
-  ) => void;
-  render?: boolean;
+  label: string | ((row: MRT_Row<T>) => string);
+  icon: React.ReactNode | ((row: MRT_Row<T>) => React.ReactNode);
+  onClick: (row: MRT_Row<T>, table: MRT_TableInstance<T>) => void;
+  render?: boolean | ((row: MRT_Row<T>) => boolean);
 };
 
-export interface rowactionconfigs {
-  actiontype: "menu" | "inline";
-  deleterender: boolean;
-  editrender: boolean;
+export interface rowactionconfigs<T extends Record<string, any>> {
+  actiontype?: "menu" | "inline";
+  deleterender?: boolean | ((row: MRT_Row<T>) => boolean);
+  editrender?: boolean | ((row: MRT_Row<T>) => boolean);
 }
