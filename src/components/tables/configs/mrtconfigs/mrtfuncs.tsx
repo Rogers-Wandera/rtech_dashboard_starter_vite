@@ -218,8 +218,8 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
   title,
   HandleDeleteData = () => {},
   rowactions = {
-    editrender: false,
-    deleterender: false,
+    editrender: true,
+    deleterender: true,
     actiontype: "menu",
   },
   menuitems = [],

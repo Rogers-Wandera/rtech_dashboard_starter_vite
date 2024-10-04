@@ -51,14 +51,10 @@ const ManageUsers = () => {
         columnConfigs={moretableconfigs}
         refetch={refetch}
         title="User"
+        enableRowActions={true}
         enableEditing={true}
         rowactions={{
-          editrender: (row) =>
-            row.original.id === user?.id
-              ? false
-              : row.original.isLocked === 1
-              ? false
-              : true,
+          editrender: false,
           deleterender: (row) => (row.original.id === user?.id ? false : true),
           actiontype: "menu",
         }}

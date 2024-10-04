@@ -1,11 +1,13 @@
 import { ButtonOwnProps } from "@mui/material";
 import {
+  MRT_Cell,
+  MRT_Column,
   MRT_ColumnDef,
   MRT_Row,
   MRT_TableInstance,
   MRT_TableOptions,
 } from "material-react-table";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 export type TableColumnConfigs<T extends Record<string, any>> = Omit<
   MRT_ColumnDef<T>,
@@ -52,6 +54,12 @@ export type TableColumns<T extends Record<string, any>> = {
     | "time-range"
     | undefined;
   header?: string;
+  Edit?: (props: {
+    cell: MRT_Cell<T, unknown>;
+    column: MRT_Column<T, unknown>;
+    row: MRT_Row<T>;
+    table: MRT_TableInstance<T>;
+  }) => ReactNode;
 };
 
 export interface additionaltopbaractions<T extends Record<string, any>> {
@@ -114,6 +122,7 @@ export interface ServerSideProps<T extends Record<string, any>> {
   title: string;
   menuitems?: RowMenuItems<T>[];
   rowactions?: rowactionconfigs<T>;
+  enableRowActions?: boolean;
 }
 
 export type TopToolBarProps<T extends Record<string, any>> = {

@@ -66,3 +66,13 @@ type NoFetchType<T = any> = {
   msg: string;
 };
 export type ServerResponse<T = any> = fetchType<T> | NoFetchType<T>;
+
+export type BaseTableType {
+  creationDate: Date;
+  createdBy: string;
+  updateDate: Date;
+  updatedBy: string;
+  deletedAt: Date;
+  deletedBy: string;
+  isActive: number;
+}

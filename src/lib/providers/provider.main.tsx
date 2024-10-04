@@ -10,8 +10,9 @@ import { ThemeProvider } from "@mui/material";
 import { ModalsProvider } from "@mantine/modals";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Outlet } from "react-router-dom";
 
-const Providers = ({ children }: { children: React.ReactNode }) => {
+const Providers = () => {
   const MaterialTheme = useMaterialTheme();
   return (
     <>
@@ -42,7 +43,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <ModalsProvider>
                     <MRT_TableContextProvider>
-                      {children}
+                      <Outlet />
                     </MRT_TableContextProvider>
                   </ModalsProvider>
                 </LocalizationProvider>

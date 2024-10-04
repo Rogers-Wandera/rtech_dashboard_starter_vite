@@ -10,7 +10,8 @@ import {
   MRT_SortingState,
   MRT_VisibilityState,
 } from "material-react-table";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const initialState: MRT_TableContextState<unknown> = {
   manual: true,
@@ -46,6 +47,7 @@ const MRT_TableContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const location = useLocation();
   const [manual, setManual] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -68,6 +70,21 @@ const MRT_TableContextProvider = ({
     pageIndex: 0,
     pageSize: 5,
   });
+
+  useEffect(() => {
+    setRowSelection({});
+    setGlobalFilter("");
+    setPagination({ pageIndex: 0, pageSize: 5 });
+    setSorting([]);
+    setData(undefined);
+    setColumnFilters([]);
+    setColumnVisibility({});
+    setError(null);
+    setIsError(false);
+    setIsFetching(false);
+    setIsLoading(false);
+    setManual(true);
+  }, [location.pathname]);
   return (
     <MRT_TableContext.Provider
       value={{

@@ -30,7 +30,8 @@ export function RenderTable<TData extends Record<string, any>>({
   additionaltopbaractions = [],
   addeditprops = {},
   menuitems = [],
-  rowactions = undefined,
+  rowactions = { editrender: true, deleterender: true, actiontype: "menu" },
+  enableRowActions = false,
   HandleDeleteData = () => {},
 }: tableProps<TData>) {
   const {
@@ -73,7 +74,7 @@ export function RenderTable<TData extends Record<string, any>>({
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
-    enableRowActions: true,
+    enableRowActions,
     enableRowSelection,
     ...HandleRenderAddEditDialogs<TData>({ ...addeditprops }),
     ...rowmenuactions,
