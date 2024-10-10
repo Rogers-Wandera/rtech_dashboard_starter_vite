@@ -25,6 +25,17 @@ export interface PaginateResponse<T = Record<string, unknown>> {
   totalDocs: number;
   totalPages: number;
   page: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface IPaginate<T = Record<string, any>>  {
+  limit: number;
+  page: number;
+  sortBy?: { id: keyof T; desc?: boolean }[];
+  conditions?: Partial<T> | null;
+  filters?: { id: keyof T; value: string }[];
+  globalFilter?: string | null;
 }
 
 export interface ServerErrorResponse {

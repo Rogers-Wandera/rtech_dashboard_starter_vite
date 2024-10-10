@@ -9,9 +9,12 @@ import { usermenuitems, userscolumns } from "./userconfig";
 import MaleImage from "@/assets/images/avatars/01.png";
 import FemaleImage from "@/assets/images/avatars/lady.png";
 import { Avatar } from "@mui/material";
+import ServerCombo from "@/components/shared/serversidecombo/servercombo";
+import { useState } from "react";
 
 const ManageUsers = () => {
   const { user } = useAuth();
+  const [value, setValue] = useState("");
   const moretableconfigs: TableColumnConfigs<User>[] = [
     { accessorKey: "gender", filterSelectOptions: ["Male", "Female"] },
     {
@@ -46,6 +49,14 @@ const ManageUsers = () => {
 
   return (
     <div>
+      <ServerCombo<User>
+        endPoint="core/auth/user"
+        label="User Name"
+        textKey="userName"
+        valueKey="id"
+        setValue={setValue}
+        value={value}
+      />
       <MRT_ServerTable<User>
         tablecolumns={userscolumns}
         columnConfigs={moretableconfigs}

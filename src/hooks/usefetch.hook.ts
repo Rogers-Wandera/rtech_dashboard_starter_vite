@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import {
+  IPaginate,
   PaginateResponse,
   ServerErrorResponse,
 } from "@/types/server/server.main.types";
@@ -8,12 +9,13 @@ import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import { useAuth } from "./auth.hooks";
 import { useEffect } from "react";
 import { notifier } from "@/lib/utils/notify/notification";
+import { usePaginateContext } from "@/lib/context/paginate/paginate.context";
 
 type props = {
   queryKey: string | any[];
   url?: string;
   endPoint?: string;
-  headers?: AxiosRequestConfig["headers"];
+  configs?: AxiosRequestConfig;
   setUrlOptions?: (url: URL) => URL;
   canfetch?: boolean | null;
 };
@@ -23,7 +25,7 @@ export function useFetch<T = any>({
   setUrlOptions = undefined,
   url = undefined,
   endPoint = "",
-  headers = {},
+  configs = {},
   canfetch = null,
 }: props) {
   const { manual, setManual } = useMRTTableContext();
@@ -57,9 +59,7 @@ export function useFetch<T = any>({
     queryKey: [queryKey],
     queryFn: async function () {
       try {
-        const response = await axios.get<T>(fetchUrl.href, {
-          headers,
-        });
+        const response = await axios.get<T>(fetchUrl.href, configs);
         setManual(false);
         return response.data;
       } catch (error) {
@@ -95,10 +95,10 @@ export function useFetch<T = any>({
   };
 }
 
-type tablegetprops = {
+type getprops = {
   queryKey: string;
   endPoint: string;
-  headers?: AxiosRequestConfig["headers"];
+  configs?: AxiosRequestConfig;
   onlyAuth?: boolean;
 };
 
@@ -106,8 +106,8 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
   queryKey,
   endPoint,
   onlyAuth = true,
-  headers = {},
-}: tablegetprops) {
+  configs = {},
+}: getprops) {
   const {
     pagination,
     columnFilters,
@@ -132,7 +132,10 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
   if (onlyAuth) {
     if (token && token?.length > 0) {
       canfetch = null;
-      headers["Authorization"] = `Bearer ${token}`;
+      configs = {
+        ...configs,
+        headers: { ...configs?.headers, Authorization: `Bearer ${token}` },
+      };
     } else {
       canfetch = false;
     }
@@ -151,7 +154,7 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
     useFetch<PaginateResponse<T>>({
       endPoint,
       queryKey: newqueryKey,
-      headers,
+      configs,
       setUrlOptions,
       canfetch,
     });
@@ -168,6 +171,79 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
     setData(data);
     setError(error);
   }, [isLoading, data, isError, error, onlyAuth, token, isFetching]);
+  return {
+    data,
+    isError,
+    isRefetching,
+    isLoading,
+    refetch,
+    isFetching,
+    error,
+  };
+}
+
+export function useFetchPaginate<T extends Record<string, any>>({
+  queryKey,
+  onlyAuth,
+  configs,
+  endPoint,
+  limit = 5,
+}: getprops & { limit?: number }) {
+  const { paginate, setPaginate } = usePaginateContext<T>();
+  const { token } = useAuth();
+  const setUrlOptions = (url: URL) => {
+    url.searchParams.set("page", JSON.stringify(paginate.page));
+    url.searchParams.set("limit", JSON.stringify(paginate.limit));
+    url.searchParams.set("filters", JSON.stringify(paginate.filters ?? []));
+    url.searchParams.set("globalFilter", paginate.globalFilter ?? "");
+    url.searchParams.set("sortBy", JSON.stringify(paginate.sortBy));
+    return url;
+  };
+
+  let canfetch = null;
+  if (onlyAuth) {
+    if (token && token?.length > 0) {
+      canfetch = null;
+      configs = {
+        ...configs,
+        headers: { ...configs?.headers, Authorization: `Bearer ${token}` },
+      };
+    } else {
+      canfetch = false;
+    }
+  }
+
+  const { data, isError, isRefetching, isLoading, refetch, isFetching, error } =
+    useFetch<PaginateResponse<T>>({
+      endPoint,
+      queryKey,
+      configs,
+      setUrlOptions,
+      canfetch,
+    });
+
+  useEffect(() => {
+    if (onlyAuth && token && token?.length > 0) {
+      if (isError && error) {
+        notifier.error({ message: error.message });
+      }
+    }
+    setPaginate({
+      page: 0,
+      limit: 5,
+      globalFilter: null,
+      filters: [],
+      sortBy: [],
+    });
+  }, [isError, error, onlyAuth, token]);
+
+  useEffect(() => {
+    refetch();
+  }, [paginate]);
+
+  useEffect(() => {
+    setPaginate({ ...paginate, limit: limit });
+  }, [limit]);
   return {
     data,
     isError,

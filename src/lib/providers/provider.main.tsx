@@ -11,6 +11,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Outlet } from "react-router-dom";
+import PaginateProvider from "../context/paginate/paginate.context";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
@@ -42,9 +43,11 @@ const Providers = () => {
               <AuthProvider>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <ModalsProvider>
-                    <MRT_TableContextProvider>
-                      <Outlet />
-                    </MRT_TableContextProvider>
+                    <PaginateProvider>
+                      <MRT_TableContextProvider>
+                        <Outlet />
+                      </MRT_TableContextProvider>
+                    </PaginateProvider>
                   </ModalsProvider>
                 </LocalizationProvider>
               </AuthProvider>
