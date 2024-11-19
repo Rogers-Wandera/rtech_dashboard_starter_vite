@@ -7,9 +7,9 @@ import {
 } from "@/types/server/server.main.types";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import { useAuth } from "./auth.hooks";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { notifier } from "@/lib/utils/notify/notification";
-import { usePaginateContext } from "@/lib/context/paginate/paginate.context";
+// import { usePaginateContext } from "@/lib/context/paginate/paginate.context";
 
 type props = {
   queryKey: string | any[];
@@ -120,14 +120,19 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
     setIsFetching,
   } = useMRTTableContext<T>();
   const { token } = useAuth();
-  const setUrlOptions = (url: URL) => {
-    url.searchParams.set("page", JSON.stringify(pagination.pageIndex));
-    url.searchParams.set("limit", JSON.stringify(pagination.pageSize));
-    url.searchParams.set("filters", JSON.stringify(columnFilters ?? []));
-    url.searchParams.set("globalFilter", globalFilter ?? "");
-    url.searchParams.set("sortBy", JSON.stringify(sorting));
-    return url;
-  };
+
+  console.log(pagination);
+  const setUrlOptions = useCallback(
+    (url: URL) => {
+      url.searchParams.set("page", (pagination.pageIndex + 1).toString());
+      url.searchParams.set("limit", pagination.pageSize.toString());
+      url.searchParams.set("filters", JSON.stringify(columnFilters ?? []));
+      url.searchParams.set("globalFilter", globalFilter ?? "");
+      url.searchParams.set("sortBy", JSON.stringify(sorting));
+      return url;
+    },
+    [pagination, columnFilters, globalFilter, sorting]
+  );
   let canfetch = null;
   if (onlyAuth) {
     if (token && token?.length > 0) {
@@ -141,14 +146,17 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
     }
   }
 
-  const newqueryKey = [
-    queryKey,
-    pagination.pageIndex,
-    pagination.pageSize,
-    columnFilters,
-    globalFilter,
-    sorting,
-  ];
+  const newqueryKey = useMemo(
+    () => [
+      queryKey,
+      pagination.pageIndex,
+      pagination.pageSize,
+      columnFilters,
+      globalFilter,
+      sorting,
+    ],
+    [queryKey, pagination, columnFilters, globalFilter, sorting]
+  );
 
   const { data, isError, isRefetching, isLoading, refetch, isFetching, error } =
     useFetch<PaginateResponse<T>>({
@@ -188,8 +196,17 @@ export function useFetchPaginate<T extends Record<string, any>>({
   configs,
   endPoint,
   limit = 5,
-}: getprops & { limit?: number }) {
-  const { paginate, setPaginate } = usePaginateContext<T>();
+  url = undefined,
+}: getprops & { limit?: number; url?: string }) {
+  const [paginate, setPaginate] = useState<IPaginate<T>>({
+    page: 1,
+    limit: limit,
+    globalFilter: null,
+    sortBy: [],
+    filters: [],
+    conditions: null,
+  });
+
   const { token } = useAuth();
   const setUrlOptions = (url: URL) => {
     url.searchParams.set("page", JSON.stringify(paginate.page));
@@ -220,6 +237,7 @@ export function useFetchPaginate<T extends Record<string, any>>({
       configs,
       setUrlOptions,
       canfetch,
+      url,
     });
 
   useEffect(() => {
@@ -252,5 +270,7 @@ export function useFetchPaginate<T extends Record<string, any>>({
     refetch,
     isFetching,
     error,
+    paginate,
+    setPaginate,
   };
 }

@@ -10,7 +10,8 @@ import {
   ServerResponse,
   UserModuleRes,
 } from "@/types/server/server.main.types";
-import { LoginResponse } from "@/types/app/auth/auth.types";
+import { LoginResponse, RegisterResponse } from "@/types/app/auth/auth.types";
+import { User } from "@/types/app/core/user.type";
 
 export const AuthApi = createApi({
   reducerPath: "authapi",
@@ -30,7 +31,7 @@ export const AuthApi = createApi({
   endpoints: (builder) => ({
     Login: builder.mutation({
       query: (payload: { email: string; password: string }) => ({
-        url: `${AuthEndpoint}/user/login`,
+        url: `${AuthEndpoint}/users/login`,
         method: "POST",
         body: payload,
       }),
@@ -41,6 +42,24 @@ export const AuthApi = createApi({
         return error;
       },
       transformResponse: (response: LoginResponse) => {
+        return response;
+      },
+    }),
+    Register: builder.mutation({
+      query: (
+        payload: Partial<User> & { confirmpassword: string; positionId: string }
+      ) => ({
+        url: `${AuthEndpoint}/users/register`,
+        method: "POST",
+        body: payload,
+      }),
+      transformErrorResponse: (error: FetchBaseQueryError) => {
+        if (error.data) {
+          return error.data as ServerErrorResponse;
+        }
+        return error;
+      },
+      transformResponse: (response: RegisterResponse) => {
         return response;
       },
     }),
@@ -64,7 +83,7 @@ export const AuthApi = createApi({
         password: string;
         confirmpassword: string;
       }) => ({
-        url: `${AuthEndpoint}/user/reset/${payload.userId}`,
+        url: `${AuthEndpoint}/users/reset/${payload.userId}`,
         method: "POST",
         body: {
           password: payload.password,
@@ -83,7 +102,7 @@ export const AuthApi = createApi({
     }),
     ResetPasswordLink: builder.mutation({
       query: (payload: { email: string }) => ({
-        url: `${AuthEndpoint}/user/resetlink`,
+        url: `${AuthEndpoint}/users/resetlink`,
         method: "POST",
         body: payload,
       }),
@@ -104,7 +123,7 @@ export const AuthApi = createApi({
         confirmpassword: string;
         password: string;
       }) => ({
-        url: `${AuthEndpoint}/user/resetpassword/${payload.userId}/${payload.token}`,
+        url: `${AuthEndpoint}/users/resetpassword/${payload.userId}/${payload.token}`,
         method: "POST",
         body: {
           password: payload.password,
@@ -123,7 +142,7 @@ export const AuthApi = createApi({
     }),
     verifyAccount: builder.mutation({
       query: (payload: { userId: string; token: string }) => ({
-        url: `${AuthEndpoint}/user/verification/verify/${payload.userId}/${payload.token}`,
+        url: `${AuthEndpoint}/users/verification/verify/${payload.userId}/${payload.token}`,
         method: "POST",
         body: {},
       }),
@@ -139,7 +158,7 @@ export const AuthApi = createApi({
     }),
     resendVerificationLink: builder.mutation({
       query: (payload: { userId: string }) => ({
-        url: `${AuthEndpoint}/user/verification/resend/${payload.userId}`,
+        url: `${AuthEndpoint}/users/verification/resend/${payload.userId}`,
         method: "POST",
         body: {},
       }),
@@ -164,4 +183,5 @@ export const {
   useFromLinkResetPasswordMutation,
   useVerifyAccountMutation,
   useResendVerificationLinkMutation,
+  useRegisterMutation,
 } = AuthApi;

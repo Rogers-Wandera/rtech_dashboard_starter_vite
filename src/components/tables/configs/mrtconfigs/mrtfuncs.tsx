@@ -31,17 +31,49 @@ import { Edit, Delete } from "@mui/icons-material";
 
 export function GenerateColumns<TData extends Record<string, any>>(
   tablecolumns: TableColumns<TData>[],
-  other: TableColumnConfigs<TData>[]
+  other: TableColumnConfigs<TData>[],
+  validationErrors: Record<string, string | undefined>,
+  setValidationErrors: React.Dispatch<
+    React.SetStateAction<Record<string, string | undefined>>
+  >
 ): MRT_ColumnDef<TData>[] {
   if (tablecolumns.length > 0) {
     const columns: MRT_ColumnDef<TData>[] = tablecolumns.map((column) => {
       const header = column?.header ? column.header : column.accessorKey;
-      let otherconfigs = {};
+      let otherconfigs: Record<string, any> = {};
+      let valError = undefined;
       if (other && other.length > 0) {
         const exists = other.find(
           (item) => item.accessorKey === column.accessorKey
         );
         exists && (otherconfigs = exists);
+      }
+      if (Object.keys(validationErrors).length > 0) {
+        valError = validationErrors[column.accessorKey];
+        if (valError) {
+          if (otherconfigs?.muiEditTextFieldProps) {
+            otherconfigs["muiEditTextFieldProps"] = {
+              ...otherconfigs["muiEditTextFieldProps"],
+              error: !!valError,
+              helperText: valError,
+              onFocus: () =>
+                setValidationErrors({
+                  ...validationErrors,
+                  [column.accessorKey]: undefined,
+                }),
+            };
+          } else {
+            otherconfigs["muiEditTextFieldProps"] = {
+              error: !!valError,
+              helperText: valError,
+              onFocus: () =>
+                setValidationErrors({
+                  ...validationErrors,
+                  [column.accessorKey]: undefined,
+                }),
+            };
+          }
+        }
       }
       return {
         ...column,
@@ -62,7 +94,9 @@ export function RenderTopBarComponents<T extends Record<string, any>>({
   showCreateBtn = true,
   otherTableOptions = {},
   additionaltopbaractions = [],
-}: TopToolBarProps<T>) {
+  customCallBack = undefined,
+  title = "Data",
+}: TopToolBarProps<T> & { title?: string }) {
   const navigate = useNavigate();
   return (
     <Box>
@@ -89,14 +123,14 @@ export function RenderTopBarComponents<T extends Record<string, any>>({
         </IconButton>
       </Tooltip>
       {showCreateBtn && (
-        <Tooltip arrow title={"Add New"}>
+        <Tooltip arrow title={"Add New " + title}>
           <IconButton
             onClick={() => {
               table.setCreatingRow(true);
               if (otherTableOptions?.createDisplayMode === "custom") {
-                // if (customCallback) {
-                //   customCallback(table);
-                // }
+                if (customCallBack) {
+                  customCallBack(table);
+                }
               }
             }}
           >
@@ -156,7 +190,8 @@ export function HandleRenderAddEditDialogs<T extends Record<string, any>>({
   addtitle = undefined,
   edittitle = undefined,
   variant = undefined,
-}: addeditprops) {
+  title = "Data",
+}: addeditprops & { title?: string }) {
   return {
     renderCreateRowDialogContent: ({
       table,
@@ -169,7 +204,7 @@ export function HandleRenderAddEditDialogs<T extends Record<string, any>>({
     }) => (
       <>
         <DialogTitle variant={variant || "h5"} sx={{ textAlign: "center" }}>
-          {addtitle || "Add New Data"}
+          {addtitle || "Add New " + title}
         </DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
@@ -192,7 +227,7 @@ export function HandleRenderAddEditDialogs<T extends Record<string, any>>({
     }) => (
       <>
         <DialogTitle variant={variant || "h5"} sx={{ textAlign: "center" }}>
-          {edittitle || "Edit Data"}
+          {edittitle || "Edit Data " + title}
         </DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}

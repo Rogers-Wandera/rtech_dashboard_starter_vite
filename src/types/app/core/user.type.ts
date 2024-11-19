@@ -13,7 +13,7 @@ export type User = {
   deleted_at: Date;
   adminCreated: number;
   position: string;
-  positionId: number;
+  positionId: number | string;
   gender: string;
   userName: string;
   image: string;

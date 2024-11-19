@@ -5,12 +5,18 @@ import { IconCheck, IconThumbDown, IconInfoHexagon } from "@tabler/icons-react";
 type NotifierProps = {
   message: string;
   title?: string;
+  timer?: number;
 };
 export const notifier = {
-  success: ({ message, title = "Operation successful" }: NotifierProps) =>
+  success: ({
+    message,
+    title = "Operation successful",
+    timer = 3000,
+  }: NotifierProps) =>
     notifications.show({
       title: title,
       message: message,
+      autoClose: timer,
       color: "white",
       styles: () => ({
         root: {
@@ -24,10 +30,15 @@ export const notifier = {
         <IconCheck color="green" style={{ width: rem(18), height: rem(18) }} />
       ),
     }),
-  error: ({ message, title = "An Error Occured" }: NotifierProps) => {
+  error: ({
+    message,
+    title = "An Error Occured",
+    timer = 3000,
+  }: NotifierProps) => {
     return notifications.show({
       title: title,
       message: message,
+      autoClose: timer,
       color: "red",
       styles: () => ({
         root: {
@@ -45,10 +56,11 @@ export const notifier = {
       ),
     });
   },
-  info: ({ message, title = "Info" }: NotifierProps) =>
+  info: ({ message, title = "Info", timer = 3000 }: NotifierProps) =>
     notifications.show({
       title: title,
       message: message,
+      autoClose: timer,
       color: "blue",
       styles: () => ({
         root: {

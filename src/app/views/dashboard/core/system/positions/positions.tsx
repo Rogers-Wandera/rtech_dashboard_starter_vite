@@ -3,6 +3,13 @@ import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
 import { Position } from "@/types/app/core/position.type";
 import { Box } from "@mantine/core";
 import { PositionColumns } from "./positionconfigs";
+import { validateRequired } from "@/lib/utils/helpers/utilfuncs";
+
+export function validateData(data: Position) {
+  return {
+    position: !validateRequired(data.position) ? "Position is required" : "",
+  };
+}
 
 const ManagePositions = () => {
   const { refetch } = useMRTPaginateTable<Position>({
@@ -17,6 +24,12 @@ const ManagePositions = () => {
         tablecolumns={PositionColumns}
         refetch={refetch}
         enableRowActions={true}
+        validateData={validateData}
+        serveractions={{
+          addEndPoint: "core/system/positions",
+          editEndPoint: "core/system/positions/edit",
+          postFields: ["position"],
+        }}
       />
     </Box>
   );

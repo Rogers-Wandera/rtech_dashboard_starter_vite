@@ -5,16 +5,22 @@ import { useAuth } from "@/hooks/auth.hooks";
 import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
 import { User } from "@/types/app/core/user.type";
 import { PaginateResponse } from "@/types/server/server.main.types";
-import { usermenuitems, userscolumns } from "./userconfig";
+import {
+  user_schema,
+  userformtype,
+  usermenuitems,
+  userscolumns,
+} from "./userconfig";
 import MaleImage from "@/assets/images/avatars/01.png";
 import FemaleImage from "@/assets/images/avatars/lady.png";
 import { Avatar } from "@mui/material";
-import ServerCombo from "@/components/shared/serversidecombo/servercombo";
-import { useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
+import UserModal from "./usermodal";
+import { useForm, zodResolver } from "@mantine/form";
 
 const ManageUsers = () => {
   const { user } = useAuth();
-  const [value, setValue] = useState("");
+  const [opened, { open, close }] = useDisclosure(false);
   const moretableconfigs: TableColumnConfigs<User>[] = [
     { accessorKey: "gender", filterSelectOptions: ["Male", "Female"] },
     {
@@ -42,21 +48,29 @@ const ManageUsers = () => {
     },
   ];
 
+  const form = useForm<userformtype>({
+    name: "user-form",
+    mode: "uncontrolled",
+    initialValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      confirmpassword: "",
+      gender: "",
+      positionId: "",
+      tel: "",
+    },
+    validate: zodResolver(user_schema),
+  });
+
   const { refetch } = useMRTPaginateTable<PaginateResponse<User>>({
     queryKey: "users",
-    endPoint: "core/auth/user",
+    endPoint: "core/auth/users",
   });
 
   return (
     <div>
-      <ServerCombo<User>
-        endPoint="core/auth/user"
-        label="User Name"
-        textKey="userName"
-        valueKey="id"
-        setValue={setValue}
-        value={value}
-      />
       <MRT_ServerTable<User>
         tablecolumns={userscolumns}
         columnConfigs={moretableconfigs}
@@ -70,7 +84,14 @@ const ManageUsers = () => {
           actiontype: "menu",
         }}
         menuitems={[...usermenuitems(user)]}
+        otherTableOptions={{ createDisplayMode: "custom" }}
+        customCallBack={(table) => {
+          table.setCreatingRow(true);
+          form.reset();
+          open();
+        }}
       />
+      <UserModal opened={opened} close={close} form={form} refetch={refetch} />
     </div>
   );
 };

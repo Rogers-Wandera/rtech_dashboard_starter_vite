@@ -1,0 +1,150 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Hooks/ Fetch Hook" />
+
+# `useFetch` Hook
+
+The `useFetch` hook simplifies data fetching with `react-query` and `axios`, providing an easy-to-use interface for RESTful API requests.
+
+## Features
+
+- Dynamically constructs the API URL with options.
+- Handles query parameters with `URL` utilities.
+- Integrates error handling for robust API calls.
+- Offers `react-query`'s comprehensive fetching states.
+
+## Properties
+
+`queryKey` (required)
+A unique key (or array) used by react-query to cache and track the query's data.
+
+- Type: string | string[]
+- Example: "userDetails" or ["userDetails", userId]
+
+`setUrlOptions` (optional)
+A function that allows custom manipulation of the API URL before the request is sent.
+
+- Type: (url: URL) => URL
+- Default: undefined
+- Example
+
+```tsx
+setUrlOptions: (url) => {
+  url.searchParams.append("filter", "active");
+  return url;
+};
+```
+
+`url` (optional)
+The base URL to use for the request. If not provided, the hook constructs the URL using `VITE_SERVER_URL` and the `endPoint`.
+
+- Type: string
+- Default: import.meta.env.VITE_SERVER_URL + prefix + endPoint
+
+`endPoint` (optional)
+The endpoint to append to the base URL when constructing the request URL.
+
+- Type: string
+- Default: ""
+- Example: "users/123"
+
+`configs` (optional)
+Axios configuration options, such as headers or timeout.
+
+- Type: AxiosRequestConfig
+- Default: {}
+- Example
+
+```tsx
+configs: {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+}
+
+```
+
+`canfetch` (optional)
+Controls whether the query should be enabled or disabled.
+
+- Type: boolean | null | undefined
+- Default: manual (from context)
+- Example: true (to enable fetching) or false (to disable it)
+
+## Examples
+
+### Basic Fetch
+
+A simple example demonstrating data fetching with the useFetch hook:
+
+```tsx
+import React from "react";
+import { useFetch } from "@/hooks/usefetch.hook";
+
+export const BasicFetchExample = () => {
+  const { data, isLoading, isError, error } = useFetch({
+    queryKey: "basicExample",
+    endPoint: "basic/example",
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error: {error.message}</p>;
+
+  return <div>Data: {JSON.stringify(data)}</div>;
+};
+```
+
+### Custom URL Options
+
+This example customizes the fetch URL using the `setUrlOptions` function:
+
+```tsx
+import React from "react";
+import { useFetch } from "@/hooks/usefetch.hook";
+
+export const CustomUrlExample = () => {
+  const { data, isLoading, isError, error } = useFetch({
+    queryKey: "customUrlExample",
+    setUrlOptions: (url) => {
+      url.searchParams.append("customParam", "value");
+      return url;
+    },
+    endPoint: "custom/url/example",
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error: {error.message}</p>;
+
+  return <div>Data: {JSON.stringify(data)}</div>;
+};
+```
+
+### Conditional Fetching
+
+Demonstrates the `enabled` property to conditionally fetch data:
+
+```tsx
+import React, { useState } from "react";
+import { useFetch } from "../path/to/your/hooks";
+
+export const ConditionalFetchExample = () => {
+  const [canFetch, setCanFetch] = useState(false);
+
+  const { data, isLoading, isError, error } = useFetch({
+    queryKey: "conditionalFetchExample",
+    endPoint: "conditional/fetch/example",
+    canfetch: canFetch,
+  });
+
+  return (
+    <div>
+      <button onClick={() => setCanFetch((prev) => !prev)}>
+        {canFetch ? "Disable" : "Enable"} Fetch
+      </button>
+      {isLoading && <p>Loading...</p>}
+      {isError && <p>Error: {error.message}</p>}
+      {data && <div>Data: {JSON.stringify(data)}</div>}
+    </div>
+  );
+};
+```

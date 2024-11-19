@@ -74,7 +74,7 @@ const MRT_TableContextProvider = ({
   useEffect(() => {
     setRowSelection({});
     setGlobalFilter("");
-    setPagination({ pageIndex: 0, pageSize: 5 });
+    // setPagination({ pageIndex: 0, pageSize: 5 });
     setSorting([]);
     setData(undefined);
     setColumnFilters([]);
@@ -85,6 +85,12 @@ const MRT_TableContextProvider = ({
     setIsLoading(false);
     setManual(true);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!manual) {
+      setManual(true);
+    }
+  }, [pagination, sorting, globalFilter]);
   return (
     <MRT_TableContext.Provider
       value={{

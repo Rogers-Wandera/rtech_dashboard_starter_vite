@@ -1,0 +1,227 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Components/ Server Table" />
+
+# `Server Table` Developer Guide
+
+Component to display server side table data with pagination and other functionalities embeded into it. it uses React Material table under the hood, see https://www.material-react-table.com/ It uses the useMRTPaginateTable hook to fetch and set data in the MRTTableContext data which is picked up by the component
+
+## Features
+
+- Dynamically constructs table data
+- Built in pagination on the serverside
+- Built in filters and sorting on the serverside
+- Enables Global filter
+- Returns a fully constructed Material React Table
+
+## Properties
+
+`tablecolumns: Array` #Required The table columns to render data in the table.
+
+- Type: TableColumns
+- Default: undefined
+- Example:
+
+```tsx
+const userscolumns: TableColumns<YOUR_TYPE>[] = [
+  { accessorKey: "name", header: "Name", type: "text" },
+  { accessorKey: "age", header: "Age", type: "text" },
+];
+```
+
+`title: string` #Optional The title that shows on the modals
+
+- Type: string
+- Default: Data
+
+`columnConfigs: Array` #Optional Additional column configs for manipulating the table columns;
+
+- Type: TableColumnConfigs
+- Default: undefined
+- See: `MRT_ColumnDef (https://www.material-react-table.com/docs/api/column-options)`
+- Example:
+
+```tsx
+const moretableconfigs: TableColumnConfigs<YOUR_TYPE>[] = [
+  { accessorKey: "age", filterSelectOptions: [23, 24] },
+  {
+    accessorKey: "name",
+    Edit: () => null,
+    Cell: ({ row }) => {
+      const text = row.original.name === "Text" ? "Hello Text" : "Just Testing";
+      return text;
+    },
+  },
+];
+```
+
+`refetch: () => {}` #Optional Function to refetch data. This is returned from the useMRTPaginateTable hook
+
+- Type: Function
+- Default: undefined
+
+`enableEditing: boolean` #Optional Whether editing is enabled.
+
+- Type: Function
+- Default: True
+
+`idField: string` #Optional The field to use when editing, overrides the default field
+
+- Type: string
+- Default: id
+
+`otherTableOptions: Object` #Optional You can define other table options for configs
+
+- Type: OtherTableOptions
+- Default: undefined
+- See MRT_TableOptions (https://www.material-react-table.com/docs/api/table-options)
+- Omiited from the Object
+  | "columns"
+  | "data"
+  | "enableEditing"
+  | "rowCount"
+  | "getRowId"
+  | "onRowSelectionChange"
+  | "onColumnFiltersChange"
+  | "onGlobalFilterChange"
+  | "onPaginationChange"
+  | "onSortingChange"
+  | "renderTopToolbarCustomActions"
+  | "muiToolbarAlertBannerProps"
+  | "state"
+  | "enableRowActions"
+  | "renderRowActions"
+  | "renderRowActionMenuItems"
+  | "onCreatingRowSave"
+
+`enableRowSelection: boolean` #Optional Whether to enable selecting of rows or not
+
+- Type: boolean
+- Default: false
+
+`showback: boolean` #Optional Whether to show the arrow back icon on the table, to handle going back to the previous page
+
+- Type: boolean
+- Default: undefined
+
+`showCreateBtn?: boolean` #Optional Whether to show the create button or not
+
+- Type: boolean
+- Default: true
+
+`additionaltopbaractions?: Array` #Optional These are the additional buttons on the topbar of the table
+
+- Type: additionaltopbaractions
+- Default: undefined
+- Example
+
+```tsx
+const topbaractions: additionaltopbaractions<YOUR_TYPE>[] = [
+  {
+    label: "Add user", // #Required the label to show incase of text or tooltip incase of icon
+    onClick: () => {
+      console.log("yaaaaay");
+    }, // #Required the click function when the action is clicked
+    icon: <InputIcon />, // #Required the icon to show
+    show: "text", // #optional can be text | icon -> default is icon
+  },
+];
+```
+
+`addeditprops?: Object` #Optional Properties for add/edit modal components.
+
+- Type: addeditprops
+- Default: `{
+edittitle: "Add",
+addtitle: "Edit",
+variant: "h1",
+}`
+- Example
+
+```tsx
+const addeditprops: addeditprops = {
+  edittitle: "Add Data",
+  addtitle: "Edit Data",
+  variant: "h3",
+};
+```
+
+`menuitems: Array` #Optional Row menuitems, these appear against the rows and are added to the default ones
+
+- Type: RowMenuItems
+- Default: undefined
+- Example
+
+#### Example 1
+
+```tsx
+export const menuitems: RowMenuItems<YOUR_TYPE>[] [
+    {
+      label: "Lock", // Required -> the label of the item
+      icon: <IconLockOff />, // Required -> The icon to show
+      onClick: () => {}, // Required -> The click handler
+      render: true, // whether to render icon or not
+    }
+];
+```
+
+#### Example 2
+
+```tsx
+export const menuitems: RowMenuItems<YOUR_TYPE>[] [
+    {
+      label: (row) =>
+        row.original.something === 1 ? "UnLock" : "Lock",
+      icon: (row) =>
+        row.original.something === 1 ? <IconLockOff /> : <IconLock />,
+      onClick: () => {},
+      render: (row) =>
+        row.original.something === something ? false : true,
+    }
+];
+```
+
+`rowactions: Object` #Optional This for configuring the built in row actions like delete, edit, and the action type for render
+
+- Type: rowactionconfigs
+- default: undefined
+- Example
+
+```tsx
+rowactions={{
+    editrender: false, // or you can use (row) => (row.original.something === something ? false : true)
+    deleterender: (row) => (row.original.something === something ? false : true), // or simply true or false
+    actiontype: "menu", // either "menu" or "inline"
+}}
+```
+
+`enableRowActions: boolean` #Optional Whether to enable row actions or not
+
+- Type: boolean
+- Default: true
+
+`HandleDeleteData: Function` #Optional This overrides the built in delete handler for the row
+
+- Type: Function
+- Default: undefined
+- Example
+
+```tsx
+const deletedata = (row: MRT_Row<YOUR_TYPE>) => {
+  console.log("Am deleted");
+};
+```
+
+`customCallBack: Function` #Optional This overrides the built in create modal incase the createDisplayMode = "custom"
+
+- Type: Function
+- Default: undefined
+- Example
+
+```tsx
+otherTableOptions={{ createDisplayMode: "custom" }}
+customCallBack={(table) => {
+    table.setCreatingRow(true);
+    open(); // maybe opening your own modal
+}}
+```

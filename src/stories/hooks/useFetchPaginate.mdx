@@ -1,0 +1,91 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Hooks/ Paginate Hook" />
+
+# `useFetchPaginate` Hook
+
+The `useFetchPaginate` hook simplifies data fetching with pagination and search capabilities. It integrates with APIs that support paginated data and provides reactive state management.
+
+## Features
+
+- Fetches paginated data from an endpoint.
+- Supports global search and filters.
+- Returns useful metadata like
+  `data`,
+  `isError`,
+  `isRefetching`,
+  `isLoading`,
+  `refetch`,
+  `isFetching`,
+  `error`,
+  `paginate`,
+  `setPaginate`, // for programatically updating the paginate
+
+## Properties
+
+- useFetchPaginate Props includes `queryKey: string` #required,`endPoint: string` optional if url is set, `url: string` overrides the built in url.
+  `limit: number` default 5, `onlyAuth: boolean`, if true it fetches for only authenticated user else fetches otherwise
+  `configs: Object` Axios Request config object
+- Paginate object includes
+  `limit: number` the number of items to return from the fetch
+  `page: 1` the page your fetching, useful for pagination
+  `sortBy: [{id: string, desc: boolean}]` id (representing properties of the given data fetched)
+  `globalFilter: string` for search capabilities
+  `filters: [{id: string, value: string}]` id (representing properties of the given data fetched), this is useful for filters of a given field like name.
+
+## Returns
+
+- Data object contains `docs: []` The data from the fetch
+  `totalDocs: number` the total number of docs altogether
+  `totalPages: number` the number of pages, useful for pagination
+  `page: number` The current page returned from the totalPages
+  `hasNextPage: boolean` if the data has a next page, useful for pagination
+  `hasPrevPage: boolean` if the data has a previous page, useful for pagination
+
+---
+
+## API
+
+### Arguments
+
+| Argument           | Type      | Description                                           |
+| ------------------ | --------- | ----------------------------------------------------- | --------------------------------- |
+| `options`          | `object`  | Configuration object for the hook.                    |
+| `options.limit`    | `number`  | The number of items to fetch per page. Default is 10. |
+| `options.queryKey` | `string   | string[]`                                             | Unique query key for React Query. |
+| `options.onlyAuth` | `boolean` | Whether to include authentication headers.            |
+
+---
+
+## Example Usage
+
+```tsx
+import { useFetchPaginate } from "@/hooks/usefetch.hook";
+
+const PaginatedList = () => {
+  const { data, isLoading, paginate, setPaginate } = useFetchPaginate({
+    queryKey: "products", // unique key. usually used for cache
+    endPoint: "/api/products", // the endpoint that works with the backend api
+    //(url already configured, u just need to pass endpoint)
+    limit: 5, // the number of items to return from the fetch
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+
+  return (
+    <div>
+      <ul>
+        {data?.docs.map((item) => (
+          <li key={item.id}>{item.name}</li>
+        ))}
+      </ul>
+      <button
+        onClick={() => setPaginate({ ...paginate, page: paginate.page + 1 })}
+        disabled={!data?.hasNextPage}
+      >
+        Next
+      </button>
+    </div>
+  );
+};
+```

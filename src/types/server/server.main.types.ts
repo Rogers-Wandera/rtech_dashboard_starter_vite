@@ -29,7 +29,7 @@ export interface PaginateResponse<T = Record<string, unknown>> {
   hasPrevPage: boolean;
 }
 
-export interface IPaginate<T = Record<string, any>>  {
+export interface IPaginate<T = Record<string, any>> {
   limit: number;
   page: number;
   sortBy?: { id: keyof T; desc?: boolean }[];
@@ -44,6 +44,7 @@ export interface ServerErrorResponse {
   timestamp: string;
   message: string;
   stack: string;
+  error?: string;
 }
 
 export interface IAuthUser {
@@ -78,7 +79,7 @@ type NoFetchType<T = any> = {
 };
 export type ServerResponse<T = any> = fetchType<T> | NoFetchType<T>;
 
-export type BaseTableType {
+export type BaseTableType = {
   creationDate: Date;
   createdBy: string;
   updateDate: Date;
@@ -86,4 +87,4 @@ export type BaseTableType {
   deletedAt: Date;
   deletedBy: string;
   isActive: number;
-}
+};

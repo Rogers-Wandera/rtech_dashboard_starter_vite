@@ -16,3 +16,5 @@ export const FetchData = async <T = unknown>(
     throw error;
   }
 };
+
+export const validateRequired = (value: string) => !!value.length;

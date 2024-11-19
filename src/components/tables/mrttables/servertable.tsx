@@ -1,9 +1,5 @@
-import {
-  MRT_ColumnDef,
-  MRT_Row,
-  useMaterialReactTable,
-} from "material-react-table";
-import { ServerSideProps } from "../configs/mrtconfigs/mrtserverside.configs";
+import { useMaterialReactTable } from "material-react-table";
+import { tableProps } from "../configs/mrtconfigs/mrtserverside.configs";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import {
   HandleRenderAddEditDialogs,
@@ -12,11 +8,6 @@ import {
 } from "../configs/mrtconfigs/mrtfuncs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
-
-type tableProps<TData extends Record<string, any>> = ServerSideProps<TData> & {
-  columns: MRT_ColumnDef<TData, any>[];
-  HandleDeleteData?: (row: MRT_Row<TData>) => void;
-};
 
 export function RenderTable<TData extends Record<string, any>>({
   columns,
@@ -33,6 +24,9 @@ export function RenderTable<TData extends Record<string, any>>({
   rowactions = { editrender: true, deleterender: true, actiontype: "menu" },
   enableRowActions = false,
   HandleDeleteData = () => {},
+  customCallBack = () => {},
+  HandleCreate = () => {},
+  setValidationErrors = () => {},
 }: tableProps<TData>) {
   const {
     columnFilters,
@@ -53,6 +47,7 @@ export function RenderTable<TData extends Record<string, any>>({
     setColumnVisibility,
     columnVisibility,
   } = useMRTTableContext<TData>();
+
   const theme = useSelector(
     (state: RootState) => state.setting.setting.theme_scheme.value
   );
@@ -74,9 +69,12 @@ export function RenderTable<TData extends Record<string, any>>({
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
+    onCreatingRowCancel: () => setValidationErrors({}),
+    onEditingRowCancel: () => setValidationErrors({}),
+    onCreatingRowSave: HandleCreate,
     enableRowActions,
     enableRowSelection,
-    ...HandleRenderAddEditDialogs<TData>({ ...addeditprops }),
+    ...HandleRenderAddEditDialogs<TData>({ ...addeditprops, title }),
     ...rowmenuactions,
     renderTopToolbarCustomActions: ({ table }) =>
       RenderTopBarComponents({
@@ -86,6 +84,8 @@ export function RenderTable<TData extends Record<string, any>>({
         showCreateBtn,
         otherTableOptions,
         additionaltopbaractions,
+        customCallBack,
+        title,
       }),
     muiToolbarAlertBannerProps: isError
       ? {

@@ -14,6 +14,10 @@ export type LoginResponse = ServerResponse & {
   accessToken: string;
 };
 
+export type RegisterResponse = ServerResponse & {
+  emailsent: string;
+};
+
 export type AuthContextState = {
   isLoggedIn: boolean;
   token: string | null;

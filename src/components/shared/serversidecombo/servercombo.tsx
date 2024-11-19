@@ -1,134 +1,147 @@
 import { useFetchPaginate } from "@/hooks/usefetch.hook";
 import { AxiosRequestConfig } from "axios";
-import { useEffect, useState } from "react";
-import {
-  Combobox,
-  LoadingOverlay,
-  TextInput,
-  useCombobox,
-  ScrollArea,
-} from "@mantine/core";
-import { usePaginateContext } from "@/lib/context/paginate/paginate.context";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Select } from "@mantine/core";
+import { MantineSelectType } from "@/types/app/app.types";
+import { debounce } from "lodash";
 
 type servercombotype<T extends Record<string, any>> = {
-  endPoint: string;
+  /** This is the endpoint for the registered server in the system, where to get the data from on the server */
+  endPoint?: string;
+  /** The label of the Combobox */
   label: string;
+  /** The key in the data for the text value of the combobox */
   textKey: keyof T;
+  /** The value of the combobox, comes from the data got. */
   valueKey: keyof T;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
+  /** The state value to pass in to the component inorder to have access to the selected value */
+  onChange?: (value: string | null) => void;
+  /** The value selected from the combobox */
   value: string;
+  /**
+   * See axios request config type for more details
+   * @type {AxiosRequestConfig} */
   configs?: AxiosRequestConfig;
+  /** Determines if only fetch must happend when authenticated user or not */
   onlyAuth?: boolean;
+  /** For manipulating the text field of the rendered option */
   renderLabel?: (item: T) => string;
+  /** The placeholder to show before any option is selected */
   placeholder?: string;
+  /** the number of items to return from the server endpoint */
+  limit?: number;
+  /** Overrides the endpoint to include, your own generated endpoint, must be a url */
+  url?: string;
+  error?: string;
+  zIndex?: number;
 };
 
 const ServerCombo = <T extends Record<string, any>>({
-  endPoint,
   label,
   valueKey,
   textKey,
   value,
-  setValue,
+  onChange = () => {},
+  endPoint = "",
   onlyAuth = true,
   configs = {},
   renderLabel = undefined,
   placeholder = "Select an option",
+  limit = 5,
+  url = undefined,
+  error = undefined,
+  zIndex = 1,
 }: servercombotype<T>) => {
-  const combobox = useCombobox();
-  const { setPaginate, paginate } = usePaginateContext();
-  const [options, setOptions] = useState<JSX.Element[]>([]);
-  const { data, isLoading, isFetching } = useFetchPaginate<T>({
-    queryKey: endPoint,
-    onlyAuth,
-    configs,
-    endPoint,
-    limit: 1,
-  });
+  const [selects, setSelects] = useState<MantineSelectType<T>[]>([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [notFound, setNotFound] = useState("Nothing found..");
+  const viewport = useRef<HTMLDivElement>(null);
 
-  const HandleScrollTop = () => {
-    if (data?.hasPrevPage) {
-      setPaginate({ ...paginate, page: paginate.page - 1 });
+  const { data, isLoading, isFetching, paginate, setPaginate } =
+    useFetchPaginate<T>({
+      queryKey: endPoint,
+      onlyAuth,
+      configs,
+      endPoint,
+      limit: limit,
+      url,
+    });
+
+  const formattedData = useMemo(() => {
+    return (
+      data?.docs?.map((item) => ({
+        value: String(item[valueKey]),
+        label: item[renderLabel ? renderLabel(item) : textKey],
+      })) || []
+    );
+  }, [data, valueKey, textKey, renderLabel]);
+
+  const HandleSearch = debounce((value: string) => {
+    setPaginate({ ...paginate, globalFilter: value });
+    setSearchValue(value);
+  }, 300);
+
+  const HandleScroll = () => {
+    const viewportEl = viewport.current;
+    if (viewportEl) {
+      const { scrollTop, scrollHeight, clientHeight } = viewportEl;
+      if (
+        scrollTop + clientHeight >= scrollHeight &&
+        !isFetching &&
+        data?.hasNextPage
+      ) {
+        setPaginate((prev) => ({
+          ...prev,
+          page: prev.page + 1,
+        }));
+      } else if (
+        scrollTop === 0 &&
+        !isLoading &&
+        !isFetching &&
+        data?.hasPrevPage
+      ) {
+        setPaginate((prev) => ({
+          ...prev,
+          page: prev.page - 1,
+        }));
+      }
     }
-    console.log("has");
-  };
-  const HandleScrollBottom = () => {
-    if (data?.hasNextPage) {
-      setPaginate({ ...paginate, page: paginate.page + 1 });
-    }
-    console.log(data);
   };
 
-  const formatData = () => {
-    if (data?.docs && data?.docs.length > 0) {
-      const formatted = data?.docs.map((item) => {
-        return {
-          value: String(item[valueKey]),
-          text: item[renderLabel ? renderLabel(item) : textKey],
-        };
-      });
-      const options = formatted.map((item, i) => (
-        <Combobox.Option value={item.text} key={`${i}-${item.text}`}>
-          {item.text}
-        </Combobox.Option>
-      ));
-      setOptions(options);
-    } else {
-      setOptions([]);
-    }
-  };
   useEffect(() => {
-    formatData();
-  }, [data]);
+    setSelects(formattedData);
+  }, [formattedData]);
+
+  useEffect(() => {
+    if (isLoading || isFetching) {
+      setNotFound("Processing....");
+    } else {
+      setNotFound("Nothing found..");
+    }
+  }, [isLoading, isFetching]);
 
   return (
-    <Combobox
-      onOptionSubmit={(option) => {
-        setValue(option);
-        combobox.closeDropdown();
+    <Select
+      data={selects}
+      allowDeselect={true}
+      searchable
+      searchValue={searchValue}
+      onSearchChange={HandleSearch}
+      maxDropdownHeight={29 * limit}
+      clearable
+      comboboxProps={{ shadow: "md", zIndex: zIndex }}
+      scrollAreaProps={{
+        viewportRef: viewport,
+        viewportProps: { onScroll: HandleScroll },
       }}
-      store={combobox}
-    >
-      <Combobox.Target>
-        <TextInput
-          label={label}
-          placeholder={placeholder}
-          value={value}
-          onChange={(event) => {
-            setValue(event.currentTarget.value);
-            setPaginate({
-              ...paginate,
-              globalFilter: event.currentTarget.value,
-            });
-            combobox.openDropdown();
-            combobox.updateSelectedOptionIndex();
-          }}
-          onClick={() => combobox.openDropdown()}
-          onFocus={() => combobox.openDropdown()}
-          onBlur={() => combobox.closeDropdown()}
-        />
-      </Combobox.Target>
-      <Combobox.Dropdown>
-        {!isLoading && !isFetching ? (
-          <Combobox.Options>
-            {options.length === 0 ? (
-              <Combobox.Empty>Nothing found</Combobox.Empty>
-            ) : (
-              <ScrollArea.Autosize
-                type="scroll"
-                mah={23}
-                onBottomReached={HandleScrollBottom}
-                // onTopReached={HandleScrollTop}
-              >
-                {options}
-              </ScrollArea.Autosize>
-            )}
-          </Combobox.Options>
-        ) : (
-          <LoadingOverlay visible={isLoading} />
-        )}
-      </Combobox.Dropdown>
-    </Combobox>
+      nothingFoundMessage={notFound}
+      limit={limit}
+      placeholder={placeholder}
+      label={label}
+      onChange={onChange}
+      value={value}
+      error={error}
+    />
   );
 };
 

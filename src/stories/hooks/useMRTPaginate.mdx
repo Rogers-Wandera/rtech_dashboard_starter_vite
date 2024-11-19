@@ -1,0 +1,65 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Hooks/ MRT Paginate Hook" />
+
+# `useMRTPaginateTable` Hook
+
+The `useMRTPaginateTable` works hand in hand with the serverside table, as it sets the context that is used by the serverside table,
+Check the serverside table docs for more information
+
+## Features
+
+- Fetches paginated data from an endpoint.
+- Returns useful metadata like
+  `data`,
+  `isError`,
+  `isRefetching`,
+  `isLoading`,
+  `refetch`,
+  `isFetching`,
+  `error`,
+
+## Returns
+
+- Data object contains `docs: []` The data from the fetch
+  `totalDocs: number` the total number of docs altogether
+  `totalPages: number` the number of pages, useful for pagination
+  `page: number` The current page returned from the totalPages
+  `hasNextPage: boolean` if the data has a next page, useful for pagination
+  `hasPrevPage: boolean` if the data has a previous page, useful for pagination
+
+## Properties
+
+- useMRTPaginateTable Props includes `queryKey: string` #required,`endPoint: #required`
+  `onlyAuth: boolean`, if true it fetches for only authenticated user else fetches otherwise
+  `configs: Object` Axios Request config object
+
+## Example Usage
+
+```tsx
+import { MRT_ServerTable } from "@/components/tables/mrttables/mrtserverside";
+import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
+import { sometype } from "./your-file";
+import { Box } from "@mantine/core";
+import { somecolumns } from "./your-file";
+
+const ManagePeople = () => {
+  const { refetch } = useMRTPaginateTable<sometype>({
+    queryKey: "people_get",
+    endPoint: "people",
+  });
+
+  return (
+    <Box>
+      <MRT_ServerTable
+        title="People"
+        tablecolumns={somecolumns}
+        refetch={refetch}
+        enableRowActions={true}
+      />
+    </Box>
+  );
+};
+
+export default ManagePeople;
+```

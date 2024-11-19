@@ -1,0 +1,166 @@
+import { Meta } from "@storybook/blocks";
+import React, { useState } from "react";
+import { usePostData } from "@/hooks/usepost.hook";
+
+<Meta title="Hooks/ Post Hook" />
+
+# `usePostData` Hook
+
+The `usePostData` hook simplifies making POST requests using `react-query` and `axios`, integrating with authorization tokens and customizable configurations.
+
+## Features
+
+- Dynamically constructs the API URL with options.
+- Automatically appends authorization headers when `onlyAuth` is true.
+- Provides easy-to-use methods for triggering POST requests.
+- Handles query parameters with `URL` utilities.
+- Integrates `react-query`'s powerful mutation states.
+
+## Properties
+
+### `queryKey` (required)
+
+A unique key (or array) used by `react-query` to track the mutation.
+
+- **Type**: `string | any[]`
+- **Example**: `"createUser"` or `["createUser", userId]`
+
+### `setUrlOptions` (optional)
+
+A function that allows custom manipulation of the API URL before the request is sent.
+
+- **Type**: `(url: URL) => URL`
+- **Default**: `undefined`
+- **Example**:
+
+```tsx
+setUrlOptions: (url) => {
+  url.searchParams.append("filter", "active");
+  return url;
+};
+```
+
+`url` (optional)
+The base URL to use for the request. If not provided, the hook constructs the URL using `VITE_SERVER_URL` and the `endPoint`.
+
+- Type: string
+- Default: import.meta.env.VITE_SERVER_URL + prefix + endPoint
+
+`endPoint` (optional)
+The endpoint to append to the base URL when constructing the request URL.
+
+- Type: string
+- Default: ""
+- Example: "users/123"
+
+`configs` (optional)
+Axios configuration options, such as headers or timeout.
+
+- Type: AxiosRequestConfig
+- Default: {}
+- Example
+
+```tsx
+configs: {
+  headers: {
+    "Content-Type": "application/json",
+  },
+}
+```
+
+`onlyAuth` (optional)
+Specifies whether to include an authorization token in the request headers.
+
+- Type: boolean
+- Default: true
+
+## Examples
+
+### Basic Post
+
+A simple example demonstrating data submission using the usePostData hook:
+
+```tsx
+export const BasicPostExample = () => {
+  const { post, isLoading, isError, isSuccess, data } = usePostData({
+    queryKey: "createUser",
+    endPoint: "users/create",
+  });
+
+  const handlePost = () => {
+    post({ name: "John Doe", email: "john.doe@example.com" });
+  };
+
+  return (
+    <div>
+      <button onClick={handlePost} disabled={isLoading}>
+        Submit
+      </button>
+      {isLoading && <p>Submitting...</p>}
+      {isError && <p>Submission failed!</p>}
+      {isSuccess && <p>Submitted successfully: {JSON.stringify(data)}</p>}
+    </div>
+  );
+};
+```
+
+### Custom URL Options
+
+This example customizes the POST URL using the `setUrlOptions` function:
+
+```tsx
+export const CustomUrlExample = () => {
+  const { post, isLoading, isError, data } = usePostData({
+    queryKey: "customPost",
+    endPoint: "custom/url",
+    setUrlOptions: (url) => {
+      url.searchParams.append("debug", "true");
+      return url;
+    },
+  });
+
+  const handlePost = () => {
+    post({ message: "Custom URL with debug mode" });
+  };
+
+  return (
+    <div>
+      <button onClick={handlePost} disabled={isLoading}>
+        Submit with Custom URL
+      </button>
+      {isLoading && <p>Submitting...</p>}
+      {isError && <p>Submission failed!</p>}
+      {data && <p>Response: {JSON.stringify(data)}</p>}
+    </div>
+  );
+};
+```
+
+### Post with Authorization
+
+This example demonstrates making a POST request with an authorization token included:
+
+```tsx
+export const AuthPostExample = () => {
+  const { post, isLoading, isError, isSuccess, data } = usePostData({
+    queryKey: "createSecureUser",
+    endPoint: "secure/createUser",
+    onlyAuth: true,
+  });
+
+  const handlePost = () => {
+    post({ username: "secure_user", password: "password123" });
+  };
+
+  return (
+    <div>
+      <button onClick={handlePost} disabled={isLoading}>
+        Submit Securely
+      </button>
+      {isLoading && <p>Submitting...</p>}
+      {isError && <p>Submission failed!</p>}
+      {isSuccess && <p>Submitted successfully: {JSON.stringify(data)}</p>}
+    </div>
+  );
+};
+```
