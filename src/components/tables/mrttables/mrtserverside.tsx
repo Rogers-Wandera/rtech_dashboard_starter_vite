@@ -115,7 +115,6 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       HandleError(error as ServerErrorResponse);
     }
   };
-  // const { pagination, sorting, globalFilter } = useMRTTableContext();
 
   const table = RenderTable({
     columns,

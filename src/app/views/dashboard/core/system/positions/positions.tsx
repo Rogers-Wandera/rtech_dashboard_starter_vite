@@ -13,7 +13,7 @@ export function validateData(data: Position) {
 
 const ManagePositions = () => {
   const { refetch } = useMRTPaginateTable<Position>({
-    queryKey: "users",
+    queryKey: "postion",
     endPoint: "core/system/positions",
   });
 

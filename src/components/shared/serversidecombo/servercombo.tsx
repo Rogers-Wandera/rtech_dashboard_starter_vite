@@ -1,6 +1,6 @@
 import { useFetchPaginate } from "@/hooks/usefetch.hook";
 import { AxiosRequestConfig } from "axios";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Select } from "@mantine/core";
 import { MantineSelectType } from "@/types/app/app.types";
 import { debounce } from "lodash";
@@ -55,17 +55,18 @@ const ServerCombo = <T extends Record<string, any>>({
   const [selects, setSelects] = useState<MantineSelectType<T>[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [notFound, setNotFound] = useState("Nothing found..");
-  const viewport = useRef<HTMLDivElement>(null);
+  const [manual, setManual] = useState(true);
 
-  const { data, isLoading, isFetching, paginate, setPaginate } =
-    useFetchPaginate<T>({
-      queryKey: endPoint,
-      onlyAuth,
-      configs,
-      endPoint,
-      limit: limit,
-      url,
-    });
+  const { data, isLoading, isFetching, setPaginate } = useFetchPaginate<T>({
+    queryKey: endPoint,
+    onlyAuth,
+    configs,
+    endPoint,
+    limit: limit,
+    url,
+    manual: manual,
+    showError: false,
+  });
 
   const formattedData = useMemo(() => {
     return (
@@ -77,36 +78,9 @@ const ServerCombo = <T extends Record<string, any>>({
   }, [data, valueKey, textKey, renderLabel]);
 
   const HandleSearch = debounce((value: string) => {
-    setPaginate({ ...paginate, globalFilter: value });
+    setPaginate((prevState) => ({ ...prevState, globalFilter: value }));
     setSearchValue(value);
   }, 300);
-
-  const HandleScroll = () => {
-    const viewportEl = viewport.current;
-    if (viewportEl) {
-      const { scrollTop, scrollHeight, clientHeight } = viewportEl;
-      if (
-        scrollTop + clientHeight >= scrollHeight &&
-        !isFetching &&
-        data?.hasNextPage
-      ) {
-        setPaginate((prev) => ({
-          ...prev,
-          page: prev.page + 1,
-        }));
-      } else if (
-        scrollTop === 0 &&
-        !isLoading &&
-        !isFetching &&
-        data?.hasPrevPage
-      ) {
-        setPaginate((prev) => ({
-          ...prev,
-          page: prev.page - 1,
-        }));
-      }
-    }
-  };
 
   useEffect(() => {
     setSelects(formattedData);
@@ -115,8 +89,14 @@ const ServerCombo = <T extends Record<string, any>>({
   useEffect(() => {
     if (isLoading || isFetching) {
       setNotFound("Processing....");
-    } else {
+    } else if (!isLoading && !isFetching && selects.length === 0) {
       setNotFound("Nothing found..");
+    }
+  }, [isLoading, isFetching, selects]);
+
+  useEffect(() => {
+    if (!isLoading && !isFetching) {
+      setManual(false);
     }
   }, [isLoading, isFetching]);
 
@@ -127,13 +107,8 @@ const ServerCombo = <T extends Record<string, any>>({
       searchable
       searchValue={searchValue}
       onSearchChange={HandleSearch}
-      maxDropdownHeight={29 * limit}
       clearable
       comboboxProps={{ shadow: "md", zIndex: zIndex }}
-      scrollAreaProps={{
-        viewportRef: viewport,
-        viewportProps: { onScroll: HandleScroll },
-      }}
       nothingFoundMessage={notFound}
       limit={limit}
       placeholder={placeholder}

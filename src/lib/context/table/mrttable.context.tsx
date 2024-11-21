@@ -10,37 +10,19 @@ import {
   MRT_SortingState,
   MRT_VisibilityState,
 } from "material-react-table";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
+import {
+  DEFAULT_COLUMN_FILTERS,
+  DEFAULT_COLUMN_VISIBILITY,
+  DEFAULT_PAGINATION,
+  DEFAULT_ROW_SELECTION,
+  DEFAULT_SORTING,
+} from "./table.defaults";
 
-const initialState: MRT_TableContextState<unknown> = {
-  manual: true,
-  setManual: () => {},
-  columnFilters: [],
-  setColumnFilters: () => {},
-  globalFilter: "",
-  setGlobalFilter: () => {},
-  sorting: [],
-  setSorting: () => {},
-  pagination: { pageIndex: 0, pageSize: 5 },
-  setPagination: () => {},
-  setRowSelection: () => {},
-  rowSelection: {},
-  data: undefined,
-  setData: () => {},
-  isLoading: false,
-  setIsLoading: () => {},
-  isFetching: false,
-  setIsFetching: () => {},
-  isError: false,
-  setIsError: () => {},
-  setError: () => {},
-  error: null,
-  columnVisibility: {},
-  setColumnVisibility: () => {},
-};
-const MRT_TableContext =
-  createContext<MRT_TableContextState<any>>(initialState);
+const MRT_TableContext = createContext<
+  MRT_TableContextState<unknown> | undefined
+>(undefined);
 
 const MRT_TableContextProvider = ({
   children,
@@ -54,79 +36,95 @@ const MRT_TableContextProvider = ({
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState<ServerErrorResponse | null>(null);
 
-  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
+  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>(
+    DEFAULT_ROW_SELECTION
+  );
   const [columnVisibility, setColumnVisibility] = useState<MRT_VisibilityState>(
-    {}
+    DEFAULT_COLUMN_VISIBILITY
   );
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
-    []
+    DEFAULT_COLUMN_FILTERS
   );
   const [data, setData] = useState<PaginateResponse<any> | undefined>(
     undefined
   );
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const [sorting, setSorting] = useState<MRT_SortingState>([]);
-  const [pagination, setPagination] = useState<MRT_PaginationState>({
-    pageIndex: 0,
-    pageSize: 5,
-  });
+  const [sorting, setSorting] = useState<MRT_SortingState>(DEFAULT_SORTING);
+  const [pagination, setPagination] =
+    useState<MRT_PaginationState>(DEFAULT_PAGINATION);
 
-  useEffect(() => {
-    setRowSelection({});
-    setGlobalFilter("");
-    // setPagination({ pageIndex: 0, pageSize: 5 });
-    setSorting([]);
-    setData(undefined);
-    setColumnFilters([]);
-    setColumnVisibility({});
-    setError(null);
-    setIsError(false);
-    setIsFetching(false);
-    setIsLoading(false);
-    setManual(true);
-  }, [location.pathname]);
+  const contextValue = useMemo(
+    () => ({
+      manual,
+      setManual,
+      filters: {
+        columnFilters,
+        setColumnFilters,
+        globalFilter,
+        setGlobalFilter,
+      },
+      sorting: { sorting, setSorting },
+      pagination: { pagination, setPagination },
+      rowSelection: { rowSelection, setRowSelection },
+      data: { data, setData },
+      status: {
+        isLoading,
+        setIsLoading,
+        isFetching,
+        setIsFetching,
+        isError,
+        setIsError,
+        error,
+        setError,
+      },
+      visibility: { columnVisibility, setColumnVisibility },
+    }),
+    [
+      manual,
+      columnFilters,
+      globalFilter,
+      sorting,
+      pagination,
+      rowSelection,
+      data,
+      isLoading,
+      isFetching,
+      isError,
+      error,
+      columnVisibility,
+    ]
+  );
 
   useEffect(() => {
     if (!manual) {
       setManual(true);
     }
-  }, [pagination, sorting, globalFilter]);
+  }, [pagination, sorting, globalFilter, columnFilters]);
+
+  useEffect(() => {
+    setManual(true);
+    setData(undefined);
+    setPagination(DEFAULT_PAGINATION);
+    setSorting(DEFAULT_SORTING);
+    setGlobalFilter("");
+    setColumnFilters(DEFAULT_COLUMN_FILTERS);
+    setRowSelection(DEFAULT_ROW_SELECTION);
+    setColumnVisibility(DEFAULT_COLUMN_VISIBILITY);
+    setError(null);
+    setIsError(false);
+    setIsFetching(false);
+    setIsLoading(false);
+  }, [location.pathname]);
+
   return (
-    <MRT_TableContext.Provider
-      value={{
-        manual,
-        rowSelection,
-        setRowSelection,
-        setManual,
-        columnFilters,
-        setColumnFilters,
-        globalFilter,
-        setGlobalFilter,
-        sorting,
-        setSorting,
-        pagination,
-        setPagination,
-        data,
-        setData,
-        isError,
-        isFetching,
-        setIsError,
-        setIsFetching,
-        setIsLoading,
-        isLoading,
-        error,
-        setError,
-        columnVisibility,
-        setColumnVisibility,
-      }}
-    >
+    <MRT_TableContext.Provider value={contextValue}>
       {children}
     </MRT_TableContext.Provider>
   );
 };
 
 export const useMRTTableContext = <T extends Record<string, any>>() => {
-  const context = useContext<MRT_TableContextState<T>>(MRT_TableContext);
+  const context = useContext(MRT_TableContext) as MRT_TableContextState<T>;
   if (context === undefined) {
     throw new Error(
       "useMRTTableContext must be used within a MRT_TableContextProvider"

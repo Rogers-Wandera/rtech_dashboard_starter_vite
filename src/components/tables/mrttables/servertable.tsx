@@ -29,23 +29,13 @@ export function RenderTable<TData extends Record<string, any>>({
   setValidationErrors = () => {},
 }: tableProps<TData>) {
   const {
-    columnFilters,
-    globalFilter,
-    sorting,
+    filters,
     pagination,
-    setColumnFilters,
-    setGlobalFilter,
-    setPagination,
-    setRowSelection,
-    setSorting,
+    sorting,
     rowSelection,
+    visibility,
+    status,
     data,
-    isError,
-    isFetching,
-    isLoading,
-    error,
-    setColumnVisibility,
-    columnVisibility,
   } = useMRTTableContext<TData>();
 
   const theme = useSelector(
@@ -58,17 +48,21 @@ export function RenderTable<TData extends Record<string, any>>({
     rowactions,
     HandleDeleteData,
   });
+
   const table = useMaterialReactTable({
     columns,
-    data: data?.docs || [],
-    rowCount: data?.totalDocs || 0,
+    data: data.data?.docs || [],
+    rowCount: data.data?.totalDocs || 0,
     getRowId: (row) => row[idField as string],
-    onRowSelectionChange: setRowSelection,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: rowSelection.setRowSelection,
+    onColumnFiltersChange: filters.setColumnFilters,
+    onGlobalFilterChange: filters.setGlobalFilter,
+    onPaginationChange: pagination.setPagination,
+    onSortingChange: sorting.setSorting,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+    onColumnVisibilityChange: visibility.setColumnVisibility,
     onCreatingRowCancel: () => setValidationErrors({}),
     onEditingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: HandleCreate,
@@ -87,10 +81,10 @@ export function RenderTable<TData extends Record<string, any>>({
         customCallBack,
         title,
       }),
-    muiToolbarAlertBannerProps: isError
+    muiToolbarAlertBannerProps: status.isError
       ? {
           color: "error",
-          children: error?.message || "Error! Failed to fetch data",
+          children: status.error?.message || "Error! Failed to fetch data",
         }
       : undefined,
     ...otherTableOptions,
@@ -107,15 +101,15 @@ export function RenderTable<TData extends Record<string, any>>({
       },
     },
     state: {
-      isLoading,
-      showAlertBanner: isError,
-      showProgressBars: isFetching,
-      rowSelection,
-      columnFilters,
-      globalFilter,
-      sorting,
-      pagination,
-      columnVisibility,
+      isLoading: status.isLoading,
+      showAlertBanner: status.isError,
+      showProgressBars: status.isFetching,
+      rowSelection: rowSelection.rowSelection,
+      columnFilters: filters.columnFilters,
+      globalFilter: filters.globalFilter,
+      sorting: sorting.sorting,
+      pagination: pagination.pagination,
+      columnVisibility: visibility.columnVisibility,
     },
   });
   return table;

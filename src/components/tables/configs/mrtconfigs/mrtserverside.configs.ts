@@ -141,6 +141,9 @@ export type OtherTableOptions<T extends Record<string, any>> = Omit<
   | "renderRowActions"
   | "renderRowActionMenuItems"
   | "onCreatingRowSave"
+  | "manualFiltering"
+  | "manualPagination"
+  | "manualSorting"
 >;
 
 /**

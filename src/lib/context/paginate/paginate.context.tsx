@@ -3,7 +3,7 @@ import { IPaginate } from "@/types/server/server.main.types";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-const initialstate: IPaginateContext = {
+const initialstate: IPaginateContext<unknown> = {
   paginate: {
     page: 1,
     limit: 5,
@@ -14,14 +14,20 @@ const initialstate: IPaginateContext = {
   setPaginate: () => {},
 };
 
-const PaginateContext = createContext<IPaginateContext<any>>(initialstate);
+const PaginateContext = createContext<IPaginateContext<unknown> | undefined>(
+  undefined
+);
 
 const PaginateProvider = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  const [paginate, setPaginate] = useState<IPaginate>(initialstate.paginate);
+  const [paginate, setPaginate] = useState<IPaginate<unknown>>(
+    initialstate.paginate
+  );
+
   useEffect(() => {
     setPaginate(initialstate.paginate);
   }, [location.pathname]);
+
   return (
     <PaginateContext.Provider value={{ paginate, setPaginate }}>
       {children}
@@ -30,7 +36,7 @@ const PaginateProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const usePaginateContext = <T extends Record<string, any>>() => {
-  const context = useContext<IPaginateContext<T>>(PaginateContext);
+  const context = useContext(PaginateContext) as IPaginateContext<T>;
   if (context === undefined) {
     throw new Error(
       "usePaginateContext must be used within a PaginateProvider"
