@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig, AxiosError } from "axios";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
 import { useAuth } from "./auth.hooks";
 
-type UsePostDataProps = {
+type UseDeleteDataProps = {
   queryKey: string | any[];
   onlyAuth?: boolean;
   configs?: AxiosRequestConfig;
@@ -19,16 +19,15 @@ type withUrl = {
   endPoint: never;
 };
 
-type PostDataPayload<T = unknown> = (noUrl | withUrl) & {
+type DeleteDataPayload<T = unknown> = (noUrl | withUrl) & {
   setUrlOptions?: (url: URL) => URL;
-  payload: T;
-  method?: "PATCH" | "PUT" | "POST" | "DELETE";
+  payload?: T;
 };
-export function usePostData<T = any, P = unknown>({
+export function useDeleteData<T = any, P = unknown>({
   queryKey,
   configs = {},
   onlyAuth = true,
-}: UsePostDataProps) {
+}: UseDeleteDataProps) {
   const { token } = useAuth();
   const prefix = import.meta.env.VITE_SERVER_PREFIX;
   if (onlyAuth) {
@@ -40,7 +39,7 @@ export function usePostData<T = any, P = unknown>({
   const mutation = useMutation<
     T,
     AxiosError<ServerErrorResponse>,
-    PostDataPayload<P>
+    DeleteDataPayload<P>
   >({
     mutationKey: [queryKey],
     mutationFn: async ({
@@ -48,8 +47,7 @@ export function usePostData<T = any, P = unknown>({
       setUrlOptions,
       endPoint,
       payload,
-      method = "POST",
-    }: PostDataPayload) => {
+    }: DeleteDataPayload) => {
       try {
         const mainurl = url
           ? url
@@ -65,11 +63,9 @@ export function usePostData<T = any, P = unknown>({
         if (setUrlOptions) {
           postUrl = setUrlOptions(new URL(mainurl));
         }
-        const response = await axios<T>({
+        const response = await axios.delete<T>(postUrl.href, {
           ...configs,
-          url: postUrl.href,
           data: payload,
-          method: method,
         });
         return response.data;
       } catch (error) {
@@ -84,7 +80,7 @@ export function usePostData<T = any, P = unknown>({
 
   return {
     ...mutation,
-    post: mutation.mutate, // Triggers the mutation
-    postAsync: mutation.mutateAsync, // For using with async/await
+    Delete: mutation.mutate, // Triggers the mutation
+    deleteAsync: mutation.mutateAsync, // For using with async/await
   };
 }

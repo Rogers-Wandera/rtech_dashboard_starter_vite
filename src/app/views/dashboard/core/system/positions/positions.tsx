@@ -31,6 +31,7 @@ const ManagePositions = () => {
           addEndPoint: "core/system/positions",
           editEndPoint: "core/system/positions",
           postFields: ["position"],
+          deleteEndPoint: "core/system/positions",
         }}
       />
     </Box>

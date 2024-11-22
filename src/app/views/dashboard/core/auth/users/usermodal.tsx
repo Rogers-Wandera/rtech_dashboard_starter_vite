@@ -19,6 +19,7 @@ import { useRegisterMutation } from "@/lib/store/services/auth/auth.api";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
 import { notifier } from "@/lib/utils/notify/notification";
+import { useMaterialTheme } from "@/lib/themes/material.theme";
 
 type props = {
   opened: boolean;
@@ -28,6 +29,7 @@ type props = {
 };
 
 const UserModal = ({ opened, close, form, refetch }: props) => {
+  const theme = useMaterialTheme();
   const [Register] = useRegisterMutation({});
   const [countryCode, setCountryCode] = useState("+256");
 
@@ -69,6 +71,11 @@ const UserModal = ({ opened, close, form, refetch }: props) => {
         overlayProps={{
           backgroundOpacity: 0.55,
           blur: 3,
+        }}
+        styles={{
+          content: { backgroundColor: theme.palette.background.default },
+          header: { backgroundColor: theme.palette.background.default },
+          title: { fontSize: "1.3rem", fontWeight: "bold" },
         }}
       >
         <form

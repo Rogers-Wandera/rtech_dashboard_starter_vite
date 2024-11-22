@@ -186,14 +186,27 @@ export interface ServerSideProps<T extends Record<string, any>> {
   serveractions?: {
     addEndPoint?: string;
     editEndPoint?: string | ((row: MRT_Row<T>) => string);
+    deleteEndPoint?: string | ((row: MRT_Row<T>) => string);
     postFields?: string[];
     postType?: "Array" | "Object";
-    addCallback?: (values: any, table: MRT_TableInstance<T>) => typeof values;
-    editCallback?: (
+    addCreateCallback?: (
+      values: any,
+      table: MRT_TableInstance<T>
+    ) => typeof values;
+    editCreateCallback?: (
       values: any,
       table: MRT_TableInstance<T>,
       row?: MRT_Row<T>
     ) => typeof values;
+    deletePayload?:
+      | Array<unknown>
+      | Record<string, any>
+      | ((row: MRT_Row<T>) => Array<unknown> | Record<string, any>);
+  };
+  actioncallbacks?: {
+    addCallBack?: <TData>(response: TData) => void;
+    editCallBack?: <TData>(response: TData, row: MRT_Row<T>) => void;
+    deleteCallBack?: <TData>(response: TData, row: MRT_Row<T>) => void;
   };
   validateData?: (
     data: any,

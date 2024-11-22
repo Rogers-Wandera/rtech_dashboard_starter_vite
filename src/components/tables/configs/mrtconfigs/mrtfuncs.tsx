@@ -28,6 +28,8 @@ import { useNavigate } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { ReactNode } from "react";
 import { Edit, Delete } from "@mui/icons-material";
+import { Text } from "@mantine/core";
+import { modals } from "@mantine/modals";
 
 export function GenerateColumns<TData extends Record<string, any>>(
   tablecolumns: TableColumns<TData>[],
@@ -259,6 +261,24 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
   },
   menuitems = [],
 }: rowactions<T>) => {
+  const text = title && title.endsWith("s") ? title.slice(0, -1) : title || "";
+
+  const openDeleteModal = (row: MRT_Row<T>) =>
+    modals.openConfirmModal({
+      title: "Delete " + text.toLowerCase(),
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete your {text.toLowerCase()}? This action
+          is destructive and you will have to contact support to restore your
+          data.
+        </Text>
+      ),
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      confirmProps: { color: "red" },
+      onConfirm: () => HandleDeleteData(row),
+    });
+
   if (rowactions.actiontype === "menu") {
     return {
       renderRowActionMenuItems: ({
@@ -322,7 +342,7 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
               label="Delete"
               onClick={() => {
                 closeMenu();
-                HandleDeleteData(row);
+                openDeleteModal(row);
               }}
               table={table}
             />
@@ -382,7 +402,7 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
             )}
             {deleterender && (
               <Tooltip title={"Delete " + title}>
-                <IconButton color="error" onClick={() => HandleDeleteData(row)}>
+                <IconButton color="error" onClick={() => openDeleteModal(row)}>
                   <Delete />
                 </IconButton>
               </Tooltip>

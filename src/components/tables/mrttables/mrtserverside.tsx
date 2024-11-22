@@ -17,6 +17,7 @@ import {
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { useAppDispatch } from "@/hooks/store.hooks";
+import { useDeleteData } from "@/hooks/usedelete.hook";
 
 export const MRT_ServerTable = <TData extends Record<string, any>>(
   options: ServerSideProps<TData>
@@ -30,6 +31,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       editEndPoint: "edit",
       postFields: [],
       postType: "Object",
+      deleteEndPoint: "delete",
     },
     validateData = undefined,
   } = options;
@@ -51,6 +53,10 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
 
   const { postAsync, data } = usePostData<ServerResponse>({
     queryKey: columns.map((column) => column.accessorKey),
+  });
+
+  const { deleteAsync, data: deleteData } = useDeleteData({
+    queryKey: [...columns.map((column) => column.accessorKey), "delete"],
   });
 
   const HandleDataToPost = (values: any, table: MRT_TableInstance<TData>) => {
@@ -103,8 +109,8 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       dispatch(setLoading(true));
       const postData = HandleDataToPost(values, table);
       if (postData && Object.keys(postData.values).length > 0) {
-        if (serveractions?.addCallback) {
-          values = serveractions.addCallback(postData.dataToPost, table);
+        if (serveractions?.addCreateCallback) {
+          values = serveractions.addCreateCallback(postData.dataToPost, table);
         }
         const addUrl = serveractions.addEndPoint
           ? serveractions.addEndPoint
@@ -116,6 +122,8 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
           message: (data?.msg as string) || "Operation successful",
           timer: 6000,
         });
+        options.actioncallbacks?.addCallBack &&
+          options.actioncallbacks?.addCallBack(data);
         dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
@@ -140,8 +148,12 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       dispatch(setLoading(true));
       const postData = HandleDataToPost(values, table);
       if (postData && Object.keys(postData.values).length > 0) {
-        if (serveractions?.editCallback) {
-          values = serveractions.editCallback(postData.dataToPost, table, row);
+        if (serveractions?.editCreateCallback) {
+          values = serveractions.editCreateCallback(
+            postData.dataToPost,
+            table,
+            row
+          );
         }
         let editUrl = `Update/${row.original[options.idField as string]}`;
         if (serveractions?.editEndPoint) {
@@ -164,6 +176,8 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
           message: (data?.msg as string) || "Operation successful",
           timer: 6000,
         });
+        options.actioncallbacks?.editCallBack &&
+          options.actioncallbacks?.editCallBack(data, row);
         dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
@@ -175,11 +189,49 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
     }
   };
 
+  const HandleDelete = async (row: MRT_Row<TData>) => {
+    try {
+      dispatch(setLoading(true));
+      let url = `Delete/${row.original[options.idField as string]}`;
+      let payload = undefined;
+      if (serveractions.deleteEndPoint) {
+        if (typeof serveractions.deleteEndPoint === "function") {
+          url = serveractions.deleteEndPoint(row);
+        } else {
+          url =
+            serveractions.deleteEndPoint +
+            `/${row.original[options.idField as string]}`;
+        }
+      }
+
+      if (serveractions.deletePayload) {
+        if (typeof serveractions.deletePayload === "function") {
+          payload = serveractions.deletePayload(row);
+        } else {
+          payload = serveractions.deletePayload;
+        }
+      }
+      await deleteAsync({ endPoint: url, payload });
+      options.refetch && options.refetch();
+      notifier.success({
+        message: (deleteData?.msg as string) || "Operation successful",
+        timer: 6000,
+      });
+      options.actioncallbacks?.deleteCallBack &&
+        options.actioncallbacks?.deleteCallBack(data, row);
+      dispatch(setLoading(false));
+    } catch (error) {
+      dispatch(setLoading(false));
+      HandleError(error as ServerErrorResponse);
+    }
+  };
+
   const table = RenderTable({
     columns,
     ...options,
     HandleCreate: handleCreate,
     HandleUpdate: HandleUpdate,
+    HandleDeleteData: HandleDelete,
   });
 
   return (
