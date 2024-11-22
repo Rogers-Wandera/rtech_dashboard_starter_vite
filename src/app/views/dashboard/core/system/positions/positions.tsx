@@ -21,13 +21,15 @@ const ManagePositions = () => {
     <Box>
       <MRT_ServerTable
         title="Position"
+        idField="id"
+        enableEditing={true}
         tablecolumns={PositionColumns}
         refetch={refetch}
         enableRowActions={true}
         validateData={validateData}
         serveractions={{
           addEndPoint: "core/system/positions",
-          editEndPoint: "core/system/positions/edit",
+          editEndPoint: "core/system/positions",
           postFields: ["position"],
         }}
       />

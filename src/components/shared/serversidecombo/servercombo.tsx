@@ -80,7 +80,7 @@ const ServerCombo = <T extends Record<string, any>>({
   const HandleSearch = debounce((value: string) => {
     setPaginate((prevState) => ({ ...prevState, globalFilter: value }));
     setSearchValue(value);
-  }, 300);
+  }, 30);
 
   useEffect(() => {
     setSelects(formattedData);

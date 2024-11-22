@@ -22,6 +22,7 @@ type withUrl = {
 type PostDataPayload<T = unknown> = (noUrl | withUrl) & {
   setUrlOptions?: (url: URL) => URL;
   payload: T;
+  method?: "PATCH" | "PUT" | "POST";
 };
 export function usePostData<T = any, P = unknown>({
   queryKey,
@@ -47,16 +48,29 @@ export function usePostData<T = any, P = unknown>({
       setUrlOptions,
       endPoint,
       payload,
+      method = "POST",
     }: PostDataPayload) => {
       try {
         const mainurl = url
           ? url
-          : import.meta.env.VITE_SERVER_URL + `${prefix}/${endPoint}`;
+          : import.meta.env.VITE_SERVER_URL +
+            `${prefix}/${
+              endPoint
+                ? endPoint.startsWith("/")
+                  ? endPoint.slice(1)
+                  : endPoint
+                : ""
+            }`;
         let postUrl = new URL(mainurl);
         if (setUrlOptions) {
           postUrl = setUrlOptions(new URL(mainurl));
         }
-        const response = await axios.post<T>(postUrl.href, payload, configs);
+        const response = await axios<T>({
+          ...configs,
+          url: postUrl.href,
+          data: payload,
+          method: method,
+        });
         return response.data;
       } catch (error) {
         const err = error as AxiosError<ServerErrorResponse>;

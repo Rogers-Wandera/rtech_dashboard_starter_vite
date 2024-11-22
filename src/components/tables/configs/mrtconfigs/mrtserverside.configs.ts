@@ -189,7 +189,11 @@ export interface ServerSideProps<T extends Record<string, any>> {
     postFields?: string[];
     postType?: "Array" | "Object";
     addCallback?: (values: any, table: MRT_TableInstance<T>) => typeof values;
-    editCallback?: (values: any, table: MRT_TableInstance<T>) => typeof values;
+    editCallback?: (
+      values: any,
+      table: MRT_TableInstance<T>,
+      row?: MRT_Row<T>
+    ) => typeof values;
   };
   validateData?: (
     data: any,
@@ -274,4 +278,13 @@ export type tableProps<TData extends Record<string, any>> =
     setValidationErrors?: React.Dispatch<
       React.SetStateAction<Record<string, string | undefined>>
     >;
+    HandleUpdate?: ({
+      values,
+      table,
+      row,
+    }: {
+      values: any;
+      table: MRT_TableInstance<TData>;
+      row: MRT_Row<TData>;
+    }) => void;
   };

@@ -27,6 +27,7 @@ export function RenderTable<TData extends Record<string, any>>({
   customCallBack = () => {},
   HandleCreate = () => {},
   setValidationErrors = () => {},
+  HandleUpdate = () => {},
 }: tableProps<TData>) {
   const {
     filters,
@@ -66,6 +67,7 @@ export function RenderTable<TData extends Record<string, any>>({
     onCreatingRowCancel: () => setValidationErrors({}),
     onEditingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: HandleCreate,
+    onEditingRowSave: HandleUpdate,
     enableRowActions,
     enableRowSelection,
     ...HandleRenderAddEditDialogs<TData>({ ...addeditprops, title }),
