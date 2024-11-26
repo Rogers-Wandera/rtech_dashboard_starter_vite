@@ -28,6 +28,7 @@ export function RenderTable<TData extends Record<string, any>>({
   HandleCreate = () => {},
   setValidationErrors = () => {},
   HandleUpdate = () => {},
+  deleteModalProps = {},
 }: tableProps<TData>) {
   const {
     filters,
@@ -48,6 +49,7 @@ export function RenderTable<TData extends Record<string, any>>({
     menuitems,
     rowactions,
     HandleDeleteData,
+    deleteModalProps,
   });
 
   const table = useMaterialReactTable({

@@ -12,13 +12,15 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Outlet } from "react-router-dom";
 import PaginateProvider from "../context/paginate/paginate.context";
+import { MantineTheme } from "../themes/mantine.theme";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
+  const Mantine_Theme = MantineTheme();
   return (
     <>
       <ThemeProvider theme={MaterialTheme}>
-        <MantineProvider>
+        <MantineProvider theme={Mantine_Theme}>
           <Suspense
             fallback={
               <div className="centered-loader">

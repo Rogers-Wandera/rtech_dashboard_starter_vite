@@ -35,7 +35,7 @@ const ChangePassword = () => {
         throw response.error;
       }
       form.reset();
-      notifier.success({ message: response.data.msg });
+      notifier.success({ message: String(response.data.msg) });
       dispatch(logOut());
     } catch (error) {
       HandleError(error as ServerErrorResponse);

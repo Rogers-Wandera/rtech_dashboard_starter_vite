@@ -4,7 +4,10 @@ import RouteRoles from "@/hocs/verifyroles";
 import { useAuth } from "@/hooks/auth.hooks";
 import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
 import { User } from "@/types/app/core/user.type";
-import { PaginateResponse } from "@/types/server/server.main.types";
+import {
+  PaginateResponse,
+  ServerResponse,
+} from "@/types/server/server.main.types";
 import {
   user_schema,
   userformtype,
@@ -17,10 +20,14 @@ import { Avatar } from "@mui/material";
 import { useDisclosure } from "@mantine/hooks";
 import UserModal from "./usermodal";
 import { useForm, zodResolver } from "@mantine/form";
+import { usePostData } from "@/hooks/usepost.hook";
 
 const ManageUsers = () => {
   const { user } = useAuth();
   const [opened, { open, close }] = useDisclosure(false);
+  const { postAsync } = usePostData<ServerResponse>({
+    queryKey: ["update_user"],
+  });
   const moretableconfigs: TableColumnConfigs<User>[] = [
     { accessorKey: "gender", filterSelectOptions: ["Male", "Female"] },
     {
@@ -43,6 +50,14 @@ const ManageUsers = () => {
             : row.original.last_active > 1
             ? `${row.original.last_active} days ago`
             : `${row.original.last_active} day ago`;
+        return display;
+      },
+    },
+    {
+      accessorKey: "verified",
+      Edit: () => null,
+      Cell: ({ row }) => {
+        const display = row.original.verified === 0 ? "No" : "Yes";
         return display;
       },
     },
@@ -71,26 +86,33 @@ const ManageUsers = () => {
 
   return (
     <div>
-      <MRT_ServerTable<User>
-        tablecolumns={userscolumns}
-        columnConfigs={moretableconfigs}
-        refetch={refetch}
-        title="User"
-        enableRowActions={true}
-        enableEditing={true}
-        rowactions={{
-          editrender: false,
-          deleterender: (row) => (row.original.id === user?.id ? false : true),
-          actiontype: "menu",
-        }}
-        menuitems={[...usermenuitems(user)]}
-        otherTableOptions={{ createDisplayMode: "custom" }}
-        customCallBack={(table) => {
-          table.setCreatingRow(true);
-          form.reset();
-          open();
-        }}
-      />
+      {!opened && (
+        <MRT_ServerTable<User>
+          tablecolumns={userscolumns}
+          columnConfigs={moretableconfigs}
+          refetch={refetch}
+          title="User"
+          enableRowActions={true}
+          enableEditing={true}
+          rowactions={{
+            editrender: false,
+            deleterender: (row) =>
+              row.original.id === user?.id ? false : true,
+            actiontype: "menu",
+          }}
+          menuitems={[...usermenuitems({ user, refetch, postAsync })]}
+          otherTableOptions={{ createDisplayMode: "custom" }}
+          customCallBack={(table) => {
+            table.setCreatingRow(true);
+            form.reset();
+            open();
+          }}
+          deleteModalProps={{
+            confirmLabel: (row) => `Delete ${row.original.userName}`,
+          }}
+          serveractions={{ deleteEndPoint: "core/auth/users" }}
+        />
+      )}
       <UserModal opened={opened} close={close} form={form} refetch={refetch} />
     </div>
   );

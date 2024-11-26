@@ -8,7 +8,7 @@ export const useMaterialTheme = () => {
   const theme = useMemo(() => {
     return createTheme({
       palette: {
-        mode: settings.theme_scheme.value as "light" | "dark",
+        mode: settings.theme_scheme.value === "dark" ? "dark" : "light",
         background: {
           default:
             settings.theme_scheme.value === "light" ? "#ffffff" : "#222738",

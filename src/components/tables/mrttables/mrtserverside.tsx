@@ -40,6 +40,8 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
     Record<string, string | undefined>
   >({});
 
+  const idField = options.idField ? options.idField : "id";
+
   const columns = useMemo<MRT_ColumnDef<TData>[]>(
     () =>
       GenerateColumns(
@@ -155,14 +157,14 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
             row
           );
         }
-        let editUrl = `Update/${row.original[options.idField as string]}`;
+        let editUrl = `Update/${row.original[idField]}`;
         if (serveractions?.editEndPoint) {
           if (typeof serveractions.editEndPoint === "function") {
             editUrl = serveractions.editEndPoint(row);
           } else {
-            editUrl =
-              serveractions.editEndPoint +
-              `/${row.original[options.idField as string]}`;
+            editUrl = serveractions.editEndPoint.endsWith("/")
+              ? serveractions.editEndPoint + `${row.original[idField]}`
+              : serveractions.editEndPoint + `/${row.original[idField]}`;
           }
         }
         await postAsync({
@@ -192,15 +194,15 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
   const HandleDelete = async (row: MRT_Row<TData>) => {
     try {
       dispatch(setLoading(true));
-      let url = `Delete/${row.original[options.idField as string]}`;
+      let url = `Delete/${row.original[idField]}`;
       let payload = undefined;
       if (serveractions.deleteEndPoint) {
         if (typeof serveractions.deleteEndPoint === "function") {
           url = serveractions.deleteEndPoint(row);
         } else {
-          url =
-            serveractions.deleteEndPoint +
-            `/${row.original[options.idField as string]}`;
+          url = serveractions.deleteEndPoint.endsWith("/")
+            ? serveractions.deleteEndPoint + `${row.original[idField]}`
+            : serveractions.deleteEndPoint + `/${row.original[idField]}`;
         }
       }
 

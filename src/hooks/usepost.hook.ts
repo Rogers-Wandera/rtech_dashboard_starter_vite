@@ -19,7 +19,7 @@ type withUrl = {
   endPoint: never;
 };
 
-type PostDataPayload<T = unknown> = (noUrl | withUrl) & {
+export type PostDataPayload<T = unknown> = (noUrl | withUrl) & {
   setUrlOptions?: (url: URL) => URL;
   payload: T;
   method?: "PATCH" | "PUT" | "POST" | "DELETE";
@@ -49,7 +49,7 @@ export function usePostData<T = any, P = unknown>({
       endPoint,
       payload,
       method = "POST",
-    }: PostDataPayload) => {
+    }: PostDataPayload<P>) => {
       try {
         const mainurl = url
           ? url

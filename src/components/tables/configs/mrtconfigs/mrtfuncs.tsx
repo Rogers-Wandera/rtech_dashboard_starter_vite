@@ -249,6 +249,12 @@ type rowactions<T extends Record<string, any>> = {
   HandleDeleteData?: (row: MRT_Row<T>) => void;
   menuitems?: RowMenuItems<T>[];
   title: string;
+  deleteModalProps?: {
+    title?: string | ((row: MRT_Row<T>) => string);
+    message?: string | ((row: MRT_Row<T>) => string);
+    confirmLabel?: string | ((row: MRT_Row<T>) => string);
+    cancelLabel?: string;
+  };
 };
 
 export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
@@ -260,24 +266,64 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
     actiontype: "menu",
   },
   menuitems = [],
+  deleteModalProps = {
+    title: undefined,
+    message: undefined,
+    confirmLabel: undefined,
+    cancelLabel: undefined,
+  },
 }: rowactions<T>) => {
   const text = title && title.endsWith("s") ? title.slice(0, -1) : title || "";
 
-  const openDeleteModal = (row: MRT_Row<T>) =>
-    modals.openConfirmModal({
-      title: "Delete " + text.toLowerCase(),
-      centered: true,
-      children: (
-        <Text size="sm">
-          Are you sure you want to delete your {text.toLowerCase()}? This action
+  const openDeleteModal = (row: MRT_Row<T>) => {
+    let title = "Delete " + text.toLowerCase();
+    let message = `Are you sure you want to delete your ${text.toLowerCase()}? This action
           is destructive and you will have to contact support to restore your
-          data.
-        </Text>
-      ),
-      labels: { confirm: "Confirm", cancel: "Cancel" },
+          data.`;
+    let confirmLabel = "Confirm";
+    if (deleteModalProps.title) {
+      if (typeof deleteModalProps.title === "function") {
+        title = deleteModalProps.title(row);
+      } else {
+        title = deleteModalProps.title;
+      }
+    }
+    if (deleteModalProps.message) {
+      if (typeof deleteModalProps.message === "function") {
+        message = deleteModalProps.message(row);
+      } else {
+        message = deleteModalProps.message;
+      }
+    }
+    if (deleteModalProps.title) {
+      if (typeof deleteModalProps.title === "function") {
+        title = deleteModalProps.title(row);
+      } else {
+        title = deleteModalProps.title;
+      }
+    }
+
+    if (deleteModalProps.confirmLabel) {
+      if (typeof deleteModalProps.confirmLabel === "function") {
+        confirmLabel = deleteModalProps.confirmLabel(row);
+      } else {
+        confirmLabel = deleteModalProps.confirmLabel;
+      }
+    }
+    return modals.openConfirmModal({
+      title: title,
+      centered: true,
+      children: <Text size="sm">{message}</Text>,
+      labels: {
+        confirm: confirmLabel,
+        cancel: deleteModalProps.cancelLabel
+          ? deleteModalProps.cancelLabel
+          : "Cancel",
+      },
       confirmProps: { color: "red" },
       onConfirm: () => HandleDeleteData(row),
     });
+  };
 
   if (rowactions.actiontype === "menu") {
     return {

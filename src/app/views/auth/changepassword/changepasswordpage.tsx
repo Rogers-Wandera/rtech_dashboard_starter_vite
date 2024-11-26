@@ -3,7 +3,7 @@ import Card from "@/components/shared/Card";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { PasswordInput, Popover, Progress } from "@mantine/core";
 import auth2 from "@/assets/images/auth/02.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
   getStrength,
@@ -14,6 +14,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { UseFormReturnType } from "@mantine/form";
 import { ResetPasswordValues } from "@/types/app/auth/auth.types";
+import { useAppDispatch } from "@/hooks/store.hooks";
+import { logOut } from "@/lib/store/services/auth/auth.slice";
 
 type props = {
   form: UseFormReturnType<
@@ -26,7 +28,7 @@ const ChangePasswordPage = ({ form, HandleSubmit }: props) => {
   const app_name = useSelector(
     (state: RootState) => state.setting.setting.app_name.value
   );
-  let history = useNavigate();
+  const dispatch = useAppDispatch();
   const [popoverOpened, setPopoverOpened] = useState({
     password: false,
     confirmpassword: false,
@@ -75,7 +77,10 @@ const ChangePasswordPage = ({ form, HandleSubmit }: props) => {
           />
         </Col>
         <Col md="6" className="p-0">
-          <button className="btn btn-primary mx-4" onClick={() => history(-1)}>
+          <button
+            className="btn btn-primary mx-4"
+            onClick={() => dispatch(logOut())}
+          >
             <ArrowBackIcon />
           </button>
           <Card className="card-transparent auth-card shadow-none d-flex justify-content-center mb-0">

@@ -212,6 +212,12 @@ export interface ServerSideProps<T extends Record<string, any>> {
     data: any,
     table: MRT_TableInstance<T>
   ) => Record<string, string>;
+  deleteModalProps?: {
+    title?: string | ((row: MRT_Row<T>) => string);
+    message?: string | ((row: MRT_Row<T>) => string);
+    confirmLabel?: string | ((row: MRT_Row<T>) => string);
+    cancelLabel?: string;
+  };
 }
 
 /**

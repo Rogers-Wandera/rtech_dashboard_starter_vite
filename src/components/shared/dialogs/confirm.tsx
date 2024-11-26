@@ -17,18 +17,15 @@ const ConfirmModal = ({
   onConfirm = () => {},
   onCancel = () => {},
 }: props) => {
-  const openModal = () =>
-    modals.openConfirmModal({
-      title: title,
-      centered: true,
-      children: <Text size="sm">{message}</Text>,
-      labels: { confirm: labels.confirmLabel, cancel: labels.cancelLabel },
-      confirmProps: { color: type === "info" ? "green" : "red" },
-      onCancel: onCancel,
-      onConfirm: onConfirm,
-    });
-
-  return { openModal };
+  return modals.openConfirmModal({
+    title: title,
+    centered: true,
+    children: <Text size="sm">{message}</Text>,
+    labels: { confirm: labels.confirmLabel, cancel: labels.cancelLabel },
+    confirmProps: { color: type === "info" ? "green" : "red" },
+    onCancel: onCancel,
+    onConfirm: onConfirm,
+  });
 };
 
 export default ConfirmModal;
