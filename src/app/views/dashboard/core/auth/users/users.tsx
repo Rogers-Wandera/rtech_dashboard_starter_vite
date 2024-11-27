@@ -16,11 +16,19 @@ import {
 } from "./userconfig";
 import MaleImage from "@/assets/images/avatars/01.png";
 import FemaleImage from "@/assets/images/avatars/lady.png";
-import { Avatar } from "@mui/material";
+import { Avatar, Badge } from "@mui/material";
 import { useDisclosure } from "@mantine/hooks";
 import UserModal from "./usermodal";
 import { useForm, zodResolver } from "@mantine/form";
 import { usePostData } from "@/hooks/usepost.hook";
+import { IconLock } from "@tabler/icons-react";
+import { styled } from "@mui/material/styles";
+
+const SmallAvatar = styled(IconLock)(() => ({
+  width: 22,
+  height: 22,
+  color: "red",
+}));
 
 const ManageUsers = () => {
   const { user } = useAuth();
@@ -37,7 +45,19 @@ const ManageUsers = () => {
         const fallbackimage =
           row.original.gender === "Male" ? MaleImage : FemaleImage;
         const image = row.original.image ? row.original.image : fallbackimage;
-        return <Avatar alt={user?.displayName} src={image} />;
+        let display = <Avatar alt={user?.displayName} src={image} />;
+        if (row.original.isLocked == 1) {
+          display = (
+            <Badge
+              overlap="circular"
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              badgeContent={<SmallAvatar />}
+            >
+              <Avatar alt={user?.displayName} src={image} />
+            </Badge>
+          );
+        }
+        return display;
       },
     },
     {

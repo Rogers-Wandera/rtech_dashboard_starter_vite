@@ -45,7 +45,7 @@ const ResetPassword = () => {
       }
       const msg = response.data.msg;
       form.reset();
-      notifier.success({ message: msg });
+      notifier.success({ message: String(msg) });
       navigate("/");
     } catch (error) {
       HandleError(error as ServerErrorResponse);

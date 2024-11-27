@@ -14,6 +14,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { UseFormReturnType } from "@mantine/form";
 import { ResetPasswordValues } from "@/types/app/auth/auth.types";
+import { useAppDispatch } from "@/hooks/store.hooks";
+import { logOut } from "@/lib/store/services/auth/auth.slice";
 
 type props = {
   form: UseFormReturnType<
@@ -23,6 +25,7 @@ type props = {
   HandleSubmit: (values: ResetPasswordValues) => void;
 };
 const ResetPasswordPage = ({ form, HandleSubmit }: props) => {
+  const dispatch = useAppDispatch();
   const app_name = useSelector(
     (state: RootState) => state.setting.setting.app_name.value
   );
@@ -75,9 +78,17 @@ const ResetPasswordPage = ({ form, HandleSubmit }: props) => {
           />
         </Col>
         <Col md="6" className="p-0">
-          <button className="btn btn-primary mx-4" onClick={() => history(-1)}>
-            <ArrowBackIcon />
-          </button>
+          <div>
+            <button
+              className="btn btn-primary mx-4"
+              onClick={() => {
+                dispatch(logOut());
+                history("/");
+              }}
+            >
+              <ArrowBackIcon />
+            </button>
+          </div>
           <Card className="card-transparent auth-card shadow-none d-flex justify-content-center mb-0">
             <Card.Body>
               <Link
