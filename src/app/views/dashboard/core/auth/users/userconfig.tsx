@@ -23,6 +23,8 @@ import { AxiosError } from "axios";
 import { IconLockFilled } from "@tabler/icons-react";
 import { useAuth } from "@/hooks/auth.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
+import { helpers } from "@/lib/utils/helpers/helper";
+import { useNavigate } from "react-router-dom";
 
 export const userscolumns: TableColumns<User>[] = [
   { accessorKey: "image", header: "Image", type: "text" },
@@ -48,6 +50,7 @@ export const usermenuitems = ({
   >;
 }): RowMenuItems<User>[] => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const { user: AuthUser } = useAuth();
   const HandleResetPassword = (row: MRT_Row<User>) => {
@@ -148,7 +151,11 @@ export const usermenuitems = ({
     {
       label: "Manage",
       icon: <ManageAccountsIcon color="secondary" />,
-      onClick: () => {},
+      onClick: (row) => {
+        const url = "/dahsboard/core/auth/user";
+        const encrypted = helpers.encryptUrl(row.original.id as string);
+        navigate(`${url}/${encrypted}`);
+      },
       render: (row) =>
         row.original.isLocked === 0 && row.original.verified === 1
           ? true
