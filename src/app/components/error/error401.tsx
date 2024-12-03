@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/auth.hooks";
 import { Container } from "react-bootstrap";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router";
 // img
 const Error401 = () => {
   const { token, isLoggedIn } = useAuth();

@@ -6,7 +6,7 @@ import { HelperClass } from "@/lib/utils/helpers/helper";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useInterval } from "@mantine/hooks";
 import React, { useCallback, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 function WithSession<P extends Object>(
   Component: React.ComponentType<P>

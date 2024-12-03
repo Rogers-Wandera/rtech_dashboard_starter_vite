@@ -1,5 +1,5 @@
 import { Container, Image } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 // img
 import error404 from "@/assets/images/error/404.png";
 import { Center } from "@mantine/core";

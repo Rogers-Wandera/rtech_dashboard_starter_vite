@@ -1,3 +1,4 @@
+import * as Icons from "@tabler/icons-react";
 import { METHODS } from "../enums/enum.types";
 
 export type ServerRolesType = {
@@ -15,6 +16,7 @@ export type ServerModuleRes = {
   route: string;
   expired: number;
   render: number;
+  icon: keyof typeof Icons;
 };
 export type UserModuleRes = {
   [key: string]: ServerModuleRes[];

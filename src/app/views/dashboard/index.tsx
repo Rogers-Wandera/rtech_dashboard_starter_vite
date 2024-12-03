@@ -10,7 +10,7 @@ import SubHeader from "@/components/partials/HeaderStyle/sub-header";
 import Sidebar from "@/components/partials/SidebarStyle/sidebar";
 import { RootState } from "@/lib/store/store";
 import { LoadingOverlay } from "@mantine/core";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import WithAuth from "@/hocs/auth.hoc";
 import WithRouteRole from "@/hocs/routerole.hoc";
 import WithSession from "@/hocs/session.hoc";

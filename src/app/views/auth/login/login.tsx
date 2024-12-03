@@ -5,7 +5,7 @@ import { useLoginMutation } from "@/lib/store/services/auth/auth.api";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import LoginPage from "./loginpage";
 import { ILoginValues } from "@/types/app/auth/auth.types";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
 import { useAuth } from "@/hooks/auth.hooks";
 import { useEffect, useState } from "react";

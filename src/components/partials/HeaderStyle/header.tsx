@@ -17,7 +17,7 @@ import * as SettingSelector from "@/lib/store/settings/dasboardsettings/selector
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import { Combobox, Image, Switch, useCombobox } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { notifier } from "@/lib/utils/notify/notification";

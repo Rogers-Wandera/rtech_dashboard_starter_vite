@@ -1,7 +1,7 @@
 import { IPaginateContext } from "@/types/app/app.types";
 import { IPaginate } from "@/types/server/server.main.types";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 const initialstate: IPaginateContext<unknown> = {
   paginate: {

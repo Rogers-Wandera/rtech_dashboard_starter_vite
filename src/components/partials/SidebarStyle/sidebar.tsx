@@ -10,7 +10,7 @@ import * as SettingSelector from "@/lib/store/settings/dasboardsettings/selector
 // Redux Selector / Action
 import { useSelector } from "react-redux";
 import Logo from "@/components/shared/logo";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 type sidebarprops = {
   app_name: string;

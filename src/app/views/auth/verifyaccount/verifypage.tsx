@@ -7,7 +7,7 @@ import { notifier } from "@/lib/utils/notify/notification";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
 import { Box, Image } from "@mantine/core";
 import { Button } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 
 type props = {
   resend: boolean;

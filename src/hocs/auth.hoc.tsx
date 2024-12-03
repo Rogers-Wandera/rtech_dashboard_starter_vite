@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/auth.hooks";
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 
 function WithAuth<P extends Object>(
   Component: React.ComponentType<P>

@@ -24,7 +24,7 @@ import { IconLockFilled } from "@tabler/icons-react";
 import { useAuth } from "@/hooks/auth.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { helpers } from "@/lib/utils/helpers/helper";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export const userscolumns: TableColumns<User>[] = [
   { accessorKey: "image", header: "Image", type: "text" },
@@ -152,7 +152,7 @@ export const usermenuitems = ({
       label: "Manage",
       icon: <ManageAccountsIcon color="secondary" />,
       onClick: (row) => {
-        const url = "/dahsboard/core/auth/user";
+        const url = "/dashboard/core/auth/user";
         const encrypted = helpers.encryptUrl(row.original.id as string);
         navigate(`${url}/${encrypted}`);
       },

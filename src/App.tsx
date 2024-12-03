@@ -4,7 +4,7 @@ import { LoadingOverlay, useMantineColorScheme } from "@mantine/core";
 import { useAppDispatch } from "./hooks/store.hooks";
 import { setSetting } from "./lib/store/settings/dasboardsettings/actions";
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import { useMaterialTheme } from "./lib/themes/material.theme";
 
 const App = () => {

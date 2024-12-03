@@ -9,7 +9,7 @@ import {
 import { PasswordInput, Popover, Progress, TextInput } from "@mantine/core";
 import auth1 from "@/assets/images/auth/01.png";
 import { ILoginValues } from "@/types/app/auth/auth.types";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import logodark from "@/assets/logos/logo2.png";
 import logolight from "@/assets/logos/logo.png";
 import { useSelector } from "react-redux";

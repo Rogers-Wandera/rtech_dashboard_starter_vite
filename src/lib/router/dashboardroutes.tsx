@@ -4,7 +4,7 @@ import ManageUsers from "@/app/views/dashboard/core/auth/users/users";
 import ManagePositions from "@/app/views/dashboard/core/system/positions/positions";
 import Dashboard from "@/app/views/dashboard/dashboard/dashboard";
 import { ROLES } from "@/types/enums/enum.types";
-import { RouteObject } from "react-router-dom";
+import { RouteObject } from "react-router";
 
 export const AuthRouter: RouteObject = {
   path: "/dashboard",
@@ -19,6 +19,9 @@ export const AuthRouter: RouteObject = {
       // ],
     },
     { path: "/dashboard/core/system/positions", element: <ManagePositions /> },
-    { path: "/dashboard/core/auth/user/:id", element: <UserProfile /> },
+    {
+      path: "/dashboard/core/auth/user/:id",
+      element: <UserProfile />,
+    },
   ],
 };

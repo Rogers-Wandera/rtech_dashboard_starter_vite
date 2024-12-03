@@ -3,7 +3,7 @@ import Card from "@/components/shared/Card";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { PasswordInput, Popover, Progress } from "@mantine/core";
 import auth2 from "@/assets/images/auth/02.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import {
   getStrength,

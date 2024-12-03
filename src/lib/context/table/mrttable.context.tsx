@@ -11,7 +11,7 @@ import {
   MRT_VisibilityState,
 } from "material-react-table";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import {
   DEFAULT_COLUMN_FILTERS,
   DEFAULT_COLUMN_VISIBILITY,

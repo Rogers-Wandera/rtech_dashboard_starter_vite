@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/auth.hooks";
 import { WithRolesProps } from "@/types/app/auth/auth.types";
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 
 const RouteRoles = <P extends WithRolesProps>(
   Component: React.ComponentType<P>

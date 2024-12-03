@@ -10,7 +10,7 @@ import { ThemeProvider } from "@mui/material";
 import { ModalsProvider } from "@mantine/modals";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import PaginateProvider from "../context/paginate/paginate.context";
 import { MantineTheme } from "../themes/mantine.theme";
 

@@ -14,7 +14,7 @@ import "@/assets/scss/customizer.scss";
 
 import "./index.css";
 
-import { RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router";
 import { router } from "./lib/router/main.router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";

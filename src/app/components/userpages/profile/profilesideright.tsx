@@ -1,7 +1,7 @@
 import { Card, Col, Image } from "react-bootstrap";
 import icon1 from "../../../../assets/images/icons/01.png";
 import icon5 from "../../../../assets/images/icons/05.png";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 const UserSideRight = () => {
   return (

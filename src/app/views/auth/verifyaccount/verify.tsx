@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router";
 import VerifyPage from "./verifypage";
 import { useVerifyAccountMutation } from "@/lib/store/services/auth/auth.api";
 import { useAuth } from "@/hooks/auth.hooks";

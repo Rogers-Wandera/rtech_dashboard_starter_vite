@@ -2,7 +2,7 @@ import { useForm } from "@mantine/form";
 import ResetPasswordPage from "./resetpassword";
 import { ResetPasswordValues } from "@/types/app/auth/auth.types";
 import { useFromLinkResetPasswordMutation } from "@/lib/store/services/auth/auth.api";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
 import { notifier } from "@/lib/utils/notify/notification";

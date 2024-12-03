@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/auth.hooks";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 
 const ChangePassword = () => {
   const [Reset] = useResetPasswordMutation({});

@@ -22,7 +22,7 @@ import CountUp from "react-countup";
 
 import shapes1 from "@/assets/images/shapes/01.png";
 import Progress from "@/components/shared/progress";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 const Dashboard = () => {
   useSelector(SettingSelector.theme_color);

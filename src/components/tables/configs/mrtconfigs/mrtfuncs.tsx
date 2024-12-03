@@ -24,7 +24,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { ArrowBack, Refresh } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { ReactNode } from "react";
 import { Edit, Delete } from "@mui/icons-material";

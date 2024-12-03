@@ -1,5 +1,5 @@
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router";
 import Card from "@/components/shared/Card";
 import auth2 from "@/assets/images/auth/02.png";
 
@@ -32,7 +32,7 @@ const ForgotPasswordPage = () => {
         throw response.error;
       }
       const msg = response.data.msg;
-      notifier.success({ message: msg });
+      notifier.success({ message: msg as string });
       setEmail("");
       history("/");
     } catch (error) {

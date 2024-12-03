@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/auth.hooks";
-import { Outlet, Navigate, useLocation } from "react-router-dom";
+import { Outlet, Navigate, useLocation } from "react-router";
 
 const ProtectedLayout = () => {
   const { token, isLoggedIn } = useAuth();
