@@ -17,6 +17,7 @@ export const MantineTheme = () => {
           "#0c0d21",
           "#01010a",
           "#222738",
+          "#0b112e",
         ],
       },
     });

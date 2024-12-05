@@ -1,5 +1,5 @@
 import * as Icons from "@tabler/icons-react";
-import { METHODS } from "../enums/enum.types";
+import { METHODS, ROLES } from "../enums/enum.types";
 
 export type ServerRolesType = {
   roleName: string;
@@ -89,4 +89,23 @@ export type BaseTableType = {
   deletedAt: Date;
   deletedBy: string;
   isActive: number;
+};
+
+export interface UserSystemRole {
+  id: number;
+  userId: string;
+  roleId: number;
+  isActive: number;
+  role: number;
+  rolename: string;
+  description: string;
+  released: number;
+}
+
+export type SystemRole = BaseTableType & {
+  id: number;
+  rolename: string;
+  value: ROLES;
+  released: number;
+  description: string;
 };

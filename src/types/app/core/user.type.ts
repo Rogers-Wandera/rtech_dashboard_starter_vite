@@ -1,3 +1,5 @@
+import { SystemRole, UserSystemRole } from "@/types/server/server.main.types";
+
 export type User = {
   id: string;
   firstname: string;
@@ -19,4 +21,11 @@ export type User = {
   image: string;
   online: string;
   last_active: number;
+};
+
+export type UserSingleView = User & {
+  system_roles: {
+    roles: UserSystemRole[];
+    unassigned: SystemRole[];
+  };
 };

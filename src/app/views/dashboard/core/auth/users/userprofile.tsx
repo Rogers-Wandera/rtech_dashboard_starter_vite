@@ -1,95 +1,141 @@
-import { InputWithButton } from "@/components/shared/inputwithbutton";
-import {
-  Container,
-  Table,
-  Checkbox,
-  ActionIcon,
-  Card,
-  Flex,
-  Title,
-  ScrollArea,
-} from "@mantine/core";
-import { IconEye, IconUserSquareRounded } from "@tabler/icons-react";
+import Card from "@/components/shared/Card";
+import { Box } from "@mantine/core";
+import { Col, Nav, Row, Tab } from "react-bootstrap";
+import gent from "@/assets/images/avatars/01.png";
+import lady from "@/assets/images/avatars/lady.png";
+import ProfileLeft from "./pages/profileleft";
+import ProfileRight from "./pages/profileright";
+import ProfileTab from "./pages/profiletab";
+import ManageRoles from "./pages/roles";
+import { useEffect, useState } from "react";
+import { IconUpload } from "@tabler/icons-react";
+import { Avatar, Badge, styled } from "@mui/material";
+import { useParams } from "react-router";
+import { helpers } from "@/lib/utils/helpers/helper";
+import { useFetch } from "@/hooks/usefetch.hook";
+import { useAuth } from "@/hooks/auth.hooks";
+import { useAppDispatch } from "@/hooks/store.hooks";
+import { setLoading } from "@/lib/store/services/defaults/defaults";
+import { UserSingleView } from "@/types/app/core/user.type";
 
-const UserProfile = () => {
+const SmallAvatar = styled(IconUpload)(({ theme }) => ({
+  width: 25,
+  height: 25,
+  cursor: "pointer",
+  color: theme.palette.mode === "dark" ? "grey" : "blue",
+}));
+
+const UserProfilePage = () => {
+  const [newsHide, setNewsHide] = useState(false);
+  const params = useParams<{ id: string }>();
+  const userId = helpers.decryptUrl(String(params.id));
+  const [manual, setManual] = useState(true);
+  const { token } = useAuth();
+
+  const dispatch = useAppDispatch();
+  const { data, isLoading, isFetching } = useFetch<UserSingleView>({
+    queryKey: "user_data-" + userId,
+    endPoint: "core/auth/users/view/" + userId,
+    manual,
+    configs: { headers: { Authorization: `Bearer ${token}` } },
+  });
+
+  useEffect(() => {
+    if (!isLoading && !isFetching) {
+      setManual(false);
+      dispatch(setLoading(false));
+    }
+    if (isLoading || isFetching) {
+      dispatch(setLoading(true));
+    }
+  }, [isLoading, isFetching]);
+
   return (
-    <Container pt={60}>
-      <ScrollArea h={400}>
-        <Card>
-          <InputWithButton placeholder="Search Module" />
-          <Table.ScrollContainer minWidth={300}>
-            <Table verticalSpacing="md">
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>
-                    <Title order={3}>Modules</Title>
-                  </Table.Th>
-                  <Table.Th>
-                    <Title order={3}>Assign Roles</Title>
-                  </Table.Th>
-                  <Table.Th>
-                    <Title order={3}>View</Title>
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {/* Parent Module */}
-                <Table.Tr>
-                  <Table.Td colSpan={3} bg="#F6F6F6">
-                    <Flex gap={10}>
-                      <IconUserSquareRounded />
-                      <strong>User Management</strong>
-                    </Flex>
-                  </Table.Td>
-                </Table.Tr>
-
-                {/* Links under User Management */}
-                <Table.Tr style={{ borderBottom: "none", borderTop: "none" }}>
-                  <Table.Td style={{ paddingLeft: "20px", border: "none" }}>
-                    Manage Users
-                  </Table.Td>
-                  <Table.Td style={{ border: "none" }}>
-                    <Checkbox color="violet" size="md" />
-                  </Table.Td>
-                  <Table.Td style={{ border: "none" }}>
-                    <ActionIcon>
-                      <IconEye size={16} />
-                    </ActionIcon>
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr style={{ borderBottom: "none", borderTop: "none" }}>
-                  <Table.Td style={{ paddingLeft: "20px", border: "none" }}>
-                    Assign Roles
-                  </Table.Td>
-                  <Table.Td style={{ border: "none" }}>
-                    <Checkbox color="violet" size="md" />
-                  </Table.Td>
-                  <Table.Td style={{ border: "none" }}>
-                    <ActionIcon>
-                      <IconEye size={16} />
-                    </ActionIcon>
-                  </Table.Td>
-                </Table.Tr>
-                <Table.Tr style={{ borderBottom: "none", borderTop: "none" }}>
-                  <Table.Td style={{ paddingLeft: "20px", border: "none" }}>
-                    View Permissions
-                  </Table.Td>
-                  <Table.Td style={{ border: "none" }}>
-                    <Checkbox color="violet" size="md" />
-                  </Table.Td>
-                  <Table.Td style={{ border: "none" }}>
-                    <ActionIcon>
-                      <IconEye size={16} />
-                    </ActionIcon>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-          </Table.ScrollContainer>
-        </Card>
-      </ScrollArea>
-    </Container>
+    <Box>
+      {data && (
+        <Tab.Container defaultActiveKey="first">
+          <Row>
+            <Col lg="12">
+              <Card>
+                <Card.Body>
+                  <div className="d-flex flex-wrap align-items-center justify-content-between">
+                    <div className="d-flex flex-wrap align-items-center">
+                      <div className="profile-img position-relative me-3 mb-3 mb-lg-0 profile-logo profile-logo1">
+                        <Badge
+                          overlap="circular"
+                          anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                          }}
+                          badgeContent={
+                            <SmallAvatar className="upload-button" size={30} />
+                          }
+                        >
+                          <Avatar
+                            sx={{ width: 100, height: 100 }}
+                            alt={data.userName}
+                            src={
+                              data.image
+                                ? data.image
+                                : data.gender.toLowerCase() === "female"
+                                ? lady
+                                : gent
+                            }
+                          />
+                        </Badge>
+                      </div>
+                      <div className="d-flex flex-wrap align-items-center mb-3 mb-sm-0">
+                        <h4 className="me-2 h4">{data.userName}</h4>
+                        <span> - {data.position}</span>
+                      </div>
+                    </div>
+                    <Nav
+                      as="ul"
+                      className="d-flex nav-pills mb-0 text-center profile-tab"
+                      data-toggle="slider-tab"
+                      id="profile-pills-tab"
+                      role="tablist"
+                    >
+                      <Nav.Item as="li">
+                        <Nav.Link
+                          eventKey="first"
+                          onClick={() => {
+                            setNewsHide(false);
+                          }}
+                        >
+                          Profile
+                        </Nav.Link>
+                      </Nav.Item>
+                      <Nav.Item as="li">
+                        <Nav.Link
+                          eventKey="second"
+                          onClick={() => {
+                            setNewsHide(true);
+                          }}
+                        >
+                          Roles
+                        </Nav.Link>
+                      </Nav.Item>
+                    </Nav>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+            {!newsHide && <ProfileLeft user={data} />}
+            <Col lg={newsHide ? "9" : "6"}>
+              <Tab.Content>
+                <ProfileTab user={data} />
+                <Tab.Pane eventKey="second" id="Roles-Management">
+                  <ManageRoles />
+                </Tab.Pane>
+              </Tab.Content>
+            </Col>
+            <ProfileRight user={data} />
+          </Row>
+        </Tab.Container>
+      )}
+    </Box>
   );
 };
 
-export default UserProfile;
+export default UserProfilePage;
