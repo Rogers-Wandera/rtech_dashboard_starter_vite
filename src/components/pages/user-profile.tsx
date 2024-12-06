@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 
 import { Row, Col, Image, Form, Nav, Dropdown, Tab } from "react-bootstrap";
-import Card from "./Card";
+import Card from "../shared/Card";
 
 import { Link } from "react-router";
 // img

@@ -17,11 +17,12 @@ import * as SettingSelector from "@/lib/store/settings/dasboardsettings/selector
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import { Combobox, Image, Switch, useCombobox } from "@mantine/core";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useAuth } from "@/hooks/auth.hooks";
+import { helpers } from "@/lib/utils/helpers/helper";
 
 const Header = memo(() => {
   const combobox = useCombobox();
@@ -30,6 +31,7 @@ const Header = memo(() => {
   const navbarHide = useSelector(SettingSelector.navbar_show); // array
   const headerNavbar = useSelector(SettingSelector.header_navbar);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const minisidebar = () => {
     document.getElementsByTagName("ASIDE")[0].classList.toggle("sidebar-mini");
   };
@@ -38,6 +40,7 @@ const Header = memo(() => {
     dispatch(logOut());
     notifier.success({ message: "Logout Successful" });
   };
+  const image = (user?.image && helpers.decrypt(user.image)) || avatars1;
   useEffect(() => {
     // navbarstylemode
     if (headerNavbar === "navs-sticky" || headerNavbar === "nav-glass") {
@@ -407,7 +410,7 @@ const Header = memo(() => {
                   aria-expanded="false"
                 >
                   <Image
-                    src={avatars1}
+                    src={image}
                     alt="user"
                     className="theme-color-default-img img-fluid avatar avatar-50 avatar-rounded"
                   />
@@ -427,7 +430,17 @@ const Header = memo(() => {
                   className="dropdown-menu-end"
                   aria-labelledby="navbarDropdown"
                 >
-                  <Dropdown.Item>Profile</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() => {
+                      navigate(
+                        `/dashboard/core/auth/user/${helpers.encryptUrl(
+                          String(user?.id)
+                        )}`
+                      );
+                    }}
+                  >
+                    Profile
+                  </Dropdown.Item>
                   <Dropdown.Item href="">Privacy Setting</Dropdown.Item>
                   <Dropdown.Divider />
                   <Dropdown.Item onClick={HandleLogOut}>Logout</Dropdown.Item>

@@ -8,15 +8,19 @@ import ProfileRight from "./pages/profileright";
 import ProfileTab from "./pages/profiletab";
 import ManageRoles from "./pages/roles";
 import { useEffect, useState } from "react";
-import { IconUpload } from "@tabler/icons-react";
+import { IconArrowLeft, IconUpload } from "@tabler/icons-react";
 import { Avatar, Badge, styled } from "@mui/material";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { helpers } from "@/lib/utils/helpers/helper";
 import { useFetch } from "@/hooks/usefetch.hook";
 import { useAuth } from "@/hooks/auth.hooks";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { UserSingleView } from "@/types/app/core/user.type";
+import { notifier } from "@/lib/utils/notify/notification";
+import { ROLES } from "@/types/enums/enum.types";
+import { useDisclosure } from "@mantine/hooks";
+import ProfileUpload from "./pages/profileimageupload";
 
 const SmallAvatar = styled(IconUpload)(({ theme }) => ({
   width: 25,
@@ -30,15 +34,18 @@ const UserProfilePage = () => {
   const params = useParams<{ id: string }>();
   const userId = helpers.decryptUrl(String(params.id));
   const [manual, setManual] = useState(true);
-  const { token } = useAuth();
+  const { token, user: AuthUser } = useAuth();
+  const navigate = useNavigate();
+  const [opened, { open, close }] = useDisclosure(false);
 
   const dispatch = useAppDispatch();
-  const { data, isLoading, isFetching } = useFetch<UserSingleView>({
-    queryKey: "user_data-" + userId,
-    endPoint: "core/auth/users/view/" + userId,
-    manual,
-    configs: { headers: { Authorization: `Bearer ${token}` } },
-  });
+  const { data, isLoading, isFetching, refetch, isError, error } =
+    useFetch<UserSingleView>({
+      queryKey: "user_data-" + userId,
+      endPoint: "core/auth/users/view/" + userId,
+      manual,
+      configs: { headers: { Authorization: `Bearer ${token}` } },
+    });
 
   useEffect(() => {
     if (!isLoading && !isFetching) {
@@ -50,16 +57,35 @@ const UserProfilePage = () => {
     }
   }, [isLoading, isFetching]);
 
+  useEffect(() => {
+    if (isError) {
+      dispatch(setLoading(false));
+      notifier.error({ message: String(error?.message) });
+    }
+  }, [isError]);
+
   return (
     <Box>
       {data && (
         <Tab.Container defaultActiveKey="first">
+          <ProfileUpload
+            refetch={refetch}
+            user={data}
+            opened={opened}
+            close={close}
+          />
           <Row>
             <Col lg="12">
               <Card>
                 <Card.Body>
                   <div className="d-flex flex-wrap align-items-center justify-content-between">
                     <div className="d-flex flex-wrap align-items-center">
+                      <IconArrowLeft
+                        color="blue"
+                        size={30}
+                        onClick={() => navigate(-1)}
+                        style={{ cursor: "pointer" }}
+                      />
                       <div className="profile-img position-relative me-3 mb-3 mb-lg-0 profile-logo profile-logo1">
                         <Badge
                           overlap="circular"
@@ -68,7 +94,13 @@ const UserProfilePage = () => {
                             horizontal: "right",
                           }}
                           badgeContent={
-                            <SmallAvatar className="upload-button" size={30} />
+                            AuthUser?.id === data.id && (
+                              <SmallAvatar
+                                onClick={open}
+                                className="upload-button"
+                                size={30}
+                              />
+                            )
                           }
                         >
                           <Avatar
@@ -106,25 +138,27 @@ const UserProfilePage = () => {
                           Profile
                         </Nav.Link>
                       </Nav.Item>
-                      <Nav.Item as="li">
-                        <Nav.Link
-                          eventKey="second"
-                          onClick={() => {
-                            setNewsHide(true);
-                          }}
-                        >
-                          Roles
-                        </Nav.Link>
-                      </Nav.Item>
+                      {AuthUser?.roles.includes(ROLES.ADMIN) && (
+                        <Nav.Item as="li">
+                          <Nav.Link
+                            eventKey="second"
+                            onClick={() => {
+                              setNewsHide(true);
+                            }}
+                          >
+                            Roles
+                          </Nav.Link>
+                        </Nav.Item>
+                      )}
                     </Nav>
                   </div>
                 </Card.Body>
               </Card>
             </Col>
-            {!newsHide && <ProfileLeft user={data} />}
+            {!newsHide && <ProfileLeft user={data} refetch={refetch} />}
             <Col lg={newsHide ? "9" : "6"}>
               <Tab.Content>
-                <ProfileTab user={data} />
+                <ProfileTab open={open} user={data} />
                 <Tab.Pane eventKey="second" id="Roles-Management">
                   <ManageRoles />
                 </Tab.Pane>

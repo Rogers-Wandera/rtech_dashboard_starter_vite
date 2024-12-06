@@ -43,7 +43,7 @@ const VerticalNav = memo((_) => {
   const [active, setActive] = useState("");
   const { modules } = useAuth();
   const modulekeys = Object.keys(modules);
-
+  let rendered = 0;
   return (
     <Fragment>
       <Accordion as="ul" className="navbar-nav iq-main-menu">
@@ -116,6 +116,9 @@ const VerticalNav = memo((_) => {
               const getToRender = modulelinks.filter(
                 (link) => link.render === 1
               );
+              if (getToRender.length > 0) {
+                rendered++;
+              }
               const icon = modulelinks[0].icon;
               const IconComponent = (Icons[icon] ||
                 Icons[
@@ -124,76 +127,87 @@ const VerticalNav = memo((_) => {
                 IconProps & React.RefAttributes<Icon>
               >;
               return (
-                <div key={module}>
-                  <CustomToggle
-                    eventKey={module}
-                    onClick={(activeKey) => setActiveMenu(activeKey.state)}
-                  >
-                    <i className="icon">
-                      {" "}
-                      {IconComponent && React.createElement(IconComponent)}
-                    </i>
-                    <span className="item-name">{module}</span>
-                    <i className="right-icon">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                <Fragment key={module}>
+                  {getToRender.length > 0 && (
+                    <div>
+                      <CustomToggle
+                        eventKey={module}
+                        onClick={(activeKey) => setActiveMenu(activeKey.state)}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </i>
-                  </CustomToggle>
-                  <Accordion.Collapse eventKey={module}>
-                    <ul className="sub-nav">
-                      {getToRender.map((link, index) => (
-                        <li
-                          className="nav-item"
-                          key={`${link.linkname}+${index}`}
-                        >
-                          <Link
-                            className={`${
-                              location.pathname === `${link.route}`
-                                ? "active"
-                                : ""
-                            } nav-link`}
-                            to={`${link.route}`}
+                        <i className="icon">
+                          {" "}
+                          {IconComponent && React.createElement(IconComponent)}
+                        </i>
+                        <span className="item-name">{module}</span>
+                        <i className="right-icon">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                            <i className="icon">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="10"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </i>
+                      </CustomToggle>
+                      <Accordion.Collapse eventKey={module}>
+                        <ul className="sub-nav">
+                          {getToRender.map((link, index) => (
+                            <li
+                              className="nav-item"
+                              key={`${link.linkname}+${index}`}
+                            >
+                              <Link
+                                className={`${
+                                  location.pathname === `${link.route}`
+                                    ? "active"
+                                    : ""
+                                } nav-link`}
+                                to={`${link.route}`}
                               >
-                                <g>
-                                  <circle
-                                    cx="12"
-                                    cy="12"
-                                    r="8"
+                                <i className="icon">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="10"
+                                    viewBox="0 0 24 24"
                                     fill="currentColor"
-                                  ></circle>
-                                </g>
-                              </svg>
-                            </i>
-                            <i className="sidenav-mini-icon"> B </i>
-                            <span className="item-name">{link.linkname}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </Accordion.Collapse>
-                </div>
+                                  >
+                                    <g>
+                                      <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="8"
+                                        fill="currentColor"
+                                      ></circle>
+                                    </g>
+                                  </svg>
+                                </i>
+                                <i className="sidenav-mini-icon"> B </i>
+                                <span className="item-name">
+                                  {link.linkname}
+                                </span>
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </Accordion.Collapse>
+                    </div>
+                  )}
+                </Fragment>
               );
             })}
           </Accordion.Item>
+        )}
+        {rendered <= 0 && (
+          <span style={{ margin: "0 1rem" }}>
+            No Assigned Roles Or Expired roles, contact admin
+          </span>
         )}
         <li>
           <hr className="hr-horizontal" />
