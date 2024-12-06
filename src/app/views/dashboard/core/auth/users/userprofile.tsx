@@ -6,7 +6,6 @@ import lady from "@/assets/images/avatars/lady.png";
 import ProfileLeft from "./pages/profileleft";
 import ProfileRight from "./pages/profileright";
 import ProfileTab from "./pages/profiletab";
-import ManageRoles from "./pages/roles";
 import { useEffect, useState } from "react";
 import { IconArrowLeft, IconUpload } from "@tabler/icons-react";
 import { Avatar, Badge, styled } from "@mui/material";
@@ -21,6 +20,7 @@ import { notifier } from "@/lib/utils/notify/notification";
 import { ROLES } from "@/types/enums/enum.types";
 import { useDisclosure } from "@mantine/hooks";
 import ProfileUpload from "./pages/profileimageupload";
+import ManageRoles from "../rolemanagement/roles";
 
 const SmallAvatar = styled(IconUpload)(({ theme }) => ({
   width: 25,
@@ -160,7 +160,7 @@ const UserProfilePage = () => {
               <Tab.Content>
                 <ProfileTab open={open} user={data} />
                 <Tab.Pane eventKey="second" id="Roles-Management">
-                  <ManageRoles />
+                  <ManageRoles type="user" user={data} />
                 </Tab.Pane>
               </Tab.Content>
             </Col>

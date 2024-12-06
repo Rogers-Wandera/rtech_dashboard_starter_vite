@@ -1,5 +1,6 @@
 import { InputWithButton } from "@/components/shared/inputwithbutton";
 import { useMaterialTheme } from "@/lib/themes/material.theme";
+import { UserSingleView } from "@/types/app/core/user.type";
 import {
   Table,
   Checkbox,
@@ -12,7 +13,18 @@ import {
 
 import { IconEye, IconUserSquareRounded } from "@tabler/icons-react";
 
-const ManageRoles = () => {
+type user_roles = {
+  type: "user";
+  user: UserSingleView;
+};
+
+type group_roles = {
+  type: "group";
+};
+
+type props = user_roles | group_roles;
+
+const ManageRoles = ({}: props) => {
   const theme = useMaterialTheme();
   const isDark = theme.palette.mode === "dark";
   return (
