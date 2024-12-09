@@ -4,11 +4,11 @@ import {
   MRT_Row,
   MRT_TableInstance,
 } from "material-react-table";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ServerSideProps } from "../configs/mrtconfigs/mrtserverside.configs";
 import { GenerateColumns } from "../configs/mrtconfigs/mrtfuncs";
 import { RenderTable } from "./servertable";
-import { usePostData } from "@/hooks/usepost.hook";
+import { useMutateData } from "@/hooks/usemutatehook";
 import { notifier } from "@/lib/utils/notify/notification";
 import {
   ServerErrorResponse,
@@ -18,6 +18,8 @@ import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { useDeleteData } from "@/hooks/usedelete.hook";
+import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
+import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 
 export const MRT_ServerTable = <TData extends Record<string, any>>(
   options: ServerSideProps<TData>
@@ -36,9 +38,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
     validateData = undefined,
   } = options;
 
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string | undefined>
-  >({});
+  const { validation } = useMRTTableContext<TData>();
 
   const idField = options.idField ? options.idField : "id";
 
@@ -47,13 +47,18 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       GenerateColumns(
         tablecolumns,
         columnConfigs,
-        validationErrors,
-        setValidationErrors
+        validation.validationErrors,
+        validation.setValidationErrors
       ),
-    [columnConfigs, tablecolumns, setValidationErrors]
+    [
+      columnConfigs,
+      tablecolumns,
+      validation.validationErrors,
+      validation.setValidationErrors,
+    ]
   );
 
-  const { postAsync, data } = usePostData<ServerResponse>({
+  const { postAsync, data } = useMutateData<ServerResponse>({
     queryKey: columns.map((column) => column.accessorKey),
   });
 
@@ -66,18 +71,27 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       (validateData && validateData(values, table)) || {};
 
     if (Object.values(newValidationErrors).some((error) => error)) {
-      setValidationErrors(newValidationErrors);
+      validation.setValidationErrors(newValidationErrors);
       return;
     }
-    setValidationErrors({});
+    validation.setValidationErrors({});
     let dataToPost: Record<string, any> | Array<Record<string, any>> = {};
     if (Object.keys(values).length > 0) {
       if (serveractions?.postFields && serveractions?.postFields?.length > 0) {
-        dataToPost = serveractions.postFields.map((field) => {
-          return {
-            [field]: values[field],
-          };
-        });
+        if (typeof serveractions.postFields === "function") {
+          const fields = serveractions.postFields(values, table);
+          dataToPost = fields.map((field) => {
+            return {
+              [field]: values[field],
+            };
+          });
+        } else {
+          dataToPost = serveractions.postFields.map((field) => {
+            return {
+              [field]: values[field],
+            };
+          });
+        }
       } else {
         dataToPost = values;
       }
@@ -170,7 +184,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
         await postAsync({
           endPoint: editUrl,
           payload: postData.values,
-          method: "PATCH",
+          method: USE_MUTATE_METHODS.PATCH,
         });
         table.setEditingRow(null);
         options.refetch && options.refetch();

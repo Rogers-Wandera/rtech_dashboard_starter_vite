@@ -20,7 +20,7 @@ import { Avatar, Badge } from "@mui/material";
 import { useDisclosure } from "@mantine/hooks";
 import UserModal from "./usermodal";
 import { useForm, zodResolver } from "@mantine/form";
-import { usePostData } from "@/hooks/usepost.hook";
+import { useMutateData } from "@/hooks/usemutatehook";
 import { IconLock } from "@tabler/icons-react";
 import { styled } from "@mui/material/styles";
 
@@ -33,7 +33,7 @@ const SmallAvatar = styled(IconLock)(() => ({
 const ManageUsers = () => {
   const { user } = useAuth();
   const [opened, { open, close }] = useDisclosure(false);
-  const { postAsync } = usePostData<ServerResponse>({
+  const { postAsync } = useMutateData<ServerResponse>({
     queryKey: ["update_user"],
   });
   const moretableconfigs: TableColumnConfigs<User>[] = [

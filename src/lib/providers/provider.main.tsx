@@ -13,6 +13,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Outlet } from "react-router";
 import PaginateProvider from "../context/paginate/paginate.context";
 import { MantineTheme } from "../themes/mantine.theme";
+import AppContextProvider from "../context/app/app.context";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
@@ -47,7 +48,9 @@ const Providers = () => {
                   <ModalsProvider>
                     <PaginateProvider>
                       <MRT_TableContextProvider>
-                        <Outlet />
+                        <AppContextProvider>
+                          <Outlet />
+                        </AppContextProvider>
                       </MRT_TableContextProvider>
                     </PaginateProvider>
                   </ModalsProvider>

@@ -91,6 +91,16 @@ export type BaseTableType = {
   isActive: number;
 };
 
+export interface IBaseTableType {
+  creationDate: Date;
+  createdBy: string;
+  updateDate: Date;
+  updatedBy: string;
+  deletedAt: Date;
+  deletedBy: string;
+  isActive: number;
+}
+
 export interface UserSystemRole {
   id: number;
   userId: string;

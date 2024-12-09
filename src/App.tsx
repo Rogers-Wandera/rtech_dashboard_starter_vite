@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { RootState } from "./lib/store/store";
-import { LoadingOverlay, useMantineColorScheme } from "@mantine/core";
+import { Box, LoadingOverlay, useMantineColorScheme } from "@mantine/core";
 import { useAppDispatch } from "./hooks/store.hooks";
 import { setSetting } from "./lib/store/settings/dasboardsettings/actions";
 import { useEffect } from "react";
@@ -27,7 +27,7 @@ const App = () => {
     }
   }, [theme.palette.mode]);
   return (
-    <div>
+    <Box pos="relative">
       <LoadingOverlay
         visible={loading}
         zIndex={1000}
@@ -35,7 +35,7 @@ const App = () => {
         loaderProps={{ color: "blue", type: "bars" }}
       />
       <Outlet />
-    </div>
+    </Box>
   );
 };
 

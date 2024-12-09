@@ -30,6 +30,7 @@ import { ReactNode } from "react";
 import { Edit, Delete } from "@mui/icons-material";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { IconCapsuleHorizontalFilled } from "@tabler/icons-react";
 
 export function GenerateColumns<TData extends Record<string, any>>(
   tablecolumns: TableColumns<TData>[],
@@ -352,7 +353,15 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
               <MRT_ActionMenuItem
                 key={`${item.label}-${index}`}
                 icon={
-                  typeof item.icon === "function" ? item.icon(row) : item.icon
+                  item.icon ? (
+                    typeof item.icon === "function" ? (
+                      item.icon(row)
+                    ) : (
+                      item.icon
+                    )
+                  ) : (
+                    <IconCapsuleHorizontalFilled />
+                  )
                 }
                 label={
                   typeof item.label === "function"
@@ -361,7 +370,7 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
                 }
                 table={table}
                 onClick={() => {
-                  item.onClick(row, table);
+                  item.onClick && item.onClick(row, table);
                   closeMenu();
                 }}
               />
@@ -425,14 +434,27 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
                     : item.label
                 }
               >
-                <IconButton
-                  color="primary"
-                  onClick={() => {
-                    item.onClick(row, table);
-                  }}
-                >
-                  {typeof item.icon === "function" ? item.icon(row) : item.icon}
-                </IconButton>
+                {item.icon ? (
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      item.onClick && item.onClick(row, table);
+                    }}
+                  >
+                    {typeof item.icon === "function"
+                      ? item.icon(row)
+                      : item.icon}
+                  </IconButton>
+                ) : (
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      item.onClick && item.onClick(row, table);
+                    }}
+                  >
+                    <IconCapsuleHorizontalFilled />
+                  </IconButton>
+                )}
               </Tooltip>
             );
           }

@@ -9,7 +9,7 @@ import {
   ServerResponse,
 } from "@/types/server/server.main.types";
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { usePostData } from "@/hooks/usepost.hook";
+import { useMutateData } from "@/hooks/usemutatehook";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { notifier } from "@/lib/utils/notify/notification";
 
@@ -24,7 +24,7 @@ const ProfileUpload = ({ opened, close, user, refetch }: props) => {
   const [files, setFiles] = useState<FileWithPath[]>([]);
 
   const dispatch = useAppDispatch();
-  const { postAsync } = usePostData<ServerResponse>({
+  const { postAsync } = useMutateData<ServerResponse>({
     queryKey: "upload-image" + user.id,
   });
 

@@ -12,7 +12,7 @@ import {
   ServerResponse,
 } from "@/types/server/server.main.types";
 import zod from "zod";
-import { PostDataPayload } from "@/hooks/usepost.hook";
+import { PostDataPayload } from "@/hooks/usemutatehook";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useAppDispatch } from "@/hooks/store.hooks";
@@ -25,6 +25,7 @@ import { useAuth } from "@/hooks/auth.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { helpers } from "@/lib/utils/helpers/helper";
 import { useNavigate } from "react-router";
+import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 
 export const userscolumns: TableColumns<User>[] = [
   { accessorKey: "image", header: "Image", type: "text" },
@@ -125,7 +126,7 @@ export const usermenuitems = ({
           const response = await postAsync({
             endPoint,
             payload: { isLocked },
-            method: "PATCH",
+            method: USE_MUTATE_METHODS.PATCH,
           });
           notifier.success({ message: response?.msg as string });
           refetch();

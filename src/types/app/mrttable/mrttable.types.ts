@@ -57,4 +57,10 @@ export interface MRT_TableContextState<T> {
     error: ServerErrorResponse | null;
     setError: React.Dispatch<React.SetStateAction<ServerErrorResponse | null>>;
   };
+  validation: {
+    validationErrors: Record<string, string | undefined>;
+    setValidationErrors: React.Dispatch<
+      React.SetStateAction<Record<string, string | undefined>>
+    >;
+  };
 }

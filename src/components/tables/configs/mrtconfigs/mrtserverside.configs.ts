@@ -187,7 +187,9 @@ export interface ServerSideProps<T extends Record<string, any>> {
     addEndPoint?: string;
     editEndPoint?: string | ((row: MRT_Row<T>) => string);
     deleteEndPoint?: string | ((row: MRT_Row<T>) => string);
-    postFields?: string[];
+    postFields?:
+      | string[]
+      | ((values: any, table: MRT_TableInstance<T>) => string[]);
     postType?: "Array" | "Object";
     addCreateCallback?: (
       values: any,
@@ -262,9 +264,9 @@ export type RowMenuItems<T extends Record<string, any>> = {
   /** The label for the menu item. */
   label: string | ((row: MRT_Row<T>) => string);
   /** The icon for the menu item. */
-  icon: React.ReactNode | ((row: MRT_Row<T>) => React.ReactNode);
+  icon?: React.ReactNode | ((row: MRT_Row<T>) => React.ReactNode);
   /** Callback to execute when the menu item is clicked. */
-  onClick: (row: MRT_Row<T>, table: MRT_TableInstance<T>) => void;
+  onClick?: (row: MRT_Row<T>, table: MRT_TableInstance<T>) => void;
   /** Whether the menu item should be rendered. */
   render?: boolean | ((row: MRT_Row<T>) => boolean);
 };

@@ -35,6 +35,9 @@ const MRT_TableContextProvider = ({
   const [isFetching, setIsFetching] = useState(false);
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState<ServerErrorResponse | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string | undefined>
+  >({});
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>(
     DEFAULT_ROW_SELECTION
@@ -62,6 +65,10 @@ const MRT_TableContextProvider = ({
         setColumnFilters,
         globalFilter,
         setGlobalFilter,
+      },
+      validation: {
+        validationErrors,
+        setValidationErrors,
       },
       sorting: { sorting, setSorting },
       pagination: { pagination, setPagination },
@@ -92,6 +99,7 @@ const MRT_TableContextProvider = ({
       isError,
       error,
       columnVisibility,
+      validationErrors,
     ]
   );
 
@@ -114,6 +122,7 @@ const MRT_TableContextProvider = ({
     setIsError(false);
     setIsFetching(false);
     setIsLoading(false);
+    setValidationErrors({});
   }, [location.pathname]);
 
   return (

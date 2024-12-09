@@ -5,7 +5,7 @@ import { Box } from "@mantine/core";
 import { PositionColumns } from "./positionconfigs";
 import { validateRequired } from "@/lib/utils/helpers/utilfuncs";
 
-export function validateData(data: Position) {
+function validateData(data: Position) {
   return {
     position: !validateRequired(data.position) ? "Position is required" : "",
   };

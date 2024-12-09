@@ -13,3 +13,10 @@ export enum ROLES {
   PROGRAMMER = 1982,
   EDITOR = 1845,
 }
+
+export enum USE_MUTATE_METHODS {
+  POST = "POST",
+  PATCH = "PATCH",
+  DELETE = "DELETE",
+  PUT = "PUT",
+}

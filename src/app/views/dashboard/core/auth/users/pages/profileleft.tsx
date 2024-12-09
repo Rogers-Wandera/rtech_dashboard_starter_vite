@@ -25,12 +25,12 @@ import {
   ServerErrorResponse,
   ServerResponse,
 } from "@/types/server/server.main.types";
-import { usePostData } from "@/hooks/usepost.hook";
+import { useMutateData } from "@/hooks/usemutatehook";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { notifier } from "@/lib/utils/notify/notification";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import ConfirmModal from "@/components/shared/dialogs/confirm";
-import { ROLES } from "@/types/enums/enum.types";
+import { ROLES, USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 
 type props = {
   user: UserSingleView;
@@ -48,7 +48,7 @@ const ProfileLeft = ({ user, refetch }: props) => {
       roleId: (value) => (value.length < 1 ? "Please choose a role" : null),
     },
   });
-  const { postAsync } = usePostData<ServerResponse>({
+  const { postAsync } = useMutateData<ServerResponse>({
     queryKey: "roles" + user.id,
   });
   const rolestoassign = user.system_roles.unassigned;
@@ -98,7 +98,7 @@ const ProfileLeft = ({ user, refetch }: props) => {
           const response = await postAsync({
             endPoint: "core/auth/users/roles",
             payload: data,
-            method: "DELETE",
+            method: USE_MUTATE_METHODS.DELETE,
           });
           form.reset();
           close();
