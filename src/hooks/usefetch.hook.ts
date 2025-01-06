@@ -210,6 +210,7 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
   useEffect(() => {
     if (isError) {
       setManual(false);
+      tableData.setData(undefined);
     }
   }, [isError]);
 
@@ -229,14 +230,12 @@ export function useFetchPaginate<T extends Record<string, any>>({
   configs,
   endPoint,
   onlyAuth = true,
-  manual = true,
   limit = 5,
   url = undefined,
   showError = true,
 }: getprops & {
   limit?: number;
   url?: string;
-  manual: boolean;
   showError?: boolean;
 }) {
   const [paginate, setPaginate] = useState<IPaginate<T>>({
@@ -248,6 +247,7 @@ export function useFetchPaginate<T extends Record<string, any>>({
     conditions: null,
   });
 
+  const [manual, setManual] = useState(true);
   const { token } = useAuth();
   const setUrlOptions = useCallback(
     (url: URL) => {
@@ -299,6 +299,13 @@ export function useFetchPaginate<T extends Record<string, any>>({
   useEffect(() => {
     setPaginate((prevState) => ({ ...prevState, limit: limit }));
   }, [limit]);
+
+  useEffect(() => {
+    if (!isLoading && !isFetching && isError) {
+      setManual(false);
+    }
+  }, [isLoading, isFetching]);
+
   return {
     data,
     isError,
@@ -309,5 +316,6 @@ export function useFetchPaginate<T extends Record<string, any>>({
     error,
     paginate,
     setPaginate,
+    setManual,
   };
 }

@@ -20,3 +20,8 @@ export enum USE_MUTATE_METHODS {
   DELETE = "DELETE",
   PUT = "PUT",
 }
+
+export enum USER_GROUP_STATUS {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+}

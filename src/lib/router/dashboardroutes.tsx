@@ -7,6 +7,7 @@ import Modules from "@/app/views/dashboard/core/system/modules/modules";
 import { ROLES } from "@/types/enums/enum.types";
 import { RouteObject } from "react-router";
 import ModuleLinks from "@/app/views/dashboard/core/system/modulelinks/modulelinks";
+import UserGroups from "@/app/views/dashboard/core/auth/usergroups/usergroups";
 
 export const AuthRouter: RouteObject = {
   path: "/dashboard",
@@ -29,6 +30,10 @@ export const AuthRouter: RouteObject = {
     {
       path: "/dashboard/core/system/modulelinks/:id",
       element: <ModuleLinks roles={[ROLES.PROGRAMMER]} />,
+    },
+    {
+      path: "/dashboard/core/auth/usergroups",
+      element: <UserGroups roles={[ROLES.ADMIN]} />,
     },
   ],
 };

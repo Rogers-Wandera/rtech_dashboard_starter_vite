@@ -54,6 +54,7 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
   const [show_permission, { open: Show, close: Hide }] = useDisclosure(false);
   const { deleteAsync } = useDeleteData({ queryKey: "module-links-delete" });
   const dispatch = useAppDispatch();
+
   const HandleDelete = () => {
     return ConfirmModal({
       message: "Are you sure you want to delete this link " + link.linkname,

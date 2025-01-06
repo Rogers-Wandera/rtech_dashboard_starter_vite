@@ -4,6 +4,7 @@ import {
   ServerResponse,
   UserModuleRes,
 } from "../../server/server.main.types";
+import { ServerLinkRole } from "../core/system.types";
 
 export interface ILoginValues {
   email: string;
@@ -59,4 +60,10 @@ export interface Permission {
   name: string;
   route: string;
   render: string;
+}
+
+export interface ServerRoles {
+  module: string;
+  links: ServerLinkRole[];
+  icon: string;
 }

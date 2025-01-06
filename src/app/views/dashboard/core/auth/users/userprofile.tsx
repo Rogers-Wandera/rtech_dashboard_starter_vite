@@ -6,7 +6,7 @@ import lady from "@/assets/images/avatars/lady.png";
 import ProfileLeft from "./pages/profileleft";
 import ProfileRight from "./pages/profileright";
 import ProfileTab from "./pages/profiletab";
-import { useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { IconArrowLeft, IconUpload } from "@tabler/icons-react";
 import { Avatar, Badge, styled } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
@@ -29,7 +29,7 @@ const SmallAvatar = styled(IconUpload)(({ theme }) => ({
   color: theme.palette.mode === "dark" ? "grey" : "blue",
 }));
 
-const UserProfilePage = () => {
+const UserProfilePage: FunctionComponent = () => {
   const [newsHide, setNewsHide] = useState(false);
   const params = useParams<{ id: string }>();
   const userId = helpers.decryptUrl(String(params.id));
@@ -159,9 +159,11 @@ const UserProfilePage = () => {
             <Col lg={newsHide ? "9" : "6"}>
               <Tab.Content>
                 <ProfileTab open={open} user={data} />
-                <Tab.Pane eventKey="second" id="Roles-Management">
-                  <ManageRoles type="user" user={data} />
-                </Tab.Pane>
+                {AuthUser?.roles.includes(ROLES.ADMIN) && (
+                  <Tab.Pane eventKey="second" id="Roles-Management">
+                    <ManageRoles type="user" data={data} />
+                  </Tab.Pane>
+                )}
               </Tab.Content>
             </Col>
             <ProfileRight user={data} />

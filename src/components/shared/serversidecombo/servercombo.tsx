@@ -55,7 +55,6 @@ const ServerCombo = <T extends Record<string, any>>({
   const [selects, setSelects] = useState<MantineSelectType<T>[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const [notFound, setNotFound] = useState("Nothing found..");
-  const [manual, setManual] = useState(true);
 
   const { data, isLoading, isFetching, setPaginate } = useFetchPaginate<T>({
     queryKey: endPoint,
@@ -64,7 +63,6 @@ const ServerCombo = <T extends Record<string, any>>({
     endPoint,
     limit: limit,
     url,
-    manual: manual,
     showError: false,
   });
 
@@ -93,12 +91,6 @@ const ServerCombo = <T extends Record<string, any>>({
       setNotFound("Nothing found..");
     }
   }, [isLoading, isFetching, selects]);
-
-  useEffect(() => {
-    if (!isLoading && !isFetching) {
-      setManual(false);
-    }
-  }, [isLoading, isFetching]);
 
   return (
     <Select

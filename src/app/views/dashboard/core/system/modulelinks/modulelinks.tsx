@@ -31,7 +31,6 @@ import { useDisclosure } from "@mantine/hooks";
 import LinkModal from "./linkmodal";
 
 const ModuleLinks = () => {
-  const [manual, setManual] = useState(false);
   const [activePage, setPage] = useState(1);
   const [editData, setEditData] = useState<ModuleLinkType | null>(null);
   const [search, setSearch] = useState("");
@@ -54,7 +53,6 @@ const ModuleLinks = () => {
   } = useFetchPaginate<ModuleLinkType>({
     endPoint: `core/system/modulelinks/${moduleId}`,
     queryKey: "modulelinks" + moduleId,
-    manual: manual,
     limit: 4,
   });
 
@@ -66,7 +64,6 @@ const ModuleLinks = () => {
 
   useEffect(() => {
     if (!isFetching || !isLoading || isError) {
-      setManual(false);
       dispatch(setLoading(false));
     }
 
@@ -84,6 +81,7 @@ const ModuleLinks = () => {
   useEffect(() => {
     setPaginate({ ...paginate, page: activePage });
   }, [activePage]);
+
   return (
     <div>
       {data && Object.keys(state.page.pageState).length > 0 && (

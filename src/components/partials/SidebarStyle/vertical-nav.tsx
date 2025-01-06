@@ -5,7 +5,7 @@ import {
   useAccordionButton,
   AccordionContext,
 } from "react-bootstrap";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import * as Icons from "@tabler/icons-react";
 import { Icon, IconProps } from "@tabler/icons-react";
 
@@ -43,6 +43,7 @@ const VerticalNav = memo((_) => {
   const [active, setActive] = useState("");
   const { modules } = useAuth();
   const modulekeys = Object.keys(modules);
+  const location = useLocation();
   let rendered = 0;
   return (
     <Fragment>
