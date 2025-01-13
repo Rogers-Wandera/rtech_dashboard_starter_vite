@@ -5,13 +5,9 @@ import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { notifier } from "@/lib/utils/notify/notification";
 import { UserGroup } from "@/types/app/core/user.type";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
-import {
-  PaginateResponse,
-  ServerErrorResponse,
-} from "@/types/server/server.main.types";
+import { ServerErrorResponse } from "@/types/server/server.main.types";
 import { Button, Modal, Textarea, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { Dispatch, SetStateAction, useEffect } from "react";
 
 type props = {
@@ -19,11 +15,7 @@ type props = {
   close: () => void;
   setGroup: Dispatch<SetStateAction<UserGroup | null>>;
   group: UserGroup | null;
-  refetch: (
-    options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<PaginateResponse<UserGroup>, ServerErrorResponse>
-  >;
+  refetch?: () => void;
 };
 
 type formprops = {
@@ -62,7 +54,7 @@ const GroupModal = ({ opened, close, group, refetch, setGroup }: props) => {
       });
       notifier.success({ message: String(response.msg) });
       form.reset();
-      await refetch();
+      refetch && (await refetch());
       setGroup(null);
       close();
       dispatch(setLoading(false));

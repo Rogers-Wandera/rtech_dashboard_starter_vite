@@ -20,6 +20,7 @@ type props = {
   manual: boolean;
   afterFetch?: () => void | Promise<void>;
   beforeFetch?: () => void | Promise<void>;
+  withAuth?: boolean;
 };
 
 export function useFetch<T = any>({
@@ -31,6 +32,7 @@ export function useFetch<T = any>({
   configs = {},
   beforeFetch = undefined,
   afterFetch = undefined,
+  withAuth = false,
 }: props) {
   const prefix = import.meta.env.VITE_SERVER_PREFIX;
   const mainurl = url
@@ -40,6 +42,14 @@ export function useFetch<T = any>({
   let fetchUrl = new URL(mainurl);
   if (setUrlOptions) {
     fetchUrl = setUrlOptions(new URL(mainurl));
+  }
+
+  const { token } = useAuth();
+  if (withAuth) {
+    configs.headers = {
+      ...configs.headers,
+      Authorization: `Bearer ${token}`,
+    };
   }
   const {
     data,

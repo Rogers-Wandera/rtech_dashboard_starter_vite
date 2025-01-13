@@ -41,6 +41,8 @@ import { notifier } from "@/lib/utils/notify/notification";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { useMutateData } from "@/hooks/usemutatehook";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
+import { useAppContext } from "@/lib/context/app/app.context";
+import { AppActions } from "@/lib/reducers/app/app.actions";
 
 type props = {
   group: UserGroup;
@@ -59,6 +61,7 @@ const GroupCard = ({ group, setGroup, open, refetch }: props) => {
   const navigate = useNavigate();
   const members = group.members.slice(0, 2);
   const otherLength = group.members.length - members.length;
+  const appState = useAppContext();
   let supervisor = group.supervisor.find(
     (supervisor) => supervisor.isMain === 1
   );
@@ -195,14 +198,19 @@ const GroupCard = ({ group, setGroup, open, refetch }: props) => {
             <Menu.Label>Actions</Menu.Label>
             {actionsShow && (
               <Menu.Item
-                onClick={() =>
-                  actionsShow &&
-                  navigate(
-                    `/dashboard/core/auth/usergroups/${helpers.encryptUrl(
-                      group.id.toString()
-                    )}`
-                  )
-                }
+                onClick={() => {
+                  if (actionsShow) {
+                    appState.dispatch({
+                      type: AppActions.PAGE_STATE,
+                      payload: group,
+                    });
+                    navigate(
+                      `/dashboard/core/auth/usergroups/${helpers.encryptUrl(
+                        group.id.toString()
+                      )}`
+                    );
+                  }
+                }}
                 leftSection={
                   <IconEye style={{ width: rem(14), height: rem(14) }} />
                 }

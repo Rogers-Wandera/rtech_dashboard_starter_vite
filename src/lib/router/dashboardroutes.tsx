@@ -8,6 +8,7 @@ import { ROLES } from "@/types/enums/enum.types";
 import { RouteObject } from "react-router";
 import ModuleLinks from "@/app/views/dashboard/core/system/modulelinks/modulelinks";
 import UserGroups from "@/app/views/dashboard/core/auth/usergroups/usergroups";
+import ManageUserGroups from "@/app/views/dashboard/core/auth/usergroups/manage/manage";
 
 export const AuthRouter: RouteObject = {
   path: "/dashboard",
@@ -34,6 +35,10 @@ export const AuthRouter: RouteObject = {
     {
       path: "/dashboard/core/auth/usergroups",
       element: <UserGroups roles={[ROLES.ADMIN]} />,
+    },
+    {
+      path: "/dashboard/core/auth/usergroups/:groupId",
+      element: <ManageUserGroups roles={[ROLES.ADMIN]} />,
     },
   ],
 };

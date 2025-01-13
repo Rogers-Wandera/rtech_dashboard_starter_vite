@@ -19,12 +19,24 @@ import MenuStyle from "./sections/menu-style";
 import MenuActiveStyle from "./sections/menu-active-style";
 import NavbarStyle from "./sections/navbar-style";
 import CardStyle from "./sections/card-style";
+import { Box, Button } from "@mantine/core";
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { RootState } from "@/lib/store/store";
+import { setShowSubHeader } from "@/lib/store/services/defaults/defaults";
+import { useAppDispatch } from "@/hooks/store.hooks";
 
 type settingprops = {
   name?: boolean;
 };
+
 const SettingOffCanvas = memo((props: settingprops) => {
   const [show, setShow] = useState(false);
+
+  const showSubHeader = useSelector(
+    (state: RootState) => state.appState.defaultstate.showSubHeader
+  );
+
+  const disptach = useAppDispatch();
 
   // Define selectors
   const themeScheme = useSelector(SettingSelector.theme_scheme);
@@ -118,6 +130,19 @@ const SettingOffCanvas = memo((props: settingprops) => {
                   <h5 className="d-inline-block">Style Setting</h5>
       </div>*/}
                 <div className="p-3">
+                  <Box mb={20}>
+                    <h5 className="mb-3">App</h5>
+                    <Button
+                      onClick={() => {
+                        disptach(setShowSubHeader(!showSubHeader));
+                      }}
+                      leftSection={
+                        !showSubHeader ? <IconEye /> : <IconEyeOff />
+                      }
+                    >
+                      {!showSubHeader ? "Show" : "Hide"} Subheader
+                    </Button>
+                  </Box>
                   <ThemeScheme
                     themeScheme={themeScheme}
                     themeSchemeDirection={themeSchemeDirection}

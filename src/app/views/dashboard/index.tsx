@@ -24,6 +24,9 @@ function DashboardLayout() {
   );
   const location = useLocation();
   const navigate = useNavigate();
+  const showSubHeader = useSelector(
+    (state: RootState) => state.appState.defaultstate.showSubHeader
+  );
   const dispatch = useAppDispatch();
   const appName = useSelector(SettingSelector.app_name);
   const nextroute = useSelector(
@@ -54,7 +57,11 @@ function DashboardLayout() {
           <Header />
           <SubHeader />
         </div>
-        <div className="py-0 conatiner-fluid content-inner mt-n5">
+        <div
+          className={`py-0 conatiner-fluid content-inner mt-${
+            showSubHeader ? "n5" : "4"
+          }`}
+        >
           <Outlet />
         </div>
         <div className="btn-download">

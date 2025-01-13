@@ -3,12 +3,14 @@ import { AuthApi } from "../auth/auth.api";
 import { HelperClass } from "@/lib/utils/helpers/helper";
 
 export const revertAll = createAction("REVERT_ALL");
+
 export interface DefaultState {
   headerText: string;
   isLoading: boolean;
   session: boolean;
   nextRoute: null | string;
   rememberMe: { email: string; password: string };
+  showSubHeader: boolean;
 }
 
 const defaultState: DefaultState = {
@@ -17,7 +19,9 @@ const defaultState: DefaultState = {
   session: false,
   nextRoute: null,
   rememberMe: { email: "", password: "" },
+  showSubHeader: true,
 };
+
 const defaultSlice = createSlice({
   name: "defaultslice",
   initialState: defaultState,
@@ -33,6 +37,9 @@ const defaultSlice = createSlice({
     },
     setNextRoute: (state, action: { payload: null | string }) => {
       state.nextRoute = action.payload;
+    },
+    setShowSubHeader: (state, action: { payload: boolean }) => {
+      state.showSubHeader = action.payload;
     },
     setRememberMe: (state, action: { payload: typeof state.rememberMe }) => {
       const helper = new HelperClass();
@@ -71,4 +78,5 @@ export const {
   setSession,
   setRememberMe,
   setNextRoute,
+  setShowSubHeader,
 } = defaultSlice.actions;
