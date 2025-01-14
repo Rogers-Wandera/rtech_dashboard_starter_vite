@@ -11,7 +11,7 @@ import {
   RowMenuItems,
   TableColumnConfigs,
   TableColumns,
-} from "./mrtserverside.configs";
+} from "./shared.config";
 
 /**
  * Additional options for configuring the Material React Table.
@@ -139,3 +139,20 @@ export type NoServertableProps<TData extends Record<string, any>> =
       row: MRT_Row<TData>;
     }) => void;
   };
+
+export type TopToolBarProps<T extends Record<string, any>> = {
+  /** The table instance. */
+  table: MRT_TableInstance<T>;
+  /** Function to refetch data. */
+  refetch?: () => void;
+  /** Whether to show a back button. */
+  showback?: boolean;
+  /** Whether to show a create button. */
+  showCreateBtn?: boolean;
+  /** Additional table options. */
+  otherTableOptions?: OtherTableOptions<T>;
+  /** Additional actions for the top bar. */
+  additionaltopbaractions?: additionaltopbaractions<T>[];
+  /** Custom callback for overriding the built in create mode */
+  customCallBack?: (table: MRT_TableInstance<T>) => void;
+};

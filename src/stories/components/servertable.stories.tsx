@@ -1,5 +1,5 @@
 import type { StoryObj, Meta } from "@storybook/react";
-import { MRT_ServerTable } from "../../components/tables/mrttables/mrtserverside";
+import { MRT_ServerTable } from "../../components/tables/mrttables/server/mrtserverside";
 import { Provider } from "react-redux";
 import { store } from "@/lib/store/store";
 import { fn } from "@storybook/test";

@@ -1,5 +1,5 @@
-import { TableColumnConfigs } from "@/components/tables/configs/mrtconfigs/mrtserverside.configs";
-import { MRT_ServerTable } from "@/components/tables/mrttables/mrtserverside";
+import { TableColumnConfigs } from "@/components/tables/configs/mrtconfigs/shared.config";
+import { MRT_ServerTable } from "@/components/tables/mrttables/server/mrtserverside";
 import RouteRoles from "@/hocs/verifyroles";
 import { useAuth } from "@/hooks/auth.hooks";
 import { useMRTPaginateTable } from "@/hooks/usefetch.hook";

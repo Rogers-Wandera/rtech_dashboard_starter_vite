@@ -1,17 +1,18 @@
 import { useMaterialReactTable } from "material-react-table";
-import { tableProps } from "../configs/mrtconfigs/mrtserverside.configs";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import {
   HandleRenderAddEditDialogs,
   HandleRenderRowActionMenus,
-  RenderTopBarComponents,
-} from "../configs/mrtconfigs/mrtfuncs";
+} from "../../configs/mrtconfigs/mrtfuncs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
+import { NoServertableProps } from "../../configs/mrtconfigs/nonserver.config";
+import { RenderTopBarComponents } from "./helper";
 
-export function RenderTable<TData extends Record<string, any>>({
+export function RenderNonServerTable<TData extends Record<string, any>>({
   columns,
   title,
+  data,
   refetch = () => {},
   idField = "id",
   otherTableOptions = {},
@@ -29,16 +30,8 @@ export function RenderTable<TData extends Record<string, any>>({
   setValidationErrors = () => {},
   HandleUpdate = () => {},
   deleteModalProps = {},
-}: tableProps<TData>) {
-  const {
-    filters,
-    pagination,
-    sorting,
-    rowSelection,
-    visibility,
-    status,
-    data,
-  } = useMRTTableContext<TData>();
+}: NoServertableProps<TData>) {
+  const { rowSelection, visibility, status } = useMRTTableContext<TData>();
 
   const theme = useSelector(
     (state: RootState) => state.setting.setting.theme_scheme.value
@@ -54,17 +47,10 @@ export function RenderTable<TData extends Record<string, any>>({
 
   const table = useMaterialReactTable({
     columns,
-    data: data.data?.docs || [],
-    rowCount: data.data?.totalDocs || 0,
+    data: data || [],
+    rowCount: data?.length || 0,
     getRowId: (row) => row[idField as string],
     onRowSelectionChange: rowSelection.setRowSelection,
-    onColumnFiltersChange: filters.setColumnFilters,
-    onGlobalFilterChange: filters.setGlobalFilter,
-    onPaginationChange: pagination.setPagination,
-    onSortingChange: sorting.setSorting,
-    manualFiltering: true,
-    manualPagination: true,
-    manualSorting: true,
     onColumnVisibilityChange: visibility.setColumnVisibility,
     onCreatingRowCancel: () => setValidationErrors({}),
     onEditingRowCancel: () => setValidationErrors({}),
@@ -109,10 +95,6 @@ export function RenderTable<TData extends Record<string, any>>({
       showAlertBanner: status.isError,
       showProgressBars: status.isFetching,
       rowSelection: rowSelection.rowSelection,
-      columnFilters: filters.columnFilters,
-      globalFilter: filters.globalFilter,
-      sorting: sorting.sorting,
-      pagination: pagination.pagination,
       columnVisibility: visibility.columnVisibility,
     },
   });

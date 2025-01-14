@@ -13,10 +13,9 @@ import React, { ReactNode } from "react";
  * Configuration for a table column.
  * @template T The type of data represented in the table.
  */
-export type TableColumnConfigs<T extends Record<string, any>> = Omit<
-  MRT_ColumnDef<T>,
-  "header"
-> & {
+export type TableColumnConfigs<
+  T extends Record<string, any> = Record<string, any>
+> = Omit<MRT_ColumnDef<T>, "header"> & {
   /** The key to access the column data in the row. */
   accessorKey: keyof T & string;
   /** The header label for the column. */
@@ -52,35 +51,36 @@ export interface addeditprops {
  * Configuration for defining table columns.
  * @template T The type of data represented in the table.
  */
-export type TableColumns<T extends Record<string, any>> = {
-  /** The key to access the column data in the row. */
-  accessorKey: keyof T & string;
-  /** The type of editor or input field to use for this column. */
-  type:
-    | "autocomplete"
-    | "checkbox"
-    | "date"
-    | "date-range"
-    | "datetime"
-    | "datetime-range"
-    | "multi-select"
-    | "range"
-    | "range-slider"
-    | "select"
-    | "text"
-    | "time"
-    | "time-range"
-    | undefined;
-  /** The header label for the column. */
-  header?: string;
-  /** A custom editor component for the column. */
-  Edit?: (props: {
-    cell: MRT_Cell<T, unknown>;
-    column: MRT_Column<T, unknown>;
-    row: MRT_Row<T>;
-    table: MRT_TableInstance<T>;
-  }) => ReactNode;
-};
+export type TableColumns<T extends Record<string, any> = Record<string, any>> =
+  {
+    /** The key to access the column data in the row. */
+    accessorKey: keyof T & string;
+    /** The type of editor or input field to use for this column. */
+    type:
+      | "autocomplete"
+      | "checkbox"
+      | "date"
+      | "date-range"
+      | "datetime"
+      | "datetime-range"
+      | "multi-select"
+      | "range"
+      | "range-slider"
+      | "select"
+      | "text"
+      | "time"
+      | "time-range"
+      | undefined;
+    /** The header label for the column. */
+    header?: string;
+    /** A custom editor component for the column. */
+    Edit?: (props: {
+      cell: MRT_Cell<T, unknown>;
+      column: MRT_Column<T, unknown>;
+      row: MRT_Row<T>;
+      table: MRT_TableInstance<T>;
+    }) => ReactNode;
+  };
 
 /**
  * Configuration for additional top bar actions in the table.
@@ -282,6 +282,8 @@ export interface rowactionconfigs<T extends Record<string, any>> {
   deleterender?: boolean | ((row: MRT_Row<T>) => boolean);
   /** Whether the edit action should be rendered. */
   editrender?: boolean | ((row: MRT_Row<T>) => boolean);
+  deleteText?: string | ((row: MRT_Row<T>) => string);
+  editText?: string | ((row: MRT_Row<T>) => string);
 }
 
 export type tableProps<TData extends Record<string, any>> =

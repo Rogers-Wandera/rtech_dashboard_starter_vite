@@ -1,7 +1,7 @@
 import {
   RowMenuItems,
   TableColumns,
-} from "@/components/tables/configs/mrtconfigs/mrtserverside.configs";
+} from "@/components/tables/configs/mrtconfigs/shared.config";
 import { User } from "@/types/app/core/user.type";
 import { IconLock, IconLockOff, IconCheck } from "@tabler/icons-react";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";

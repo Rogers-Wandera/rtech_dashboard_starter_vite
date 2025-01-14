@@ -1,19 +1,17 @@
 import { useMaterialReactTable } from "material-react-table";
-import { tableProps } from "../configs/mrtconfigs/mrtserverside.configs";
+import { tableProps } from "../../configs/mrtconfigs/shared.config";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import {
   HandleRenderAddEditDialogs,
   HandleRenderRowActionMenus,
-  RenderTopBarComponents,
-} from "../configs/mrtconfigs/mrtfuncs";
+} from "../../configs/mrtconfigs/mrtfuncs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
-import { NoServertableProps } from "../configs/mrtconfigs/nonserver.config";
+import { RenderTopBarComponents } from "./helper";
 
-export function RenderNonServerTable<TData extends Record<string, any>>({
+export function RenderTable<TData extends Record<string, any>>({
   columns,
   title,
-  data,
   refetch = () => {},
   idField = "id",
   otherTableOptions = {},
@@ -31,14 +29,15 @@ export function RenderNonServerTable<TData extends Record<string, any>>({
   setValidationErrors = () => {},
   HandleUpdate = () => {},
   deleteModalProps = {},
-}: NoServertableProps<TData>) {
+}: tableProps<TData>) {
   const {
-    // filters,
-    // pagination,
-    // sorting,
+    filters,
+    pagination,
+    sorting,
     rowSelection,
     visibility,
     status,
+    data,
   } = useMRTTableContext<TData>();
 
   const theme = useSelector(
@@ -55,17 +54,17 @@ export function RenderNonServerTable<TData extends Record<string, any>>({
 
   const table = useMaterialReactTable({
     columns,
-    data: data || [],
-    rowCount: data?.length || 0,
+    data: data.data?.docs || [],
+    rowCount: data.data?.totalDocs || 0,
     getRowId: (row) => row[idField as string],
     onRowSelectionChange: rowSelection.setRowSelection,
-    // onColumnFiltersChange: filters.setColumnFilters,
-    // onGlobalFilterChange: filters.setGlobalFilter,
-    // onPaginationChange: pagination.setPagination,
-    // onSortingChange: sorting.setSorting,
-    // manualFiltering: false,
-    // manualPagination: false,
-    // manualSorting: false,
+    onColumnFiltersChange: filters.setColumnFilters,
+    onGlobalFilterChange: filters.setGlobalFilter,
+    onPaginationChange: pagination.setPagination,
+    onSortingChange: sorting.setSorting,
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
     onColumnVisibilityChange: visibility.setColumnVisibility,
     onCreatingRowCancel: () => setValidationErrors({}),
     onEditingRowCancel: () => setValidationErrors({}),
@@ -75,17 +74,17 @@ export function RenderNonServerTable<TData extends Record<string, any>>({
     enableRowSelection,
     ...HandleRenderAddEditDialogs<TData>({ ...addeditprops, title }),
     ...rowmenuactions,
-    // renderTopToolbarCustomActions: ({ table }) =>
-    //   RenderTopBarComponents({
-    //     table,
-    //     refetch,
-    //     showback,
-    //     showCreateBtn,
-    //     otherTableOptions,
-    //     additionaltopbaractions,
-    //     customCallBack,
-    //     title,
-    //   }),
+    renderTopToolbarCustomActions: ({ table }) =>
+      RenderTopBarComponents({
+        table,
+        refetch,
+        showback,
+        showCreateBtn,
+        otherTableOptions,
+        additionaltopbaractions,
+        customCallBack,
+        title,
+      }),
     muiToolbarAlertBannerProps: status.isError
       ? {
           color: "error",
@@ -110,10 +109,10 @@ export function RenderNonServerTable<TData extends Record<string, any>>({
       showAlertBanner: status.isError,
       showProgressBars: status.isFetching,
       rowSelection: rowSelection.rowSelection,
-      //   columnFilters: filters.columnFilters,
-      //   globalFilter: filters.globalFilter,
-      //   sorting: sorting.sorting,
-      //   pagination: pagination.pagination,
+      columnFilters: filters.columnFilters,
+      globalFilter: filters.globalFilter,
+      sorting: sorting.sorting,
+      pagination: pagination.pagination,
       columnVisibility: visibility.columnVisibility,
     },
   });

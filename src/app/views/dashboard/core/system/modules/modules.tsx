@@ -1,4 +1,4 @@
-import { MRT_ServerTable } from "@/components/tables/mrttables/mrtserverside";
+import { MRT_ServerTable } from "@/components/tables/mrttables/server/mrtserverside";
 import RouteRoles from "@/hocs/verifyroles";
 import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
 import { ModuleType } from "@/types/app/core/system.types";

@@ -1,4 +1,4 @@
-import { TableColumns } from "@/components/tables/configs/mrtconfigs/mrtserverside.configs";
+import { TableColumns } from "@/components/tables/configs/mrtconfigs/shared.config";
 import { Position } from "@/types/app/core/position.type";
 
 export const PositionColumns: TableColumns<Position>[] = [

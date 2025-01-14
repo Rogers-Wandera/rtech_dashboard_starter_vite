@@ -1,5 +1,5 @@
-import { TableColumnConfigs } from "@/components/tables/configs/mrtconfigs/mrtserverside.configs";
-import MRT_NoServerTable from "@/components/tables/mrttables/non-servertable";
+import { TableColumnConfigs } from "@/components/tables/configs/mrtconfigs/shared.config";
+import MRT_NoServerTable from "@/components/tables/mrttables/nonserver/non-servertable";
 import { UserGroup, UserGroupSupervisors } from "@/types/app/core/user.type";
 import {
   Avatar,

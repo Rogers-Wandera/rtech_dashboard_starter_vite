@@ -1,30 +1,29 @@
+import { useMemo } from "react";
+import { GenerateColumns } from "../../configs/mrtconfigs/mrtfuncs";
+import { NoServerSideProps } from "../../configs/mrtconfigs/nonserver.config";
 import {
   MaterialReactTable,
   MRT_ColumnDef,
   MRT_Row,
   MRT_TableInstance,
 } from "material-react-table";
-import { useMemo } from "react";
-import { ServerSideProps } from "../configs/mrtconfigs/mrtserverside.configs";
-import { GenerateColumns } from "../configs/mrtconfigs/mrtfuncs";
-import { RenderTable } from "./servertable";
+import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
+import { RenderNonServerTable } from "./nonservertable";
 import { useMutateData } from "@/hooks/usemutatehook";
-import { notifier } from "@/lib/utils/notify/notification";
 import {
   ServerErrorResponse,
   ServerResponse,
 } from "@/types/server/server.main.types";
-import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
-import { setLoading } from "@/lib/store/services/defaults/defaults";
-import { useAppDispatch } from "@/hooks/store.hooks";
 import { useDeleteData } from "@/hooks/usedelete.hook";
-import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
+import { useAppDispatch } from "@/hooks/store.hooks";
+import { setLoading } from "@/lib/store/services/defaults/defaults";
+import { notifier } from "@/lib/utils/notify/notification";
+import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 
-export const MRT_ServerTable = <TData extends Record<string, any>>(
-  options: ServerSideProps<TData>
+const MRT_NoServerTable = <TData extends Record<string, any>>(
+  options: NoServerSideProps<TData>
 ) => {
-  const dispatch = useAppDispatch();
   const {
     tablecolumns,
     columnConfigs = [],
@@ -38,9 +37,11 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
     validateData = undefined,
   } = options;
 
-  const { validation } = useMRTTableContext<TData>();
-
   const idField = options.idField ? options.idField : "id";
+
+  const dispatch = useAppDispatch();
+
+  const { validation } = useMRTTableContext<TData>();
 
   const columns = useMemo<MRT_ColumnDef<TData>[]>(
     () =>
@@ -241,18 +242,18 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       HandleError(error as ServerErrorResponse);
     }
   };
-
-  const table = RenderTable({
+  const table = RenderNonServerTable({
     columns,
     ...options,
     HandleCreate: handleCreate,
     HandleUpdate: HandleUpdate,
     HandleDeleteData: HandleDelete,
   });
-
   return (
-    <div>
+    <>
       <MaterialReactTable table={table} />
-    </div>
+    </>
   );
 };
+
+export default MRT_NoServerTable;

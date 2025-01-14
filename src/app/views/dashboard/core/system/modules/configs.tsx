@@ -4,7 +4,7 @@ import {
   RowMenuItems,
   TableColumnConfigs,
   TableColumns,
-} from "@/components/tables/configs/mrtconfigs/mrtserverside.configs";
+} from "@/components/tables/configs/mrtconfigs/shared.config";
 import { AppActions, AppReducerActions } from "@/lib/reducers/app/app.actions";
 import { helpers } from "@/lib/utils/helpers/helper";
 import { ModuleType } from "@/types/app/core/system.types";

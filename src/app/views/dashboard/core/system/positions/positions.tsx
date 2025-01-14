@@ -1,4 +1,4 @@
-import { MRT_ServerTable } from "@/components/tables/mrttables/mrtserverside";
+import { MRT_ServerTable } from "@/components/tables/mrttables/server/mrtserverside";
 import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
 import { Position } from "@/types/app/core/position.type";
 import { Box } from "@mantine/core";

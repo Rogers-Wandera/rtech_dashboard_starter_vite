@@ -12,20 +12,15 @@ import {
   RowMenuItems,
   TableColumnConfigs,
   TableColumns,
-  TopToolBarProps,
-} from "./mrtserverside.configs";
+} from "./shared.config";
 import {
   Box,
-  Button,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { ArrowBack, Refresh } from "@mui/icons-material";
-import { useNavigate } from "react-router";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import { ReactNode } from "react";
 import { Edit, Delete } from "@mui/icons-material";
 import { Text } from "@mantine/core";
@@ -88,105 +83,6 @@ export function GenerateColumns<TData extends Record<string, any>>(
     return columns;
   }
   return [];
-}
-
-export function RenderTopBarComponents<T extends Record<string, any>>({
-  table,
-  refetch = () => {},
-  showback = false,
-  showCreateBtn = true,
-  otherTableOptions = {},
-  additionaltopbaractions = [],
-  customCallBack = undefined,
-  title = "Data",
-}: TopToolBarProps<T> & { title?: string }) {
-  const navigate = useNavigate();
-  return (
-    <Box>
-      {showback && (
-        <Tooltip arrow title="Go back">
-          <IconButton
-            onClick={() => {
-              navigate(-1);
-            }}
-            color="secondary"
-          >
-            <ArrowBack />
-          </IconButton>
-        </Tooltip>
-      )}
-      <Tooltip arrow title="Refresh Data">
-        <IconButton
-          onClick={() => {
-            table.setColumnFilters([]);
-            refetch();
-          }}
-        >
-          <Refresh />
-        </IconButton>
-      </Tooltip>
-      {showCreateBtn && (
-        <Tooltip arrow title={"Add New " + title}>
-          <IconButton
-            onClick={() => {
-              table.setCreatingRow(true);
-              if (otherTableOptions?.createDisplayMode === "custom") {
-                if (customCallBack) {
-                  customCallBack(table);
-                }
-              }
-            }}
-          >
-            <AddBoxIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-
-      {additionaltopbaractions &&
-        additionaltopbaractions.length > 0 &&
-        additionaltopbaractions.map((action, index) => {
-          let show = (
-            <Tooltip arrow title={action.label} key={index}>
-              <IconButton
-                onClick={() => {
-                  const rows = table.getSelectedRowModel().rows;
-                  const row = rows[0];
-                  action.onClick(table, row, rows);
-                }}
-              >
-                {action.icon}
-              </IconButton>
-            </Tooltip>
-          );
-          if (action.show === "text") {
-            const placement =
-              action.buttonconfigs?.iconplacement === "end"
-                ? { endIcon: action.icon }
-                : { startIcon: action.icon };
-            show = (
-              <Tooltip arrow title={action.label} key={index}>
-                <Button
-                  {...placement}
-                  // startIcon={action.icon}
-                  variant={action.buttonconfigs?.variant || "contained"}
-                  size={action.buttonconfigs?.size || "small"}
-                  color={action.buttonconfigs?.color || "primary"}
-                  {...action.buttonconfigs?.otherprops}
-                  onClick={() => {
-                    const rows = table.getSelectedRowModel().rows;
-                    const row = rows[0];
-                    action.onClick(table, row, rows);
-                  }}
-                >
-                  {action.label}
-                </Button>
-              </Tooltip>
-            );
-          }
-          return show;
-        })}
-    </Box>
-  );
 }
 
 export function HandleRenderAddEditDialogs<T extends Record<string, any>>({
@@ -333,14 +229,22 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
         table,
         closeMenu = () => {},
       }: actiontypeprops<T>) => {
+        const editText =
+          typeof rowactions.editText === "function"
+            ? rowactions.editText(row)
+            : rowactions.editText || "Edit";
+        const deleteText =
+          typeof rowactions.deleteText === "function"
+            ? rowactions.deleteText(row)
+            : rowactions.deleteText || "Delete";
         const editrender =
           typeof rowactions.editrender === "function"
             ? rowactions.editrender(row)
-            : rowactions.editrender;
+            : rowactions.editrender === true;
         const deleterender =
           typeof rowactions.deleterender === "function"
             ? rowactions.deleterender(row)
-            : rowactions.deleterender;
+            : rowactions.deleterender === true;
         const additionalcolumns = menuitems.map((item, index) => {
           const render =
             item.render === undefined
@@ -382,7 +286,7 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
             <MRT_ActionMenuItem
               icon={<Edit sx={{ color: "green" }} />}
               key="edit"
-              label="Edit"
+              label={editText}
               onClick={() => {
                 closeMenu();
                 table.setEditingRow(row);
@@ -394,7 +298,7 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
             <MRT_ActionMenuItem
               icon={<Delete sx={{ color: "red" }} />}
               key="delete"
-              label="Delete"
+              label={deleteText}
               onClick={() => {
                 closeMenu();
                 openDeleteModal(row);
@@ -409,14 +313,22 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
   } else {
     return {
       renderRowActions: ({ row, table }: actiontypeprops<T>) => {
+        const editText =
+          typeof rowactions.editText === "function"
+            ? rowactions.editText(row)
+            : rowactions.editText || "Edit " + title;
+        const deleteText =
+          typeof rowactions.deleteText === "function"
+            ? rowactions.deleteText(row)
+            : rowactions.deleteText || "Delete " + title;
         const editrender =
           typeof rowactions.editrender === "function"
             ? rowactions.editrender(row)
-            : rowactions.editrender;
+            : rowactions.editrender === true;
         const deleterender =
           typeof rowactions.deleterender === "function"
             ? rowactions.deleterender(row)
-            : rowactions.deleterender;
+            : rowactions.deleterender === true;
         const additionalcolumns = menuitems.map((item, index) => {
           const render =
             item.render === undefined
@@ -462,14 +374,14 @@ export const HandleRenderRowActionMenus = <T extends Record<string, any>>({
         return (
           <Box sx={{ display: "flex", gap: "1rem" }}>
             {editrender && (
-              <Tooltip title={"Edit " + title}>
+              <Tooltip title={editText}>
                 <IconButton onClick={() => table.setEditingRow(row)}>
                   <Edit />
                 </IconButton>
               </Tooltip>
             )}
             {deleterender && (
-              <Tooltip title={"Delete " + title}>
+              <Tooltip title={deleteText}>
                 <IconButton color="error" onClick={() => openDeleteModal(row)}>
                   <Delete />
                 </IconButton>

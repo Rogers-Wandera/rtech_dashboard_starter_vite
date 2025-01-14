@@ -14,6 +14,7 @@ import GroupInfo from "./groupinfo";
 import { UserGroup } from "@/types/app/core/user.type";
 import { useFetch } from "@/hooks/usefetch.hook";
 import { IconArrowBack } from "@tabler/icons-react";
+import GroupUsers from "./users";
 
 const ManageUserGroups = () => {
   const params = useParams<{ groupId: string }>();
@@ -97,6 +98,9 @@ const ManageUserGroups = () => {
               <Tab.Content>
                 <Tab.Pane eventKey="group-management">
                   <GroupInfo group={data} refetch={refetch} />
+                </Tab.Pane>
+                <Tab.Pane eventKey="group-users">
+                  <GroupUsers group={data} />
                 </Tab.Pane>
               </Tab.Content>
             </Col>
