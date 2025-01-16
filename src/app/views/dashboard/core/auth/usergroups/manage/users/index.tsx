@@ -3,13 +3,18 @@ import {
   TableColumns,
 } from "@/components/tables/configs/mrtconfigs/shared.config";
 import MRT_NoServerTable from "@/components/tables/mrttables/nonserver/non-servertable";
-import { UserGroup, UserGroupMember } from "@/types/app/core/user.type";
+import { User, UserGroup, UserGroupMember } from "@/types/app/core/user.type";
 import { Avatar, Box } from "@mantine/core";
 import femaleAvatar from "@/assets/images/avatars/woman.png";
 import maleAvatar from "@/assets/images/avatars/man.png";
+import ServerCombo from "@/components/shared/serversidecombo/servercombo";
+import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
+import { validateRequired } from "@/lib/utils/helpers/utilfuncs";
+import { useState } from "react";
 
 type props = {
   group: UserGroup;
+  refetch: () => void;
 };
 
 const tablecols: TableColumns<UserGroupMember>[] = [
@@ -20,7 +25,7 @@ const tablecols: TableColumns<UserGroupMember>[] = [
   },
   {
     header: "Name",
-    accessorKey: "userName",
+    accessorKey: "userId",
     type: "text",
   },
   {
@@ -29,7 +34,20 @@ const tablecols: TableColumns<UserGroupMember>[] = [
     type: "text",
   },
 ];
-const GroupUsers = ({ group }: props) => {
+
+function validateData(data: UserGroupMember) {
+  return {
+    userId: !validateRequired(data.userId as string)
+      ? "Please select a user"
+      : "",
+  };
+}
+const GroupUsers = ({ group, refetch }: props) => {
+  const [userId, setUserId] = useState<string | null>(null);
+  const {
+    validation: { validationErrors },
+  } = useMRTTableContext<UserGroupMember>();
+
   const moreTableCols: TableColumnConfigs<UserGroupMember>[] = [
     {
       accessorKey: "userImage",
@@ -41,12 +59,49 @@ const GroupUsers = ({ group }: props) => {
         }
         return <Avatar alt={row.original.userName} src={image} />;
       },
+      Edit: () => null,
+    },
+    {
+      accessorKey: "userId",
+      Cell: ({ row }) => row.original.userName,
+      Edit: ({ column, row }) => {
+        return (
+          <ServerCombo<User>
+            endPoint="core/auth/users"
+            label="User"
+            textKey="userName"
+            valueKey="id"
+            zIndex={10000}
+            value={userId}
+            formatData={(data) => {
+              const filter = data.filter((item) => {
+                return !group.members.some(
+                  (member) => member.userId === item.value
+                );
+              });
+              return filter;
+            }}
+            otherOptions={{
+              onChange: (event) => {
+                row._valuesCache[column.id] = event;
+                setUserId(event);
+              },
+              error: validationErrors["userId"],
+            }}
+          />
+        );
+      },
+    },
+    {
+      accessorKey: "gender",
+      Edit: () => null,
     },
   ];
   return (
     <Box>
       <MRT_NoServerTable
         title="Group User"
+        refetch={refetch}
         data={group.members}
         tablecolumns={tablecols}
         enableRowSelection={true}
@@ -63,6 +118,12 @@ const GroupUsers = ({ group }: props) => {
           enableDensityToggle: false,
           enableFullScreenToggle: false,
         }}
+        serveractions={{
+          deleteEndPoint: "core/auth/usergroupmembers",
+          addEndPoint: "core/auth/usergroupmembers/" + group.id,
+          postFields: ["userId"],
+        }}
+        validateData={validateData}
       />
     </Box>
   );

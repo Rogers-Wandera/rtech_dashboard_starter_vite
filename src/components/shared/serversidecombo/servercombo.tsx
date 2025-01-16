@@ -1,7 +1,7 @@
 import { useFetchPaginate } from "@/hooks/usefetch.hook";
 import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { Select } from "@mantine/core";
+import { Select, SelectProps } from "@mantine/core";
 import { MantineSelectType } from "@/types/app/app.types";
 import { debounce } from "lodash";
 
@@ -17,7 +17,7 @@ type servercombotype<T extends Record<string, any>> = {
   /** The state value to pass in to the component inorder to have access to the selected value */
   onChange?: (value: string | null) => void;
   /** The value selected from the combobox */
-  value: string;
+  value?: string | null;
   /**
    * See axios request config type for more details
    * @type {AxiosRequestConfig} */
@@ -34,13 +34,15 @@ type servercombotype<T extends Record<string, any>> = {
   url?: string;
   error?: string;
   zIndex?: number;
+  otherOptions?: SelectProps;
+  formatData?: (data: MantineSelectType<T>[]) => MantineSelectType<T>[];
 };
 
 const ServerCombo = <T extends Record<string, any>>({
   label,
   valueKey,
   textKey,
-  value,
+  value = null,
   onChange = () => {},
   endPoint = "",
   onlyAuth = true,
@@ -51,6 +53,8 @@ const ServerCombo = <T extends Record<string, any>>({
   url = undefined,
   error = undefined,
   zIndex = 1,
+  otherOptions = {},
+  formatData = undefined,
 }: servercombotype<T>) => {
   const [selects, setSelects] = useState<MantineSelectType<T>[]>([]);
   const [searchValue, setSearchValue] = useState("");
@@ -67,12 +71,19 @@ const ServerCombo = <T extends Record<string, any>>({
   });
 
   const formattedData = useMemo(() => {
-    return (
-      data?.docs?.map((item) => ({
-        value: String(item[valueKey]),
-        label: item[renderLabel ? renderLabel(item) : textKey],
-      })) || []
-    );
+    const selects =
+      data?.docs?.map((item, i) => {
+        const renderLabelText = renderLabel ? renderLabel(item) : undefined;
+        return {
+          value: String(item[valueKey]),
+          label: renderLabelText
+            ? renderLabelText
+            : item[textKey]
+            ? item[textKey]
+            : `Value Wrong [${i}]`,
+        };
+      }) || [];
+    return selects;
   }, [data, valueKey, textKey, renderLabel]);
 
   const HandleSearch = debounce((value: string) => {
@@ -81,7 +92,11 @@ const ServerCombo = <T extends Record<string, any>>({
   }, 30);
 
   useEffect(() => {
-    setSelects(formattedData);
+    if (formatData) {
+      setSelects(formatData(formattedData));
+    } else {
+      setSelects(formattedData);
+    }
   }, [formattedData]);
 
   useEffect(() => {
@@ -108,6 +123,7 @@ const ServerCombo = <T extends Record<string, any>>({
       onChange={onChange}
       value={value}
       error={error}
+      {...otherOptions}
     />
   );
 };

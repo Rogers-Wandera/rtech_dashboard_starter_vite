@@ -41,6 +41,7 @@ export interface UserGroupMember extends IBaseTableType {
   id: number;
   group?: UserGroup;
   user?: User;
+  userId?: string;
   userName?: string;
   userImage?: string | null;
   groupName?: string;

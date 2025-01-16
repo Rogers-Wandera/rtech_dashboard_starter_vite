@@ -12,7 +12,7 @@ import { RenderTopBarComponents } from "./helper";
 export function RenderNonServerTable<TData extends Record<string, any>>({
   columns,
   title,
-  data,
+  data = undefined,
   refetch = () => {},
   idField = "id",
   otherTableOptions = {},
@@ -31,7 +31,14 @@ export function RenderNonServerTable<TData extends Record<string, any>>({
   HandleUpdate = () => {},
   deleteModalProps = {},
 }: NoServertableProps<TData>) {
-  const { rowSelection, visibility, status } = useMRTTableContext<TData>();
+  const {
+    rowSelection,
+    visibility,
+    status,
+    data: tableData,
+  } = useMRTTableContext<TData>();
+
+  const displayData = data ? data : (tableData.data as TData[]);
 
   const theme = useSelector(
     (state: RootState) => state.setting.setting.theme_scheme.value
@@ -47,8 +54,8 @@ export function RenderNonServerTable<TData extends Record<string, any>>({
 
   const table = useMaterialReactTable({
     columns,
-    data: data || [],
-    rowCount: data?.length || 0,
+    data: (Array.isArray(displayData) && displayData) || [],
+    rowCount: (Array.isArray(displayData) && displayData.length) || 0,
     getRowId: (row) => row[idField as string],
     onRowSelectionChange: rowSelection.setRowSelection,
     onColumnVisibilityChange: visibility.setColumnVisibility,

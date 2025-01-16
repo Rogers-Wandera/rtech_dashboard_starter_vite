@@ -42,9 +42,9 @@ export interface MRT_TableContextState<T> {
     >;
   };
   data: {
-    data: PaginateResponse<T> | undefined;
+    data: PaginateResponse<T> | T[] | undefined;
     setData: React.Dispatch<
-      React.SetStateAction<PaginateResponse<T> | undefined>
+      React.SetStateAction<PaginateResponse<T> | T[] | undefined>
     >;
   };
   status: {

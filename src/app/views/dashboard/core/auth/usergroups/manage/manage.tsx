@@ -15,6 +15,7 @@ import { UserGroup } from "@/types/app/core/user.type";
 import { useFetch } from "@/hooks/usefetch.hook";
 import { IconArrowBack } from "@tabler/icons-react";
 import GroupUsers from "./users";
+import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 
 const ManageUserGroups = () => {
   const params = useParams<{ groupId: string }>();
@@ -22,16 +23,18 @@ const ManageUserGroups = () => {
   const groupId = helpers.decryptUrl(String(params.groupId));
   const [manual, setManual] = useState(true);
   const navigate = useNavigate();
+  const { status } = useMRTTableContext();
 
-  const { data, isLoading, isError, error, refetch } = useFetch<UserGroup>({
-    endPoint: "core/auth/usergroups/" + groupId,
-    queryKey: "single-group",
-    manual: manual,
-    afterFetch: () => {
-      setManual(false);
-    },
-    withAuth: true,
-  });
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useFetch<UserGroup>({
+      endPoint: "core/auth/usergroups/" + groupId,
+      queryKey: "single-group",
+      manual: manual,
+      afterFetch: () => {
+        setManual(false);
+      },
+      withAuth: true,
+    });
 
   useEffect(() => {
     dispatch(setShowSubHeader(false));
@@ -44,6 +47,12 @@ const ManageUserGroups = () => {
       dispatch(setLoading(false));
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    status.setIsError(isError);
+    status.setIsFetching(isFetching);
+    status.setIsLoading(isLoading);
+  }, [isLoading, isFetching, isError]);
 
   if (isError) {
     return <ErrorPage type="400" message={error?.message} />;
@@ -100,7 +109,7 @@ const ManageUserGroups = () => {
                   <GroupInfo group={data} refetch={refetch} />
                 </Tab.Pane>
                 <Tab.Pane eventKey="group-users">
-                  <GroupUsers group={data} />
+                  <GroupUsers group={data} refetch={refetch} />
                 </Tab.Pane>
               </Tab.Content>
             </Col>

@@ -24,27 +24,18 @@ type OtherTableOptions<T extends Record<string, any>> = Omit<
   | "enableEditing"
   | "rowCount"
   | "getRowId"
-  | "onRowSelectionChange"
-  | "onColumnFiltersChange"
-  | "onGlobalFilterChange"
-  | "onPaginationChange"
-  | "onSortingChange"
   | "renderTopToolbarCustomActions"
   | "muiToolbarAlertBannerProps"
-  | "state"
   | "enableRowActions"
   | "renderRowActions"
   | "renderRowActionMenuItems"
   | "onCreatingRowSave"
-  | "manualFiltering"
-  | "manualPagination"
-  | "manualSorting"
 >;
 
 export interface NoServerSideProps<T extends Record<string, any>> {
   /** The table columns to render data in the table. */
   tablecolumns: TableColumns<T>[];
-  data: T[];
+  data?: T[];
   /** Column configurations for updates and modal editing. */
   columnConfigs?: TableColumnConfigs<T>[];
   /** Function to refetch data. */

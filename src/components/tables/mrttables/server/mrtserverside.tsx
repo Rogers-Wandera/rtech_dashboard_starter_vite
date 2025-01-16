@@ -77,7 +77,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
     validation.setValidationErrors({});
     let dataToPost: Record<string, any> | Array<Record<string, any>> = {};
     if (Object.keys(values).length > 0) {
-      if (serveractions?.postFields && serveractions?.postFields?.length > 0) {
+      if (serveractions?.postFields) {
         if (typeof serveractions.postFields === "function") {
           const fields = serveractions.postFields(values, table);
           dataToPost = fields.map((field) => {
@@ -125,13 +125,14 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       dispatch(setLoading(true));
       const postData = HandleDataToPost(values, table);
       if (postData && Object.keys(postData.values).length > 0) {
+        values = postData.values;
         if (serveractions?.addCreateCallback) {
           values = serveractions.addCreateCallback(postData.dataToPost, table);
         }
         const addUrl = serveractions.addEndPoint
           ? serveractions.addEndPoint
           : "";
-        await postAsync({ endPoint: addUrl, payload: postData.values });
+        await postAsync({ endPoint: addUrl, payload: values });
         table.setCreatingRow(null);
         options.refetch && options.refetch();
         notifier.success({
@@ -164,6 +165,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
       dispatch(setLoading(true));
       const postData = HandleDataToPost(values, table);
       if (postData && Object.keys(postData.values).length > 0) {
+        values = postData.values;
         if (serveractions?.editCreateCallback) {
           values = serveractions.editCreateCallback(
             postData.dataToPost,
@@ -183,7 +185,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
         }
         await postAsync({
           endPoint: editUrl,
-          payload: postData.values,
+          payload: values,
           method: USE_MUTATE_METHODS.PATCH,
         });
         table.setEditingRow(null);

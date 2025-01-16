@@ -35,7 +35,7 @@ function GroupInfo({ group, refetch }: props) {
         refetch={refetch}
       />
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-        <GroupSupervisors group={group} />
+        <GroupSupervisors group={group} refetch={refetch} />
         <Grid gutter="md">
           <Grid.Col>
             <Card shadow="sm" padding="lg" radius="md" withBorder>

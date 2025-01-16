@@ -235,6 +235,76 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
   };
 }
 
+export function useMRTNoPaginateTable<T extends Record<string, any>>({
+  queryKey,
+  endPoint,
+  onlyAuth = true,
+  configs = {},
+}: getprops) {
+  const {
+    status,
+    data: tableData,
+    manual,
+    setManual,
+  } = useMRTTableContext<T>();
+
+  const { token } = useAuth();
+
+  let canfetch = false;
+  if (onlyAuth) {
+    if (token && token?.length > 0) {
+      canfetch = true;
+      configs = {
+        ...configs,
+        headers: { ...configs?.headers, Authorization: `Bearer ${token}` },
+      };
+    } else {
+      canfetch = false;
+    }
+  }
+
+  const { data, isError, isRefetching, isLoading, refetch, isFetching, error } =
+    useFetch<T[]>({
+      endPoint,
+      queryKey: queryKey,
+      configs,
+      manual: canfetch && manual,
+      afterFetch: () => {
+        setManual(false);
+      },
+    });
+
+  useEffect(() => {
+    if (onlyAuth && token && token?.length > 0) {
+      if (isError && error) {
+        notifier.error({ message: error.message });
+      }
+    }
+    status.setIsError(isError);
+    status.setIsLoading(isLoading);
+    status.setIsFetching(isFetching);
+    tableData.setData(data);
+    status.setError(error);
+  }, [isError, isLoading, isFetching, data, error]);
+
+  useEffect(() => {
+    if (isError) {
+      setManual(false);
+      tableData.setData(undefined);
+    }
+  }, [isError]);
+
+  return {
+    data,
+    isError,
+    isRefetching,
+    isLoading,
+    refetch,
+    isFetching,
+    error,
+  };
+}
+
 export function useFetchPaginate<T extends Record<string, any>>({
   queryKey,
   configs,

@@ -9,7 +9,7 @@ export interface IPaginateContext<T = Record<string, any>> {
 
 export type MantineSelectType<T extends Record<string, any>> = {
   value: string;
-  label: T[string | keyof T];
+  label: string | NonNullable<T[keyof T]>;
 };
 
 export interface AppContextState {
