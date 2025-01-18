@@ -54,6 +54,7 @@ export interface UserGroupSupervisors extends IBaseTableType {
   group?: UserGroup;
   userName?: string;
   userImage?: string | null;
+  userId?: string;
   groupName?: string;
   gender?: string;
   isMain: number;

@@ -9,12 +9,14 @@ import {
   Pagination,
   Flex,
   Text,
+  Alert,
 } from "@mantine/core";
 import RolePage from "./rolepage";
 import { ServerRoles } from "@/types/app/auth/auth.types";
 import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
+import { IconInfoCircle } from "@tabler/icons-react";
 
 type user_roles = {
   type: "user";
@@ -32,6 +34,8 @@ const ManageRoles = ({ type, data }: props) => {
   const [activePage, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const dispatch = useAppDispatch();
+  const queryKey = type === "user" ? "user_roles" : "group_roles";
+  const endpoint = type === "user" ? "user" : "group";
   const {
     data: rolesData,
     isLoading,
@@ -41,8 +45,8 @@ const ManageRoles = ({ type, data }: props) => {
     paginate,
     refetch,
   } = useFetchPaginate<ServerRoles>({
-    queryKey: `user_roles-${type === "user" ? data.id : data.id}`,
-    endPoint: `core/auth/linkroles/user/serverroles/${
+    queryKey: `${queryKey}-${type === "user" ? data.id : data.id}`,
+    endPoint: `core/auth/linkroles/${endpoint}/serverroles/${
       type === "user" ? data.id : String(data.id)
     }`,
   });
@@ -95,7 +99,7 @@ const ManageRoles = ({ type, data }: props) => {
 
   return (
     <ScrollArea h={400}>
-      {rolesData && (
+      {rolesData && rolesData?.docs?.length > 0 && (
         <Card>
           <InputWithButton
             value={search}
@@ -140,10 +144,35 @@ const ManageRoles = ({ type, data }: props) => {
                       refetch={refetch}
                     />
                   ))}
-                {/* {type === "group" && <RolePage />} */}
+                {type === "group" &&
+                  rolesData.docs.map((role) => (
+                    <RolePage
+                      type="group"
+                      key={role.module}
+                      role={role}
+                      data={data}
+                      refetch={refetch}
+                    />
+                  ))}
               </Table.Tbody>
             </Table>
           </Table.ScrollContainer>
+        </Card>
+      )}
+      {(!rolesData || !rolesData?.docs || rolesData?.docs?.length === 0) && (
+        <Card>
+          <Alert
+            variant="light"
+            color="blue"
+            title="Roles not set"
+            icon={<IconInfoCircle />}
+          >
+            {`No ${
+              type === "user"
+                ? "user roles"
+                : "group roles found, contact admin or systems administrator"
+            } found`}
+          </Alert>
         </Card>
       )}
     </ScrollArea>

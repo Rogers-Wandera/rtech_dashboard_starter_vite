@@ -50,6 +50,16 @@ const RolePage = ({ role, data, type, refetch }: props) => {
             type="user"
           />
         ))}
+      {type === "group" &&
+        role.links.map((link) => (
+          <LinkRolePage
+            refetch={refetch}
+            key={link.id}
+            link={link}
+            data={data}
+            type="group"
+          />
+        ))}
     </Fragment>
   );
 };

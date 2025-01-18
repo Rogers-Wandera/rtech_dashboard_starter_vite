@@ -16,6 +16,7 @@ import { useFetch } from "@/hooks/usefetch.hook";
 import { IconArrowBack } from "@tabler/icons-react";
 import GroupUsers from "./users";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
+import ManageRoles from "../../rolemanagement/roles";
 
 const ManageUserGroups = () => {
   const params = useParams<{ groupId: string }>();
@@ -110,6 +111,11 @@ const ManageUserGroups = () => {
                 </Tab.Pane>
                 <Tab.Pane eventKey="group-users">
                   <GroupUsers group={data} refetch={refetch} />
+                </Tab.Pane>
+                <Tab.Pane eventKey="group-roles">
+                  <Box mb={30}>
+                    <ManageRoles type="group" data={data} />
+                  </Box>
                 </Tab.Pane>
               </Tab.Content>
             </Col>
