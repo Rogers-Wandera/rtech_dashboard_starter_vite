@@ -106,7 +106,7 @@ const ManageUsers = () => {
 
   return (
     <div>
-      {!opened && (
+      <div style={{ display: opened ? "none" : "block" }}>
         <MRT_ServerTable<User>
           tablecolumns={userscolumns}
           columnConfigs={moretableconfigs}
@@ -132,8 +132,10 @@ const ManageUsers = () => {
           }}
           serveractions={{ deleteEndPoint: "core/auth/users" }}
         />
-      )}
-      <UserModal opened={opened} close={close} form={form} refetch={refetch} />
+      </div>
+      <div style={{ display: opened ? "block" : "none" }}>
+        <UserModal close={close} form={form} refetch={refetch} />
+      </div>
     </div>
   );
 };

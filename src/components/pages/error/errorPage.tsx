@@ -10,7 +10,7 @@ import Image400 from "@/assets/images/error/400.jpg";
 import Image404 from "@/assets/images/error/404_image.jpg";
 import Image500 from "@/assets/images/error/500_image.jpg";
 import classes from "./styles.module.css";
-import { useNavigate } from "react-router";
+import { NavigateFunction, useNavigate } from "react-router";
 
 type props = {
   title?: string;
@@ -18,7 +18,7 @@ type props = {
   type?: "400" | "404" | "500";
   ctx?: {
     title?: string;
-    link?: string;
+    link?: string | ((navigate: NavigateFunction) => void);
   };
 };
 export function ErrorPage({ title, message, ctx, type = "500" }: props) {
@@ -26,7 +26,11 @@ export function ErrorPage({ title, message, ctx, type = "500" }: props) {
 
   const HandleCtx = () => {
     if (ctx?.link) {
-      navigate(ctx.link);
+      if (typeof ctx.link === "function") {
+        ctx.link(navigate);
+      } else {
+        navigate(ctx.link);
+      }
     } else {
       navigate(-1);
     }

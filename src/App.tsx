@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router";
 import { useMaterialTheme } from "./lib/themes/material.theme";
 import { setShowSubHeader } from "./lib/store/services/defaults/defaults";
+import ErrorBoundary from "./lib/utils/errorhandler/error.boundary";
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -33,15 +34,18 @@ const App = () => {
   useEffect(() => {
     dispatch(setShowSubHeader(true));
   }, [location.pathname]);
+
   return (
     <Box pos="relative">
-      <LoadingOverlay
-        visible={loading}
-        zIndex={1000}
-        overlayProps={{ radius: "sm", blur: 2 }}
-        loaderProps={{ color: "blue", type: "bars" }}
-      />
-      <Outlet />
+      <ErrorBoundary>
+        <LoadingOverlay
+          visible={loading}
+          zIndex={1000}
+          overlayProps={{ radius: "sm", blur: 2 }}
+          loaderProps={{ color: "blue", type: "bars" }}
+        />
+        <Outlet />
+      </ErrorBoundary>
     </Box>
   );
 };

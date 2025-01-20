@@ -42,6 +42,7 @@ export interface ServerLinkRole {
   days_left: number | null;
   userId: string;
   permissions: ServerLinkPermission[];
+  groupId: number | null;
 }
 
 export interface ServerLinkPermission {

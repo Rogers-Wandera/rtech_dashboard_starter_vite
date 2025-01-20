@@ -48,9 +48,9 @@ const MRT_TableContextProvider = ({
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     DEFAULT_COLUMN_FILTERS
   );
-  const [data, setData] = useState<PaginateResponse<any> | undefined>(
-    undefined
-  );
+  const [data, setData] = useState<
+    PaginateResponse<unknown> | unknown[] | undefined
+  >(undefined);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const [sorting, setSorting] = useState<MRT_SortingState>(DEFAULT_SORTING);
   const [pagination, setPagination] =

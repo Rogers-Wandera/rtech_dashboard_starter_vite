@@ -8,6 +8,7 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { RenderTopBarComponents } from "./helper";
+import { PaginateResponse } from "@/types/server/server.main.types";
 
 export function RenderTable<TData extends Record<string, any>>({
   columns,
@@ -40,6 +41,7 @@ export function RenderTable<TData extends Record<string, any>>({
     data,
   } = useMRTTableContext<TData>();
 
+  const tableData = data?.data as PaginateResponse<TData>;
   const theme = useSelector(
     (state: RootState) => state.setting.setting.theme_scheme.value
   );
@@ -54,8 +56,8 @@ export function RenderTable<TData extends Record<string, any>>({
 
   const table = useMaterialReactTable({
     columns,
-    data: data.data?.docs || [],
-    rowCount: data.data?.totalDocs || 0,
+    data: tableData?.docs || [],
+    rowCount: tableData?.totalDocs || 0,
     getRowId: (row) => row[idField as string],
     onRowSelectionChange: rowSelection.setRowSelection,
     onColumnFiltersChange: filters.setColumnFilters,

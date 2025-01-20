@@ -6,7 +6,10 @@ import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { notifier } from "@/lib/utils/notify/notification";
 import { TanStackRefetchType } from "@/types/app/app.types";
 import { ServerRoles } from "@/types/app/auth/auth.types";
-import { ServerLinkPermission } from "@/types/app/core/system.types";
+import {
+  ServerLinkPermission,
+  ServerLinkRole,
+} from "@/types/app/core/system.types";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 import {
   PaginateResponse,
@@ -20,8 +23,14 @@ type props = {
   permission: ServerLinkPermission;
   linkRoleId: number;
   refetch: TanStackRefetchType<PaginateResponse<ServerRoles>>;
+  link: ServerLinkRole;
 };
-const RolePermissionPage = ({ permission, linkRoleId, refetch }: props) => {
+const RolePermissionPage = ({
+  permission,
+  linkRoleId,
+  refetch,
+  link,
+}: props) => {
   const [checked, setChecked] = useState(Number(permission.checked) === 1);
   const dispatch = useAppDispatch();
   const { postAsync } = useMutateData({ queryKey: "user-permissions-assign" });
@@ -67,7 +76,9 @@ const RolePermissionPage = ({ permission, linkRoleId, refetch }: props) => {
       </ListItemIcon>
       <ListItemText
         id={String(permission.id)}
-        primary={permission.accessName}
+        primary={`${permission.accessName} ${
+          link?.groupId !== null && "(Group Permission)"
+        }`}
         secondary={permission.description}
       />
       <Switch
@@ -76,6 +87,7 @@ const RolePermissionPage = ({ permission, linkRoleId, refetch }: props) => {
         inputProps={{
           "aria-labelledby": "switch-list-label-wifi",
         }}
+        disabled={link?.groupId !== null}
       />
     </ListItem>
   );

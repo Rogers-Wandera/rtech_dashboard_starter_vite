@@ -26,6 +26,7 @@ const LinkRolePermission = ({ link, refetch }: props) => {
               permission={permission}
               linkRoleId={Number(link.linkRoleId)}
               refetch={refetch}
+              link={link}
             />
           ))}
         </List>
