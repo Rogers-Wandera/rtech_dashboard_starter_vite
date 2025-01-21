@@ -103,6 +103,7 @@ export interface NoServerSideProps<T extends Record<string, any>> {
     confirmLabel?: string | ((row: MRT_Row<T>) => string);
     cancelLabel?: string;
   };
+  display?: boolean;
 }
 
 export type NoServertableProps<TData extends Record<string, any>> =
