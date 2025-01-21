@@ -10,9 +10,10 @@ import { ServerRoles } from "@/types/app/auth/auth.types";
 type props = {
   link: ServerLinkRole;
   refetch: TanStackRefetchType<PaginateResponse<ServerRoles>>;
+  type: "user" | "group";
 };
 
-const LinkRolePermission = ({ link, refetch }: props) => {
+const LinkRolePermission = ({ link, refetch, type }: props) => {
   return (
     <ScrollArea h={165}>
       {link.permissions.length > 0 && (
@@ -27,6 +28,7 @@ const LinkRolePermission = ({ link, refetch }: props) => {
               linkRoleId={Number(link.linkRoleId)}
               refetch={refetch}
               link={link}
+              type={type}
             />
           ))}
         </List>

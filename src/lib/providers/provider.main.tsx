@@ -14,6 +14,7 @@ import { Outlet } from "react-router";
 import PaginateProvider from "../context/paginate/paginate.context";
 import { MantineTheme } from "../themes/mantine.theme";
 import AppContextProvider from "../context/app/app.context";
+import PermissionProvider from "../context/auth/permission.context";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
@@ -49,7 +50,9 @@ const Providers = () => {
                     <PaginateProvider>
                       <MRT_TableContextProvider>
                         <AppContextProvider>
-                          <Outlet />
+                          <PermissionProvider>
+                            <Outlet />
+                          </PermissionProvider>
                         </AppContextProvider>
                       </MRT_TableContextProvider>
                     </PaginateProvider>

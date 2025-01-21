@@ -1,5 +1,9 @@
 import { useAuth } from "@/hooks/auth.hooks";
-import { useGetUserModulesQuery } from "@/lib/store/services/auth/auth.api";
+import {
+  useGetUserModulesQuery,
+  usePermissionsQuery,
+} from "@/lib/store/services/auth/auth.api";
+import { ROLES } from "@/types/enums/enum.types";
 import { LoadingOverlay } from "@mantine/core";
 import { useEffect } from "react";
 
@@ -14,13 +18,36 @@ function WithUserModules<P extends Object>(
         skip: !isLoggedIn,
       }
     );
+    // console.log(user?.roles);
+    const {
+      refetch: refetchPermissions,
+      isLoading: isLoadingPermissions,
+      isFetching: isFetchingPermissions,
+      data: permissions,
+    } = usePermissionsQuery(String(user?.id), {
+      skip: !isLoggedIn || user?.roles.includes(ROLES.ADMIN),
+    });
+
     useEffect(() => {
       if (isLoggedIn) {
         refetch();
       }
     }, [isLoggedIn]);
 
-    if (isLoading && isFetching && !data) {
+    useEffect(() => {
+      if (isLoggedIn && !user?.roles.includes(ROLES.ADMIN)) {
+        refetchPermissions();
+      }
+    }, [isLoggedIn, user]);
+
+    if (
+      isLoading &&
+      isFetching &&
+      isLoadingPermissions &&
+      isFetchingPermissions &&
+      !data &&
+      !permissions
+    ) {
       return (
         <LoadingOverlay
           visible={isLoading}

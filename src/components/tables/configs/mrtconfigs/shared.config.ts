@@ -220,6 +220,8 @@ export interface ServerSideProps<T extends Record<string, any>> {
     confirmLabel?: string | ((row: MRT_Row<T>) => string);
     cancelLabel?: string;
   };
+
+  display?: boolean;
 }
 
 /**

@@ -1,4 +1,8 @@
-import { IAuthState, IAuthUser } from "@/types/server/server.main.types";
+import {
+  IAuthState,
+  IAuthUser,
+  User_Permission,
+} from "@/types/server/server.main.types";
 import { createSlice } from "@reduxjs/toolkit";
 import { AuthApi } from "./auth.api";
 import { jwtDecode } from "jwt-decode";
@@ -10,6 +14,7 @@ const initialState: IAuthState = {
   token: null,
   user: null,
   modules: {},
+  permissions: [],
 };
 
 export const AuthSlice = createSlice({
@@ -31,6 +36,9 @@ export const AuthSlice = createSlice({
     logOut: () => {
       return initialState;
     },
+    setPermissions(state, action: { payload: User_Permission[] }) {
+      state.permissions = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -44,6 +52,12 @@ export const AuthSlice = createSlice({
         AuthApi.endpoints.getUserModules.matchFulfilled,
         (state, action) => {
           state.modules = action.payload;
+        }
+      )
+      .addMatcher(
+        AuthApi.endpoints.Permissions.matchFulfilled,
+        (state, action) => {
+          state.permissions = action.payload;
         }
       );
   },

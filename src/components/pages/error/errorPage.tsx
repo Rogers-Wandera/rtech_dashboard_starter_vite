@@ -9,13 +9,14 @@ import {
 import Image400 from "@/assets/images/error/400.jpg";
 import Image404 from "@/assets/images/error/404_image.jpg";
 import Image500 from "@/assets/images/error/500_image.jpg";
+import Image401 from "@/assets/images/error/401.jpg";
 import classes from "./styles.module.css";
 import { NavigateFunction, useNavigate } from "react-router";
 
 type props = {
   title?: string;
   message?: string;
-  type?: "400" | "404" | "500";
+  type?: "400" | "401" | "404" | "500";
   ctx?: {
     title?: string;
     link?: string | ((navigate: NavigateFunction) => void);
@@ -35,11 +36,28 @@ export function ErrorPage({ title, message, ctx, type = "500" }: props) {
       navigate(-1);
     }
   };
+  let imageToShow = Image500;
+
+  switch (type) {
+    case "400":
+      imageToShow = Image400;
+      break;
+    case "404":
+      imageToShow = Image404;
+      break;
+    case "401":
+      imageToShow = Image401;
+      break;
+    default:
+      imageToShow = Image500;
+      break;
+  }
+
   return (
     <Container className={classes.root}>
       <SimpleGrid spacing={{ base: 40, sm: 80 }} cols={{ base: 1, sm: 2 }}>
         <Image
-          src={type === "400" ? Image400 : type === "404" ? Image404 : Image500}
+          src={imageToShow}
           className={classes.mobileImage}
           alt={`image-` + type}
         />
@@ -65,7 +83,7 @@ export function ErrorPage({ title, message, ctx, type = "500" }: props) {
           </Button>
         </div>
         <Image
-          src={type === "400" ? Image400 : type === "404" ? Image404 : Image500}
+          src={imageToShow}
           className={classes.desktopImage}
           alt={`image-` + type}
         />

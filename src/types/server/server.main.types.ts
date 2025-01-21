@@ -66,6 +66,7 @@ export interface IAuthState {
   token: string | null;
   user: IAuthUser | null;
   modules: UserModuleRes;
+  permissions: User_Permission[];
 }
 
 type fetchType<T = any> = {
@@ -119,3 +120,16 @@ export type SystemRole = BaseTableType & {
   released: number;
   description: string;
 };
+
+export interface User_Permission {
+  method: METHODS;
+  expireTime: Date | null;
+  userName: string;
+  userId: string;
+  isGroupPermission: boolean;
+  expired: number;
+  groupId: string | null;
+  groupName: string | null;
+  days_left: number | null;
+  roleName: string;
+}

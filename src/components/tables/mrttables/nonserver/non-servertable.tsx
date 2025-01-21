@@ -37,6 +37,10 @@ const MRT_NoServerTable = <TData extends Record<string, any>>(
     validateData = undefined,
   } = options;
 
+  const display = (options?.display === false && { display: "none" }) || {
+    display: "block",
+  };
+
   const idField = options.idField ? options.idField : "id";
 
   const dispatch = useAppDispatch();
@@ -253,9 +257,9 @@ const MRT_NoServerTable = <TData extends Record<string, any>>(
     HandleDeleteData: HandleDelete,
   });
   return (
-    <>
+    <div style={{ ...display }}>
       <MaterialReactTable table={table} />
-    </>
+    </div>
   );
 };
 

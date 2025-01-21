@@ -24,6 +24,10 @@ import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 export const MRT_ServerTable = <TData extends Record<string, any>>(
   options: ServerSideProps<TData>
 ) => {
+  const display = (options?.display === false && { display: "none" }) || {
+    display: "block",
+  };
+
   const dispatch = useAppDispatch();
   const {
     tablecolumns,
@@ -253,7 +257,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
   });
 
   return (
-    <div>
+    <div style={{ ...display }}>
       <MaterialReactTable table={table} />
     </div>
   );

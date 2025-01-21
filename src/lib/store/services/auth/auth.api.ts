@@ -8,6 +8,7 @@ import { AuthEndpoint } from "@/lib/endpoints/server.core.endpoints";
 import {
   ServerErrorResponse,
   ServerResponse,
+  User_Permission,
   UserModuleRes,
 } from "@/types/server/server.main.types";
 import { LoginResponse, RegisterResponse } from "@/types/app/auth/auth.types";
@@ -42,6 +43,22 @@ export const AuthApi = createApi({
         return error;
       },
       transformResponse: (response: LoginResponse) => {
+        return response;
+      },
+    }),
+    Permissions: builder.query({
+      query: (userId: string) => ({
+        url: `${AuthEndpoint}/users/userpermissions/${userId}`,
+        method: "GET",
+      }),
+      transformErrorResponse: (error: FetchBaseQueryError) => {
+        if (error.data) {
+          return error.data as ServerErrorResponse;
+        }
+        return error;
+      },
+
+      transformResponse: (response: User_Permission[]) => {
         return response;
       },
     }),
@@ -184,4 +201,5 @@ export const {
   useVerifyAccountMutation,
   useResendVerificationLinkMutation,
   useRegisterMutation,
+  usePermissionsQuery,
 } = AuthApi;

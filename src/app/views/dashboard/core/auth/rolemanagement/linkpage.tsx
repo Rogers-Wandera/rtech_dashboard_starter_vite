@@ -131,8 +131,8 @@ const LinkRolePage = ({ link, refetch, type, data }: props) => {
             checked={link.is_assigned === 1}
             color="violet"
             size="md"
-            label={link?.groupId != null && "Group Role"}
-            disabled={link?.groupId !== null}
+            label={type === "user" && link?.groupId !== null && "Group Role"}
+            disabled={type === "user" && link?.groupId !== null}
           />
         </Table.Td>
         <Table.Td style={{ border: "none", paddingLeft: "20px" }}>
@@ -154,7 +154,7 @@ const LinkRolePage = ({ link, refetch, type, data }: props) => {
           {link.is_assigned === 1 &&
             (link.expired === 1 || (link.days_left && link.days_left <= 3)) && (
               <ActionIcon
-                disabled={link?.groupId !== null}
+                disabled={type === "user" && link?.groupId !== null}
                 color="green"
                 ml={4}
                 onClick={() => {
@@ -173,7 +173,7 @@ const LinkRolePage = ({ link, refetch, type, data }: props) => {
       {show && (
         <Table.Tr>
           <Table.Td colSpan={3}>
-            <LinkRolePermission link={link} refetch={refetch} />
+            <LinkRolePermission link={link} refetch={refetch} type={type} />
           </Table.Td>
         </Table.Tr>
       )}

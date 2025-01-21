@@ -128,7 +128,8 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
   endPoint,
   onlyAuth = true,
   configs = {},
-}: getprops) {
+  skip = null,
+}: getprops & { skip?: boolean | null }) {
   const {
     pagination,
     sorting,
@@ -175,6 +176,13 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
     }
   }
 
+  let shouldFetch = manual && canfetch;
+  if (skip != null) {
+    shouldFetch = skip;
+  }
+
+  console.log(skip);
+
   const newqueryKey = useMemo(
     () => [
       queryKey,
@@ -198,7 +206,7 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
       queryKey: newqueryKey,
       configs,
       setUrlOptions,
-      manual: canfetch && manual,
+      manual: shouldFetch,
       afterFetch: () => {
         setManual(false);
       },

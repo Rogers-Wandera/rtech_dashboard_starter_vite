@@ -24,12 +24,15 @@ type props = {
   linkRoleId: number;
   refetch: TanStackRefetchType<PaginateResponse<ServerRoles>>;
   link: ServerLinkRole;
+  type: "user" | "group";
 };
+
 const RolePermissionPage = ({
   permission,
   linkRoleId,
   refetch,
   link,
+  type,
 }: props) => {
   const [checked, setChecked] = useState(Number(permission.checked) === 1);
   const dispatch = useAppDispatch();
@@ -77,7 +80,7 @@ const RolePermissionPage = ({
       <ListItemText
         id={String(permission.id)}
         primary={`${permission.accessName} ${
-          link?.groupId !== null && "(Group Permission)"
+          type === "user" && link?.groupId !== null ? "(Group Permission)" : ""
         }`}
         secondary={permission.description}
       />
@@ -87,7 +90,7 @@ const RolePermissionPage = ({
         inputProps={{
           "aria-labelledby": "switch-list-label-wifi",
         }}
-        disabled={link?.groupId !== null}
+        disabled={type === "user" && link?.groupId !== null}
       />
     </ListItem>
   );
