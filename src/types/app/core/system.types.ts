@@ -7,6 +7,7 @@ export interface ModuleType extends IBaseTableType {
   name: string;
   position: number;
   icon: string;
+  modulelinks: ModuleLinkType[];
 }
 
 export interface ModuleLinkType extends IBaseTableType {

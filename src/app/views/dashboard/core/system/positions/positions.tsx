@@ -1,5 +1,5 @@
 import { MRT_ServerTable } from "@/components/tables/mrttables/server/mrtserverside";
-import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
+import { useMRTPaginateTable } from "@/hooks/data/usefetch.hook";
 import { Position } from "@/types/app/core/position.type";
 import { Box } from "@mantine/core";
 import { PositionColumns } from "./positionconfigs";
@@ -7,6 +7,7 @@ import { validateRequired } from "@/lib/utils/helpers/utilfuncs";
 import { usePermissions } from "@/lib/context/auth/permission.context";
 import { POSITION_PERMISSION } from "@/types/enums/permissions.enum";
 import { ErrorPage } from "@/components/pages/error/errorPage";
+import Meta from "@/components/shared/meta";
 
 function validateData(data: Position) {
   return {
@@ -32,6 +33,7 @@ const ManagePositions = () => {
 
   return (
     <Box>
+      <Meta title="Positions" header="Manage Positions" />
       <MRT_ServerTable
         display={canFetch}
         title="Position"

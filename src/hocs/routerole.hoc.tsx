@@ -1,5 +1,5 @@
 import { urlexcludes } from "@/assets/app/urlexcludes";
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { RootState } from "@/lib/store/store";
 import { UserModuleRes } from "@/types/server/server.main.types";
 import { useSelector } from "react-redux";

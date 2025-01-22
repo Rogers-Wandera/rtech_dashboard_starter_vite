@@ -1,6 +1,6 @@
 import { MRT_ServerTable } from "@/components/tables/mrttables/server/mrtserverside";
 import RouteRoles from "@/hocs/verifyroles";
-import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
+import { useMRTPaginateTable } from "@/hooks/data/usefetch.hook";
 import { ModuleType } from "@/types/app/core/system.types";
 import {
   ModuleColumns,
@@ -11,6 +11,7 @@ import { validateRequired } from "@/lib/utils/helpers/utilfuncs";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import _ from "lodash";
 import { useAppContext } from "@/lib/context/app/app.context";
+import Meta from "@/components/shared/meta";
 
 function validateData(data: ModuleType) {
   return {
@@ -29,6 +30,7 @@ const Modules = () => {
   });
   return (
     <div>
+      <Meta title="Modules" header="Manage Modules" />
       <MRT_ServerTable
         title="Module"
         tablecolumns={ModuleColumns}

@@ -4,7 +4,7 @@ import { ResetPasswordValues } from "@/types/app/auth/auth.types";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
 import { useResetPasswordMutation } from "@/lib/store/services/auth/auth.api";
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";

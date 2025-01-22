@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { RootState } from "@/lib/store/store";
 import { METHODS, ROLES } from "@/types/enums/enum.types";
 import { User_Permission } from "@/types/server/server.main.types";

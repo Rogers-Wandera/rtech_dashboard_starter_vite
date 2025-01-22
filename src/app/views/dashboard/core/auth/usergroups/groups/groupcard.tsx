@@ -28,7 +28,7 @@ import TruncatedText from "@/components/shared/truncatedtext";
 import { useNavigate } from "react-router";
 import { helpers } from "@/lib/utils/helpers/helper";
 import { Dispatch, SetStateAction } from "react";
-import { useDeleteData } from "@/hooks/usedelete.hook";
+import { useDeleteData } from "@/hooks/data/usedelete.hook";
 import ConfirmModal from "@/components/shared/dialogs/confirm";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
@@ -39,7 +39,7 @@ import {
 } from "@/types/server/server.main.types";
 import { notifier } from "@/lib/utils/notify/notification";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 import { useAppContext } from "@/lib/context/app/app.context";
 import { AppActions } from "@/lib/reducers/app/app.actions";

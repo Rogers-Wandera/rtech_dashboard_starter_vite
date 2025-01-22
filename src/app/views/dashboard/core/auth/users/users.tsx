@@ -1,8 +1,8 @@
 import { TableColumnConfigs } from "@/components/tables/configs/mrtconfigs/shared.config";
 import { MRT_ServerTable } from "@/components/tables/mrttables/server/mrtserverside";
 import RouteRoles from "@/hocs/verifyroles";
-import { useAuth } from "@/hooks/auth.hooks";
-import { useMRTPaginateTable } from "@/hooks/usefetch.hook";
+import { useAuth } from "@/hooks/auth/auth.hooks";
+import { useMRTPaginateTable } from "@/hooks/data/usefetch.hook";
 import { User } from "@/types/app/core/user.type";
 import {
   PaginateResponse,
@@ -20,9 +20,10 @@ import { Avatar, Badge } from "@mui/material";
 import { useDisclosure } from "@mantine/hooks";
 import UserModal from "./usermodal";
 import { useForm, zodResolver } from "@mantine/form";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import { IconLock } from "@tabler/icons-react";
 import { styled } from "@mui/material/styles";
+import Meta from "@/components/shared/meta";
 
 const SmallAvatar = styled(IconLock)(() => ({
   width: 22,
@@ -106,6 +107,7 @@ const ManageUsers = () => {
 
   return (
     <div>
+      <Meta title="Users" header="Manage Users" />
       <div style={{ display: opened ? "none" : "block" }}>
         <MRT_ServerTable<User>
           tablecolumns={userscolumns}

@@ -1,7 +1,9 @@
+import ServerCombo from "@/components/shared/serversidecombo/servercombo";
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
+import { validateRequired } from "@/lib/utils/helpers/utilfuncs";
 import { notifier } from "@/lib/utils/notify/notification";
 import { TanStackRefetchType } from "@/types/app/app.types";
 import { ModuleLinkType } from "@/types/app/core/system.types";
@@ -179,4 +181,97 @@ const LinkModal = ({
   );
 };
 
+type transferprops = {
+  opened: boolean;
+  close: () => void;
+  refetch: TanStackRefetchType<PaginateResponse<ModuleLinkType>>;
+  link: ModuleLinkType;
+};
+
+export const TransferLinkModal = ({
+  opened,
+  close,
+  refetch,
+  link,
+}: transferprops) => {
+  const { postAsync } = useMutateData({
+    queryKey: "transfer-link",
+  });
+  const dispatch = useAppDispatch();
+  const form = useForm<{ moduleId: string }>({
+    initialValues: {
+      moduleId: "",
+    },
+    validate: {
+      moduleId: (value) =>
+        !validateRequired(value) ? "Module is required" : null,
+    },
+  });
+
+  const HandleSave = async (values: { moduleId: string }) => {
+    try {
+      dispatch(setLoading(true));
+      const mainurl = "core/system/modulelinks/transfer/link";
+      const response = await postAsync({
+        endPoint: mainurl,
+        payload: { moduleId: Number(values.moduleId), linkId: link.id },
+        method: USE_MUTATE_METHODS.PATCH,
+      });
+      notifier.success({ message: String(response.msg) });
+      form.reset();
+      close();
+      await refetch();
+      dispatch(setLoading(false));
+    } catch (error) {
+      dispatch(setLoading(false));
+      HandleError(error as ServerErrorResponse);
+    }
+  };
+  return (
+    <Modal
+      overlayProps={{
+        backgroundOpacity: 0.55,
+        blur: 3,
+      }}
+      centered
+      opened={opened}
+      onClose={() => {
+        close();
+        form.reset();
+      }}
+      title={
+        <Group>
+          <Title order={3}>Transfer Link to another Module</Title>
+        </Group>
+      }
+    >
+      <form
+        onSubmit={form.onSubmit(async (values) => {
+          await HandleSave(values);
+        })}
+      >
+        <ServerCombo
+          endPoint="/core/system/modules"
+          textKey="name"
+          valueKey="id"
+          label="Module"
+          zIndex={10000}
+          placeholder="Select a module"
+          key={form.key("moduleId")}
+          value={form.getInputProps("moduleId").value}
+          onChange={form.getInputProps("moduleId").onChange}
+          otherOptions={{ error: form.getInputProps("moduleId").error }}
+        />
+        <Button
+          mt={20}
+          type="submit"
+          size="xs"
+          leftSection={<IconHexagonPlus />}
+        >
+          Save
+        </Button>
+      </form>
+    </Modal>
+  );
+};
 export default LinkModal;

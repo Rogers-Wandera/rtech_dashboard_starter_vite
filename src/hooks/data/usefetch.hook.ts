@@ -6,7 +6,7 @@ import {
   ServerErrorResponse,
 } from "@/types/server/server.main.types";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
-import { useAuth } from "./auth.hooks";
+import { useAuth } from "../auth/auth.hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { notifier } from "@/lib/utils/notify/notification";
 // import { usePaginateContext } from "@/lib/context/paginate/paginate.context";
@@ -141,6 +141,12 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
   } = useMRTTableContext<T>();
   const { token } = useAuth();
 
+  endPoint = endPoint
+    ? endPoint.startsWith("/")
+      ? endPoint.slice(1)
+      : endPoint
+    : endPoint;
+
   const setUrlOptions = useCallback(
     (url: URL) => {
       url.searchParams.set(
@@ -180,8 +186,6 @@ export function useMRTPaginateTable<T extends Record<string, any>>({
   if (skip != null) {
     shouldFetch = skip;
   }
-
-  console.log(skip);
 
   const newqueryKey = useMemo(
     () => [
@@ -256,6 +260,11 @@ export function useMRTNoPaginateTable<T extends Record<string, any>>({
     setManual,
   } = useMRTTableContext<T>();
 
+  endPoint = endPoint
+    ? endPoint.startsWith("/")
+      ? endPoint.slice(1)
+      : endPoint
+    : endPoint;
   const { token } = useAuth();
 
   let canfetch = false;
@@ -326,6 +335,11 @@ export function useFetchPaginate<T extends Record<string, any>>({
   url?: string;
   showError?: boolean;
 }) {
+  endPoint = endPoint
+    ? endPoint.startsWith("/")
+      ? endPoint.slice(1)
+      : endPoint
+    : endPoint;
   const [paginate, setPaginate] = useState<IPaginate<T>>({
     page: 1,
     limit: limit,

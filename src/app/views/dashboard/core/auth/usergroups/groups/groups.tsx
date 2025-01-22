@@ -1,5 +1,5 @@
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { useFetchPaginate } from "@/hooks/usefetch.hook";
+import { useFetchPaginate } from "@/hooks/data/usefetch.hook";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { UserGroup } from "@/types/app/core/user.type";
 import { Alert, Box, Flex, Grid, Pagination } from "@mantine/core";

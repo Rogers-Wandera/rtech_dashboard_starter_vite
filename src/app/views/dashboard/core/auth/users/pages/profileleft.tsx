@@ -18,14 +18,14 @@ import {
   IconTrashXFilled,
 } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { useForm } from "@mantine/form";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import {
   ServerErrorResponse,
   ServerResponse,
 } from "@/types/server/server.main.types";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { notifier } from "@/lib/utils/notify/notification";
 import { setLoading } from "@/lib/store/services/defaults/defaults";

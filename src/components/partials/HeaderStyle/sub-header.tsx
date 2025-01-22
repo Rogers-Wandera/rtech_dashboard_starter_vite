@@ -9,24 +9,24 @@ import topHeader4 from "@/assets/images/dashboard/top-header4.png";
 import topHeader5 from "@/assets/images/dashboard/top-header5.png";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 
 const SubHeader = memo(() => {
-  const show = useSelector(
-    (state: RootState) => state.appState.defaultstate.showSubHeader
+  const { showSubHeader: show, headerText } = useSelector(
+    (state: RootState) => state.appState.defaultstate
   );
+  const { user } = useAuth();
   return (
     <Fragment>
-      {show && (
+      {show && user && (
         <div className="iq-navbar-header" style={{ height: "215px" }}>
           <Container fluid className=" iq-container">
             <Row>
               <Col md="12">
                 <div className="d-flex justify-content-between flex-wrap">
                   <div>
-                    <h2>Hello Admin !</h2>
-                    <p className="mt-4 text-center">
-                      Welecome to RTech Starter Dashboard
-                    </p>
+                    <h2>Hello {user.displayName} !</h2>
+                    <p className="mt-4 text-center">{headerText}</p>
                   </div>
                   <div
                     className="d-flex align-items-center"

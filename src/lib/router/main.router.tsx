@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router";
 import { AuthRouter } from "./dashboardroutes";
-import { NoAuthRouter } from "./noauthrouter";
-import { ErrorRoutes } from "./errorroutes";
-import { GeneralAuthRoutes } from "./generalauthroutes";
+import { NoAuthRouter } from "./noauth/noauthrouter";
+import { ErrorRoutes } from "./error/errorroutes";
+import { GeneralAuthRoutes } from "./general/generalauthroutes";
 import Providers from "../providers/provider.main";
 import App from "@/App";
 

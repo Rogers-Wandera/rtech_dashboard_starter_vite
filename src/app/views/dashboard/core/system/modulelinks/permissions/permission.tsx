@@ -1,6 +1,6 @@
 import ConfirmModal from "@/components/shared/dialogs/confirm";
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { useDeleteData } from "@/hooks/usedelete.hook";
+import { useDeleteData } from "@/hooks/data/usedelete.hook";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { notifier } from "@/lib/utils/notify/notification";

@@ -28,6 +28,11 @@ export const ModuleColumns: TableColumns<ModuleType>[] = [
     type: "text",
     header: "Position",
   },
+  {
+    accessorKey: "isActive",
+    type: "text",
+    header: "No Links",
+  },
 ];
 
 export const ModulesColumnConfigs = (
@@ -72,6 +77,10 @@ export const ModulesColumnConfigs = (
           />
         );
       },
+    },
+    {
+      accessorKey: "isActive",
+      Cell: ({ row }) => row.original?.modulelinks?.length || 0,
     },
     {
       accessorKey: "position",

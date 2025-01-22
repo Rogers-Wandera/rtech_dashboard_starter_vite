@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { setSession } from "@/lib/store/services/defaults/defaults";

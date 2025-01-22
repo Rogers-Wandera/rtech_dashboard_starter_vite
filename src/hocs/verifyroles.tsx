@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { WithRolesProps } from "@/types/app/auth/auth.types";
 import React from "react";
 import { Navigate } from "react-router";

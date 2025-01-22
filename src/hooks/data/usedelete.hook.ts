@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosRequestConfig, AxiosError } from "axios";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
-import { useAuth } from "./auth.hooks";
+import { useAuth } from "../auth/auth.hooks";
 
 type UseDeleteDataProps = {
   queryKey: string | any[];

@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { Container } from "react-bootstrap";
 import { Link, Navigate } from "react-router";
 // img

@@ -4,7 +4,7 @@ import {
   ServerErrorResponse,
   ServerResponse,
 } from "@/types/server/server.main.types";
-import { useAuth } from "./auth.hooks";
+import { useAuth } from "../auth/auth.hooks";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 
 type UsePostDataProps = {

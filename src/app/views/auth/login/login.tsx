@@ -7,7 +7,7 @@ import LoginPage from "./loginpage";
 import { ILoginValues } from "@/types/app/auth/auth.types";
 import { Navigate, useLocation, useNavigate } from "react-router";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { useEffect, useState } from "react";
 import { HelperClass } from "@/lib/utils/helpers/helper";
 import { useAppDispatch } from "@/hooks/store.hooks";
@@ -15,6 +15,7 @@ import {
   setNextRoute,
   setRememberMe,
 } from "@/lib/store/services/defaults/defaults";
+import { useSocketEmit } from "@/hooks/services/socket.hooks";
 
 const AuthLogin = () => {
   const helper = new HelperClass();
@@ -23,6 +24,7 @@ const AuthLogin = () => {
   const { email, password } = useSelector(
     (state: RootState) => state.appState.defaultstate.rememberMe
   );
+  const emit = useSocketEmit("LOGIN");
   const router = useNavigate();
   const [rememberMe, setRemember] = useState(email !== "" && password !== "");
   const location = useLocation();
@@ -40,6 +42,7 @@ const AuthLogin = () => {
       password: (value) => (value.length <= 0 ? "Password is required" : null),
     },
   });
+
   const [Login] = useLoginMutation({});
   const app_name = useSelector(
     (state: RootState) => state.setting.setting.app_name.value
@@ -54,7 +57,9 @@ const AuthLogin = () => {
         dispatch(setRememberMe({ ...values }));
       }
       dispatch(setNextRoute(route));
+      console.log(response);
       form.reset();
+      emit({ userId: response.data.id });
       router("/dashboard");
     } catch (error) {
       HandleError(error as ServerErrorResponse);

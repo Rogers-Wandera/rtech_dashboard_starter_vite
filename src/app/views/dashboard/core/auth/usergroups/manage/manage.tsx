@@ -12,11 +12,12 @@ import { Card, Col, Nav, Row, Tab } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
 import GroupInfo from "./groupinfo";
 import { UserGroup } from "@/types/app/core/user.type";
-import { useFetch } from "@/hooks/usefetch.hook";
+import { useFetch } from "@/hooks/data/usefetch.hook";
 import { IconArrowBack } from "@tabler/icons-react";
 import GroupUsers from "./users";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import ManageRoles from "../../rolemanagement/roles";
+import Meta from "@/components/shared/meta";
 
 const ManageUserGroups = () => {
   const params = useParams<{ groupId: string }>();
@@ -66,6 +67,10 @@ const ManageUserGroups = () => {
     <Box>
       {data && (
         <Tab.Container defaultActiveKey="group-management">
+          <Meta
+            title={"Group " + data.groupName}
+            header={`Manage ${data.groupName} [Group]`}
+          />
           <Row>
             <Col lg="12">
               <Card>

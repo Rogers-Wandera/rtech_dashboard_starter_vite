@@ -23,7 +23,7 @@ import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import { IconCircleCheckFilled, IconCircleXFilled } from "@tabler/icons-react";
 import ConfirmModal from "@/components/shared/dialogs/confirm";
 import { MRT_Row } from "material-react-table";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { ServerErrorResponse } from "@/types/server/server.main.types";

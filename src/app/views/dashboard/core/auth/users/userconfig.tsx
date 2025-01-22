@@ -12,7 +12,7 @@ import {
   ServerResponse,
 } from "@/types/server/server.main.types";
 import zod from "zod";
-import { PostDataPayload } from "@/hooks/usemutatehook";
+import { PostDataPayload } from "@/hooks/data/usemutatehook";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useAppDispatch } from "@/hooks/store.hooks";
@@ -21,7 +21,7 @@ import ConfirmModal from "@/components/shared/dialogs/confirm";
 import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { IconLockFilled } from "@tabler/icons-react";
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { helpers } from "@/lib/utils/helpers/helper";
 import { useNavigate } from "react-router";

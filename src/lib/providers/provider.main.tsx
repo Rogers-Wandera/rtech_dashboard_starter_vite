@@ -15,54 +15,62 @@ import PaginateProvider from "../context/paginate/paginate.context";
 import { MantineTheme } from "../themes/mantine.theme";
 import AppContextProvider from "../context/app/app.context";
 import PermissionProvider from "../context/auth/permission.context";
+import { SocketProvider } from "../context/services/socket";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
   const Mantine_Theme = MantineTheme();
+  const socketUrl = import.meta.env.VITE_SERVER_URL;
+  const socketToken = import.meta.env.VITE_SOCKET_TOKEN;
   return (
     <>
-      <ThemeProvider theme={MaterialTheme}>
-        <MantineProvider theme={Mantine_Theme}>
-          <Suspense
-            fallback={
-              <div className="centered-loader">
-                <Loader type="bars" color="blue" />
-              </div>
-            }
-          >
-            <PersistGate
-              persistor={persistor}
-              loading={
+      <SocketProvider
+        url={socketUrl}
+        options={{ auth: { token: socketToken } }}
+      >
+        <ThemeProvider theme={MaterialTheme}>
+          <MantineProvider theme={Mantine_Theme}>
+            <Suspense
+              fallback={
                 <div className="centered-loader">
                   <Loader type="bars" color="blue" />
                 </div>
               }
             >
-              <Notifications
-                position="top-right"
-                zIndex={1000}
-                limit={5}
-                autoClose={4000}
-              />
-              <AuthProvider>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <ModalsProvider>
-                    <PaginateProvider>
-                      <MRT_TableContextProvider>
-                        <AppContextProvider>
-                          <PermissionProvider>
-                            <Outlet />
-                          </PermissionProvider>
-                        </AppContextProvider>
-                      </MRT_TableContextProvider>
-                    </PaginateProvider>
-                  </ModalsProvider>
-                </LocalizationProvider>
-              </AuthProvider>
-            </PersistGate>
-          </Suspense>
-        </MantineProvider>
-      </ThemeProvider>
+              <PersistGate
+                persistor={persistor}
+                loading={
+                  <div className="centered-loader">
+                    <Loader type="bars" color="blue" />
+                  </div>
+                }
+              >
+                <Notifications
+                  position="top-right"
+                  zIndex={1000}
+                  limit={5}
+                  autoClose={4000}
+                />
+                <AuthProvider>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <ModalsProvider>
+                      <PaginateProvider>
+                        <MRT_TableContextProvider>
+                          <AppContextProvider>
+                            <PermissionProvider>
+                              <Outlet />
+                            </PermissionProvider>
+                          </AppContextProvider>
+                        </MRT_TableContextProvider>
+                      </PaginateProvider>
+                    </ModalsProvider>
+                  </LocalizationProvider>
+                </AuthProvider>
+              </PersistGate>
+            </Suspense>
+          </MantineProvider>
+        </ThemeProvider>
+      </SocketProvider>
     </>
   );
 };

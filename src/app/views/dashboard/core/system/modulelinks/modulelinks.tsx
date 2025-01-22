@@ -20,7 +20,7 @@ import {
   Title,
 } from "@mantine/core";
 import { SearchInput } from "@/components/shared/inputs/search";
-import { useFetchPaginate } from "@/hooks/usefetch.hook";
+import { useFetchPaginate } from "@/hooks/data/usefetch.hook";
 import { useEffect, useState } from "react";
 import { helpers } from "@/lib/utils/helpers/helper";
 import { ModuleLinkType, ModuleType } from "@/types/app/core/system.types";
@@ -29,6 +29,7 @@ import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { useAppContext } from "@/lib/context/app/app.context";
 import { useDisclosure } from "@mantine/hooks";
 import LinkModal from "./linkmodal";
+import Meta from "@/components/shared/meta";
 
 const ModuleLinks = () => {
   const [activePage, setPage] = useState(1);
@@ -84,6 +85,7 @@ const ModuleLinks = () => {
 
   return (
     <div>
+      <Meta title="Module Links" header={`Manage ${module.name} links`} />
       {data && Object.keys(state.page.pageState).length > 0 && (
         <Box mb={20}>
           <LinkModal

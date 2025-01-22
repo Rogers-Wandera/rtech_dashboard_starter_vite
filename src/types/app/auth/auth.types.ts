@@ -11,8 +11,10 @@ export interface ILoginValues {
   password: string;
 }
 
-export type LoginResponse = ServerResponse & {
+export type LoginResponse = {
   accessToken: string;
+  id: string;
+  msg: string;
 };
 
 export type RegisterResponse = ServerResponse & {

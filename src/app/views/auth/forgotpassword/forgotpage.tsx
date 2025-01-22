@@ -5,7 +5,7 @@ import auth2 from "@/assets/images/auth/02.png";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState } from "react";
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import { useResetPasswordLinkMutation } from "@/lib/store/services/auth/auth.api";

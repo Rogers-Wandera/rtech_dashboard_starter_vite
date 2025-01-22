@@ -9,12 +9,12 @@ import {
 } from "material-react-table";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import { RenderNonServerTable } from "./nonservertable";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import {
   ServerErrorResponse,
   ServerResponse,
 } from "@/types/server/server.main.types";
-import { useDeleteData } from "@/hooks/usedelete.hook";
+import { useDeleteData } from "@/hooks/data/usedelete.hook";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { notifier } from "@/lib/utils/notify/notification";
@@ -63,11 +63,11 @@ const MRT_NoServerTable = <TData extends Record<string, any>>(
     ]
   );
 
-  const { postAsync, data } = useMutateData<ServerResponse>({
+  const { postAsync } = useMutateData<ServerResponse>({
     queryKey: columns.map((column) => column.accessorKey),
   });
 
-  const { deleteAsync, data: deleteData } = useDeleteData({
+  const { deleteAsync } = useDeleteData({
     queryKey: [...columns.map((column) => column.accessorKey), "delete"],
   });
 
@@ -138,15 +138,15 @@ const MRT_NoServerTable = <TData extends Record<string, any>>(
         const addUrl = serveractions.addEndPoint
           ? serveractions.addEndPoint
           : "";
-        await postAsync({ endPoint: addUrl, payload: values });
+        const response = await postAsync({ endPoint: addUrl, payload: values });
         table.setCreatingRow(null);
         options.refetch && options.refetch();
         notifier.success({
-          message: (data?.msg as string) || "Operation successful",
+          message: (response?.msg as string) || "Operation successful",
           timer: 6000,
         });
         options.actioncallbacks?.addCallBack &&
-          options.actioncallbacks?.addCallBack(data);
+          options.actioncallbacks?.addCallBack(response);
         dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
@@ -189,7 +189,7 @@ const MRT_NoServerTable = <TData extends Record<string, any>>(
               : serveractions.editEndPoint + `/${row.original[idField]}`;
           }
         }
-        await postAsync({
+        const response = await postAsync({
           endPoint: editUrl,
           payload: values,
           method: USE_MUTATE_METHODS.PATCH,
@@ -197,11 +197,11 @@ const MRT_NoServerTable = <TData extends Record<string, any>>(
         table.setEditingRow(null);
         options.refetch && options.refetch();
         notifier.success({
-          message: (data?.msg as string) || "Operation successful",
+          message: (response?.msg as string) || "Operation successful",
           timer: 6000,
         });
         options.actioncallbacks?.editCallBack &&
-          options.actioncallbacks?.editCallBack(data, row);
+          options.actioncallbacks?.editCallBack(response, row);
         dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
@@ -235,14 +235,14 @@ const MRT_NoServerTable = <TData extends Record<string, any>>(
           payload = serveractions.deletePayload;
         }
       }
-      await deleteAsync({ endPoint: url, payload });
+      const response = await deleteAsync({ endPoint: url, payload });
       options.refetch && options.refetch();
       notifier.success({
-        message: (deleteData?.msg as string) || "Operation successful",
+        message: (response?.msg as string) || "Operation successful",
         timer: 6000,
       });
       options.actioncallbacks?.deleteCallBack &&
-        options.actioncallbacks?.deleteCallBack(data, row);
+        options.actioncallbacks?.deleteCallBack(response, row);
       dispatch(setLoading(false));
     } catch (error) {
       dispatch(setLoading(false));
@@ -255,6 +255,7 @@ const MRT_NoServerTable = <TData extends Record<string, any>>(
     HandleCreate: handleCreate,
     HandleUpdate: HandleUpdate,
     HandleDeleteData: HandleDelete,
+    setValidationErrors: validation.setValidationErrors,
   });
   return (
     <div style={{ ...display }}>

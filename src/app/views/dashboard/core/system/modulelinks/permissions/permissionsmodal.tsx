@@ -1,5 +1,5 @@
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { notifier } from "@/lib/utils/notify/notification";

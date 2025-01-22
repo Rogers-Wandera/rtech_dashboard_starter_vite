@@ -1,4 +1,4 @@
-import { useFetchPaginate } from "@/hooks/usefetch.hook";
+import { useFetchPaginate } from "@/hooks/data/usefetch.hook";
 import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { Select, SelectProps } from "@mantine/core";

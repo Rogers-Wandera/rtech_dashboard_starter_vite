@@ -21,7 +21,7 @@ import { Link, useNavigate } from "react-router";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { notifier } from "@/lib/utils/notify/notification";
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import { helpers } from "@/lib/utils/helpers/helper";
 
 const Header = memo(() => {

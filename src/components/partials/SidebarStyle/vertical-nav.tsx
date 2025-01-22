@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 import React, { useState, useContext, memo, Fragment } from "react";
 import {
   Accordion,

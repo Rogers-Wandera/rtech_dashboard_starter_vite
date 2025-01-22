@@ -1,5 +1,5 @@
 import { InputWithButton } from "@/components/shared/inputwithbutton";
-import { useFetchPaginate } from "@/hooks/usefetch.hook";
+import { useFetchPaginate } from "@/hooks/data/usefetch.hook";
 import { UserGroup, UserSingleView } from "@/types/app/core/user.type";
 import {
   Table,

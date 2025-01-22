@@ -8,7 +8,7 @@ import { useMemo } from "react";
 import { ServerSideProps } from "../../configs/mrtconfigs/shared.config";
 import { GenerateColumns } from "../../configs/mrtconfigs/mrtfuncs";
 import { RenderTable } from "./servertable";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import { notifier } from "@/lib/utils/notify/notification";
 import {
   ServerErrorResponse,
@@ -17,7 +17,7 @@ import {
 import { HandleError } from "@/lib/utils/errorhandler/server.error.handler";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { useDeleteData } from "@/hooks/usedelete.hook";
+import { useDeleteData } from "@/hooks/data/usedelete.hook";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 
@@ -62,11 +62,11 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
     ]
   );
 
-  const { postAsync, data } = useMutateData<ServerResponse>({
+  const { postAsync } = useMutateData<ServerResponse>({
     queryKey: columns.map((column) => column.accessorKey),
   });
 
-  const { deleteAsync, data: deleteData } = useDeleteData({
+  const { deleteAsync } = useDeleteData({
     queryKey: [...columns.map((column) => column.accessorKey), "delete"],
   });
 
@@ -133,18 +133,18 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
         if (serveractions?.addCreateCallback) {
           values = serveractions.addCreateCallback(postData.dataToPost, table);
         }
-        const addUrl = serveractions.addEndPoint
+        const addUrl = serveractions?.addEndPoint
           ? serveractions.addEndPoint
           : "";
-        await postAsync({ endPoint: addUrl, payload: values });
+        const response = await postAsync({ endPoint: addUrl, payload: values });
         table.setCreatingRow(null);
         options.refetch && options.refetch();
         notifier.success({
-          message: (data?.msg as string) || "Operation successful",
+          message: (response?.msg as string) || "Operation successful",
           timer: 6000,
         });
         options.actioncallbacks?.addCallBack &&
-          options.actioncallbacks?.addCallBack(data);
+          options.actioncallbacks?.addCallBack(response);
         dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
@@ -187,7 +187,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
               : serveractions.editEndPoint + `/${row.original[idField]}`;
           }
         }
-        await postAsync({
+        const response = await postAsync({
           endPoint: editUrl,
           payload: values,
           method: USE_MUTATE_METHODS.PATCH,
@@ -195,11 +195,11 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
         table.setEditingRow(null);
         options.refetch && options.refetch();
         notifier.success({
-          message: (data?.msg as string) || "Operation successful",
+          message: (response?.msg as string) || "Operation successful",
           timer: 6000,
         });
         options.actioncallbacks?.editCallBack &&
-          options.actioncallbacks?.editCallBack(data, row);
+          options.actioncallbacks?.editCallBack(response, row);
         dispatch(setLoading(false));
       } else {
         dispatch(setLoading(false));
@@ -233,14 +233,14 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
           payload = serveractions.deletePayload;
         }
       }
-      await deleteAsync({ endPoint: url, payload });
+      const response = await deleteAsync({ endPoint: url, payload });
       options.refetch && options.refetch();
       notifier.success({
-        message: (deleteData?.msg as string) || "Operation successful",
+        message: (response?.msg as string) || "Operation successful",
         timer: 6000,
       });
       options.actioncallbacks?.deleteCallBack &&
-        options.actioncallbacks?.deleteCallBack(data, row);
+        options.actioncallbacks?.deleteCallBack(response, row);
       dispatch(setLoading(false));
     } catch (error) {
       dispatch(setLoading(false));
@@ -254,6 +254,7 @@ export const MRT_ServerTable = <TData extends Record<string, any>>(
     HandleCreate: handleCreate,
     HandleUpdate: HandleUpdate,
     HandleDeleteData: HandleDelete,
+    setValidationErrors: validation.setValidationErrors,
   });
 
   return (

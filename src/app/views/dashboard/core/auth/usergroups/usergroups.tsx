@@ -3,6 +3,7 @@ import UserGroupHeader from "./header/header";
 import UserGroupsPage from "./groups/groups";
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
+import Meta from "@/components/shared/meta";
 
 const UserGroups = () => {
   const [search, setSearch] = useState("");
@@ -15,6 +16,7 @@ const UserGroups = () => {
   };
   return (
     <div>
+      <Meta title="User Groups" header="Manage User Groups" />
       <UserGroupHeader
         search={search}
         open={open}

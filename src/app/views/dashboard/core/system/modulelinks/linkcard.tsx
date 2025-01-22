@@ -7,6 +7,7 @@ import {
   IconLockFilled,
   IconDeviceProjector,
   IconHomeX,
+  IconTransfer,
 } from "@tabler/icons-react";
 import {
   ActionIcon,
@@ -32,14 +33,15 @@ import {
   ServerErrorResponse,
 } from "@/types/server/server.main.types";
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { useMutateData } from "@/hooks/usemutatehook";
+import { useMutateData } from "@/hooks/data/usemutatehook";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import { notifier } from "@/lib/utils/notify/notification";
 import { TanStackRefetchType } from "@/types/app/app.types";
-import { useDeleteData } from "@/hooks/usedelete.hook";
+import { useDeleteData } from "@/hooks/data/usedelete.hook";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 import { useDisclosure } from "@mantine/hooks";
 import LinkPermissionCard from "./permissions/permissioncard";
+import { TransferLinkModal } from "./linkmodal";
 
 type props = {
   link: ModuleLinkType;
@@ -54,6 +56,7 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
   const [show_permission, { open: Show, close: Hide }] = useDisclosure(false);
   const { deleteAsync } = useDeleteData({ queryKey: "module-links-delete" });
   const dispatch = useAppDispatch();
+  const [opened, { open: opener, close }] = useDisclosure(false);
 
   const HandleDelete = () => {
     return ConfirmModal({
@@ -118,6 +121,12 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
   };
   return (
     <Card withBorder padding="lg" radius="md" style={{ cursor: "pointer" }}>
+      <TransferLinkModal
+        opened={opened}
+        close={close}
+        refetch={refetch}
+        link={link}
+      />
       {show_permission && (
         <LinkPermissionCard
           close={Hide}
@@ -232,6 +241,14 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
                   }
                 >
                   Permissions
+                </Menu.Item>
+                <Menu.Item
+                  onClick={opener}
+                  leftSection={
+                    <IconTransfer style={{ width: rem(14), height: rem(14) }} />
+                  }
+                >
+                  Transfer
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>

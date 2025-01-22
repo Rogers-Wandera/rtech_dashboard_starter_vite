@@ -7,7 +7,7 @@ import { UserSingleView } from "@/types/app/core/user.type";
 import dayjs from "dayjs";
 import { Avatar, Badge, styled } from "@mui/material";
 import { IconUpload } from "@tabler/icons-react";
-import { useAuth } from "@/hooks/auth.hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 
 type props = {
   user: UserSingleView;
