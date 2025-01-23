@@ -23,6 +23,7 @@ import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useAuth } from "@/hooks/auth/auth.hooks";
 import { helpers } from "@/lib/utils/helpers/helper";
+import NotificationsPage from "@/app/views/notifications/notifications";
 
 const Header = memo(() => {
   const combobox = useCombobox();
@@ -301,37 +302,7 @@ const Header = memo(() => {
                   aria-labelledby="notification-drop"
                 >
                   <div className="m-0 shadow-none card">
-                    <div className="py-3 card-header d-flex justify-content-between bg-primary">
-                      <div className="header-title">
-                        <h5 className="mb-0 text-white">All Notifications</h5>
-                      </div>
-                    </div>
-                    <div className="p-0 card-body">
-                      {/* <Link to="#" className="iq-sub-card">
-                        <div className="d-flex align-items-center">
-                          <div className="">
-                            <img
-                              className="p-1 avatar-40 rounded-pill bg-soft-primary"
-                              src={shapes2}
-                              alt=""
-                            />
-                          </div>
-                          <div className="ms-3 w-100">
-                            <h6 className="mb-0 ">New customer is join</h6>
-                            <div className="d-flex justify-content-between align-items-center">
-                              <p className="mb-0">Cyst Bni</p>
-                              <small className="float-right font-size-12">
-                                5 days ago
-                              </small>
-                            </div>
-                          </div>
-                        </div>
-                      </Link> */}
-                      <Alert severity="info">
-                        <AlertTitle>Info</AlertTitle>
-                        No notifications at the moment.
-                      </Alert>
-                    </div>
+                    <NotificationsPage />
                   </div>
                 </Dropdown.Menu>
               </Dropdown>

@@ -15,7 +15,6 @@ import {
   setNextRoute,
   setRememberMe,
 } from "@/lib/store/services/defaults/defaults";
-import { useSocketEmit } from "@/hooks/services/socket.hooks";
 
 const AuthLogin = () => {
   const helper = new HelperClass();
@@ -24,7 +23,6 @@ const AuthLogin = () => {
   const { email, password } = useSelector(
     (state: RootState) => state.appState.defaultstate.rememberMe
   );
-  const emit = useSocketEmit("LOGIN");
   const router = useNavigate();
   const [rememberMe, setRemember] = useState(email !== "" && password !== "");
   const location = useLocation();
@@ -59,7 +57,6 @@ const AuthLogin = () => {
       dispatch(setNextRoute(route));
       console.log(response);
       form.reset();
-      emit({ userId: response.data.id });
       router("/dashboard");
     } catch (error) {
       HandleError(error as ServerErrorResponse);
