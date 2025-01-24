@@ -9,6 +9,7 @@ import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import { useAuth } from "../auth/auth.hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { notifier } from "@/lib/utils/notify/notification";
+import { useSocket } from "@/lib/context/services/socket";
 // import { usePaginateContext } from "@/lib/context/paginate/paginate.context";
 
 type props = {
@@ -34,6 +35,7 @@ export function useFetch<T = any>({
   afterFetch = undefined,
   withAuth = false,
 }: props) {
+  const state = useSocket();
   const prefix = import.meta.env.VITE_SERVER_PREFIX;
   const mainurl = url
     ? url
@@ -93,7 +95,7 @@ export function useFetch<T = any>({
       }
     },
     placeholderData: keepPreviousData,
-    enabled: manual,
+    enabled: manual && state?.isConnected,
   });
 
   return {

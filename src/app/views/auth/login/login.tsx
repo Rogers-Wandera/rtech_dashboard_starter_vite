@@ -15,6 +15,9 @@ import {
   setNextRoute,
   setRememberMe,
 } from "@/lib/store/services/defaults/defaults";
+import { useSocket } from "@/lib/context/services/socket";
+import { Alert } from "@mantine/core";
+import { IconInfoCircle } from "@tabler/icons-react";
 
 const AuthLogin = () => {
   const helper = new HelperClass();
@@ -26,6 +29,7 @@ const AuthLogin = () => {
   const router = useNavigate();
   const [rememberMe, setRemember] = useState(email !== "" && password !== "");
   const location = useLocation();
+  const state = useSocket();
   const originalRoute = (location.state?.from as string) || "/dashboard";
   const route =
     originalRoute === "/unauthorized" ? "/dashboard" : originalRoute;
@@ -74,6 +78,14 @@ const AuthLogin = () => {
   }
   return (
     <>
+      {state?.error && (
+        <Alert
+          variant="light"
+          color="red"
+          title={`Server connection error: ${state?.error}`}
+          icon={<IconInfoCircle />}
+        />
+      )}
       <LoginPage
         rememberMe={rememberMe}
         setRememberMe={setRemember}

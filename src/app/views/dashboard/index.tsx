@@ -9,7 +9,7 @@ import { Button } from "react-bootstrap";
 import SubHeader from "@/components/partials/HeaderStyle/sub-header";
 import Sidebar from "@/components/partials/SidebarStyle/sidebar";
 import { RootState } from "@/lib/store/store";
-import { LoadingOverlay } from "@mantine/core";
+import { Alert, LoadingOverlay } from "@mantine/core";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import WithAuth from "@/hocs/auth.hoc";
 import WithRouteRole from "@/hocs/routerole.hoc";
@@ -17,11 +17,14 @@ import WithSession from "@/hocs/session.hoc";
 import WithUserModules from "@/hocs/withmodules.hoc";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setNextRoute } from "@/lib/store/services/defaults/defaults";
+import { useSocket } from "@/lib/context/services/socket";
+import { IconInfoCircle } from "@tabler/icons-react";
 
 function DashboardLayout() {
   const loading = useSelector(
     (state: RootState) => state.appState.defaultstate.isLoading
   );
+  const state = useSocket();
   const location = useLocation();
   const navigate = useNavigate();
   const showSubHeader = useSelector(
@@ -54,7 +57,15 @@ function DashboardLayout() {
       <Sidebar app_name={appName} />
       <main className="main-content">
         <div className="position-relative">
-          <Header />
+          {state?.error && (
+            <Alert
+              variant="light"
+              color="red"
+              title={`Server connection error: ${state?.error}`}
+              icon={<IconInfoCircle />}
+            />
+          )}
+          {!state?.error && <Header />}
           <SubHeader />
         </div>
         <div
