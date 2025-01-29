@@ -16,6 +16,7 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import storage from "./storage";
 import { AuthApi } from "./services/auth/auth.api";
 import { AuthReducer } from "./services/auth/auth.slice";
+import NotificationReducer from "./services/notifications/index";
 
 const persistConfig = {
   key: "root",
@@ -25,6 +26,7 @@ const persistConfig = {
 const rootReducers = combineReducers({
   authuser: AuthReducer,
   defaultstate: defaultReducer,
+  notification: NotificationReducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducers);
 

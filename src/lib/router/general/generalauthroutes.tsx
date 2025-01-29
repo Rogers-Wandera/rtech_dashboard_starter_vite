@@ -1,5 +1,5 @@
 import ChangePassword from "@/app/views/auth/changepassword/changepassword";
-import ProtectedLayout from "@/hocs/protectedlayout";
+import ProtectedLayout from "@/hocs/auth/protectedlayout";
 import { RouteObject } from "react-router";
 
 export const GeneralAuthRoutes: RouteObject = {

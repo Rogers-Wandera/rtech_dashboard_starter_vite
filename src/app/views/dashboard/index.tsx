@@ -11,16 +11,20 @@ import Sidebar from "@/components/partials/SidebarStyle/sidebar";
 import { RootState } from "@/lib/store/store";
 import { Alert, LoadingOverlay } from "@mantine/core";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import WithAuth from "@/hocs/auth.hoc";
-import WithRouteRole from "@/hocs/routerole.hoc";
-import WithSession from "@/hocs/session.hoc";
-import WithUserModules from "@/hocs/withmodules.hoc";
+import WithAuth from "@/hocs/auth/auth.hoc";
+import WithRouteRole from "@/hocs/auth/routerole.hoc";
+import WithSession from "@/hocs/auth/session.hoc";
+import WithUserModules from "@/hocs/auth/withmodules.hoc";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setNextRoute } from "@/lib/store/services/defaults/defaults";
 import { useSocket } from "@/lib/context/services/socket";
 import { IconInfoCircle } from "@tabler/icons-react";
+import { withNotification } from "@/hocs/services/notifications/notification.hoc";
+import { withUserService } from "@/hocs/services/auth/userservice.hoc";
 
-function DashboardLayout() {
+type props = { userstate?: { online: string[] } };
+
+function DashboardLayout({ userstate }: props) {
   const loading = useSelector(
     (state: RootState) => state.appState.defaultstate.isLoading
   );
@@ -73,7 +77,7 @@ function DashboardLayout() {
             showSubHeader ? "n5" : "4"
           }`}
         >
-          <Outlet />
+          <Outlet context={{ online: userstate?.online || [] }} />
         </div>
         <div className="btn-download">
           <Button variant="success py-1 px-1 d-flex gap-0">
@@ -87,7 +91,9 @@ function DashboardLayout() {
   );
 }
 
-const DashBoardWithSession = WithAuth(WithSession(DashboardLayout));
+const DashBoardWithSession = WithAuth(
+  withUserService(withNotification(WithSession(DashboardLayout)))
+);
 const DashboardWithModules = WithUserModules(DashBoardWithSession);
 const DashboardWithRoles = WithRouteRole(DashboardWithModules);
 export default DashboardWithRoles;

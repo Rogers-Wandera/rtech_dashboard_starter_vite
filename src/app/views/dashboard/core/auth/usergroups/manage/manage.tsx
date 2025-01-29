@@ -1,5 +1,5 @@
 import { ErrorPage } from "@/components/pages/error/errorPage";
-import RouteRoles from "@/hocs/verifyroles";
+import RouteRoles from "@/hocs/auth/verifyroles";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import {
   setLoading,

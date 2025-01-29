@@ -205,11 +205,7 @@ const VerticalNav = memo((_) => {
             })}
           </Accordion.Item>
         )}
-        {rendered <= 0 && (
-          <span style={{ margin: "0 1rem" }}>
-            No Assigned Roles Or Expired roles, contact admin
-          </span>
-        )}
+
         <li>
           <hr className="hr-horizontal" />
         </li>

@@ -24,10 +24,13 @@ import { notifier } from "@/lib/utils/notify/notification";
 import { useAuth } from "@/hooks/auth/auth.hooks";
 import { helpers } from "@/lib/utils/helpers/helper";
 import NotificationsPage from "@/app/views/notifications/notifications";
+import { useSocketEmit } from "@/hooks/services/socket.hooks";
+import { USER_EVENTS } from "@/types/enums/event.enums";
 
 const Header = memo(() => {
   const combobox = useCombobox();
   const { user } = useAuth();
+  const emit = useSocketEmit(USER_EVENTS.LOGOUT);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const navbarHide = useSelector(SettingSelector.navbar_show); // array
   const headerNavbar = useSelector(SettingSelector.header_navbar);
@@ -39,6 +42,7 @@ const Header = memo(() => {
 
   const HandleLogOut = () => {
     dispatch(logOut());
+    emit({ userId: user?.id });
     notifier.success({ message: "Logout Successful" });
   };
   const image = (user?.image && helpers.decrypt(user.image)) || avatars1;

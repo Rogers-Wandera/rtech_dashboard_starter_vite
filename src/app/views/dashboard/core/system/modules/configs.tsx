@@ -81,6 +81,7 @@ export const ModulesColumnConfigs = (
     {
       accessorKey: "isActive",
       Cell: ({ row }) => row.original?.modulelinks?.length || 0,
+      Edit: () => null,
     },
     {
       accessorKey: "position",

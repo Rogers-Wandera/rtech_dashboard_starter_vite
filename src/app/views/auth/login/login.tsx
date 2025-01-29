@@ -18,10 +18,13 @@ import {
 import { useSocket } from "@/lib/context/services/socket";
 import { Alert } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
+import { useSocketEmit } from "@/hooks/services/socket.hooks";
+import { USER_EVENTS } from "@/types/enums/event.enums";
 
 const AuthLogin = () => {
   const helper = new HelperClass();
   const dispatch = useAppDispatch();
+  const emit = useSocketEmit(USER_EVENTS.LOGIN);
   const { isLoggedIn, token } = useAuth();
   const { email, password } = useSelector(
     (state: RootState) => state.appState.defaultstate.rememberMe
@@ -59,7 +62,7 @@ const AuthLogin = () => {
         dispatch(setRememberMe({ ...values }));
       }
       dispatch(setNextRoute(route));
-      console.log(response);
+      emit({ userId: response.data.id });
       form.reset();
       router("/dashboard");
     } catch (error) {

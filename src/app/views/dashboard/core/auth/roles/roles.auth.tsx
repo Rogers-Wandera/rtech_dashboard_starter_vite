@@ -1,7 +1,7 @@
 import Meta from "@/components/shared/meta";
 import { TableColumnConfigs } from "@/components/tables/configs/mrtconfigs/shared.config";
 import { MRT_ServerTable } from "@/components/tables/mrttables/server/mrtserverside";
-import RouteRoles from "@/hocs/verifyroles";
+import RouteRoles from "@/hocs/auth/verifyroles";
 import { useMRTPaginateTable } from "@/hooks/data/usefetch.hook";
 import { validateRequired } from "@/lib/utils/helpers/utilfuncs";
 import { SystemRole } from "@/types/server/server.main.types";

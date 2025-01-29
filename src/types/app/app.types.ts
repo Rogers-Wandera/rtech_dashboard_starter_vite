@@ -26,3 +26,7 @@ export interface AppDefaultContext {
 export type TanStackRefetchType<T = Record<string, any>> = (
   options?: RefetchOptions
 ) => Promise<QueryObserverResult<T, ServerErrorResponse>>;
+
+export type OutLetContextType = {
+  online: string[];
+};

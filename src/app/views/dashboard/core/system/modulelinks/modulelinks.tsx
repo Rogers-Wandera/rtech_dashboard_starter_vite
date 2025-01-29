@@ -1,4 +1,4 @@
-import RouteRoles from "@/hocs/verifyroles";
+import RouteRoles from "@/hocs/auth/verifyroles";
 import LinkCard from "./linkcard";
 import { Card, Col } from "react-bootstrap";
 import {

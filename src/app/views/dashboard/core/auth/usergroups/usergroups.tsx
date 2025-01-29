@@ -1,4 +1,4 @@
-import RouteRoles from "@/hocs/verifyroles";
+import RouteRoles from "@/hocs/auth/verifyroles";
 import UserGroupHeader from "./header/header";
 import UserGroupsPage from "./groups/groups";
 import { useState } from "react";

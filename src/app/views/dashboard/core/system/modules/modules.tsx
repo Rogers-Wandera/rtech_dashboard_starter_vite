@@ -1,5 +1,5 @@
 import { MRT_ServerTable } from "@/components/tables/mrttables/server/mrtserverside";
-import RouteRoles from "@/hocs/verifyroles";
+import RouteRoles from "@/hocs/auth/verifyroles";
 import { useMRTPaginateTable } from "@/hooks/data/usefetch.hook";
 import { ModuleType } from "@/types/app/core/system.types";
 import {
