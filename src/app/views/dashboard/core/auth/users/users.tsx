@@ -26,7 +26,10 @@ import { styled } from "@mui/material/styles";
 import Meta from "@/components/shared/meta";
 import { useOutletContext } from "react-router";
 import { OutLetContextType } from "@/types/app/app.types";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
+import ConfirmModalReason from "@/components/shared/dialogs/confirmreason";
+import { MRT_Row } from "material-react-table";
+import { notifier } from "@/lib/utils/notify/notification";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -75,9 +78,38 @@ const ManageUsers = () => {
     }
   }
   const [opened, { open, close }] = useDisclosure(false);
+  const [confirm, { open: Open, close: Close }] = useDisclosure(false);
+  const [row, setRow] = useState<MRT_Row<User> | null>(null);
   const { postAsync } = useMutateData<ServerResponse>({
     queryKey: ["update_user"],
   });
+
+  const { refetch } = useMRTPaginateTable<PaginateResponse<User>>({
+    queryKey: "users",
+    endPoint: "core/auth/users",
+  });
+
+  const menuitems = useCallback(
+    () => usermenuitems({ user, refetch, postAsync, open: Open, setRow }),
+    [user, refetch, postAsync]
+  );
+
+  const form = useForm<userformtype>({
+    name: "user-form",
+    mode: "uncontrolled",
+    initialValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      confirmpassword: "",
+      gender: "",
+      positionId: "",
+      tel: "",
+    },
+    validate: zodResolver(user_schema),
+  });
+
   const moretableconfigs: TableColumnConfigs<User>[] = useMemo(
     () => [
       { accessorKey: "gender", filterSelectOptions: ["Male", "Female"] },
@@ -139,30 +171,36 @@ const ManageUsers = () => {
     [state.online]
   );
 
-  const form = useForm<userformtype>({
-    name: "user-form",
-    mode: "uncontrolled",
-    initialValues: {
-      firstname: "",
-      lastname: "",
-      email: "",
-      password: "",
-      confirmpassword: "",
-      gender: "",
-      positionId: "",
-      tel: "",
-    },
-    validate: zodResolver(user_schema),
-  });
-
-  const { refetch } = useMRTPaginateTable<PaginateResponse<User>>({
-    queryKey: "users",
-    endPoint: "core/auth/users",
-  });
-
   return (
     <div>
       <Meta title="Users" header={`Manage Users ` + (msg ? `(${msg})` : "")} />
+      <ConfirmModalReason
+        opened={confirm}
+        type="danger"
+        additionalData={{ isLocked: row?.original.isLocked === 1 ? 0 : 1 }}
+        callBack={(response) => {
+          notifier.success({ message: response?.msg as string });
+          refetch();
+        }}
+        endPoint={`core/auth/users/lock/${row?.original.id}`}
+        onClose={() => {
+          Close();
+          setRow(null);
+        }}
+        message={`Are you certain, you want to ${
+          row?.original.isLocked == 1 ? "unlock" : "lock"
+        } the user, ${
+          row?.original.isLocked == 0
+            ? `this action will make
+      the user be logged out of the system if they are logged in`
+            : `this will make the user have access to the system again.`
+        } ${
+          row?.original.isLocked == 0
+            ? `,
+      and they will not be able to log in until unlocked`
+            : "."
+        }`}
+      />
 
       <div style={{ display: opened ? "none" : "block" }}>
         <MRT_ServerTable<User>
@@ -178,7 +216,7 @@ const ManageUsers = () => {
               row.original.id === user?.id ? false : true,
             actiontype: "menu",
           }}
-          menuitems={[...usermenuitems({ user, refetch, postAsync })]}
+          menuitems={menuitems()}
           otherTableOptions={{ createDisplayMode: "custom" }}
           customCallBack={(table) => {
             table.setCreatingRow(true);

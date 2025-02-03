@@ -5,12 +5,13 @@ import {
 import {
   MRT_ColumnFiltersState,
   MRT_PaginationState,
+  MRT_Row,
   MRT_RowSelectionState,
   MRT_SortingState,
   MRT_VisibilityState,
 } from "material-react-table";
 
-export interface MRT_TableContextState<T> {
+export interface MRT_TableContextState<T extends Record<string, any>> {
   filters: {
     columnFilters: MRT_ColumnFiltersState;
     setColumnFilters: React.Dispatch<
@@ -40,6 +41,10 @@ export interface MRT_TableContextState<T> {
     setRowSelection: React.Dispatch<
       React.SetStateAction<MRT_RowSelectionState>
     >;
+  };
+  row: {
+    data: MRT_Row<T> | null;
+    setRow: React.Dispatch<React.SetStateAction<MRT_Row<T> | null>>;
   };
   data: {
     data: PaginateResponse<T> | T[] | undefined;

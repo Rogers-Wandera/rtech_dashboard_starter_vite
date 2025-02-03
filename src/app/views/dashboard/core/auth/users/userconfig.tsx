@@ -26,6 +26,8 @@ import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { helpers } from "@/lib/utils/helpers/helper";
 import { useNavigate } from "react-router";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
+import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
+import { Dispatch, SetStateAction } from "react";
 
 export const userscolumns: TableColumns<User>[] = [
   { accessorKey: "image", header: "Image", type: "text" },
@@ -40,6 +42,8 @@ export const usermenuitems = ({
   user,
   refetch,
   postAsync,
+  open,
+  setRow,
 }: {
   user: IAuthUser | null;
   refetch: () => void;
@@ -49,9 +53,12 @@ export const usermenuitems = ({
     PostDataPayload<unknown>,
     unknown
   >;
+  open: () => void;
+  setRow: Dispatch<SetStateAction<MRT_Row<User> | null>>;
 }): RowMenuItems<User>[] => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const {} = useMRTTableContext();
 
   const { user: AuthUser } = useAuth();
   const HandleResetPassword = (row: MRT_Row<User>) => {
@@ -103,41 +110,34 @@ export const usermenuitems = ({
     });
   };
   const HandleConfirmLock = (row: MRT_Row<User>) => {
-    return ConfirmModal({
-      message: `Are you certain, you want to ${
-        row.original.isLocked == 1 ? "unlock" : "lock"
-      } the user, ${
-        row.original.isLocked == 0
-          ? `this action will make 
-      the user be logged out of the system if they are logged in`
-          : `this will make the user have access to the system again.`
-      } ${
-        row.original.isLocked == 0
-          ? `, 
-      and they will not be able to log in until unlocked`
-          : "."
-      }`,
-      onConfirm: async () => {
-        try {
-          dispatch(setLoading(true));
-          const isLocked = row.original.isLocked === 1 ? 0 : 1;
-          const endPoint = `core/auth/users/lock/${row.original.id}`;
+    if (row.original.isLocked == 1) {
+      return ConfirmModal({
+        message: `Are you certain, you want to unlock
+       the user,  this will grant the user  access to the system again.
+      `,
+        onConfirm: async () => {
+          try {
+            dispatch(setLoading(true));
 
-          const response = await postAsync({
-            endPoint,
-            payload: { isLocked },
-            method: USE_MUTATE_METHODS.PATCH,
-          });
-          notifier.success({ message: response?.msg as string });
-          refetch();
-          dispatch(setLoading(false));
-        } catch (error) {
-          dispatch(setLoading(false));
-          HandleError(error as ServerErrorResponse);
-        }
-      },
-      type: "danger",
-    });
+            const endPoint = `core/auth/users/lock/${row.original.id}`;
+            const response = await postAsync({
+              endPoint,
+              payload: { isLocked: 0 },
+              method: USE_MUTATE_METHODS.PATCH,
+            });
+            notifier.success({ message: response?.msg as string });
+            refetch();
+            dispatch(setLoading(false));
+          } catch (error) {
+            dispatch(setLoading(false));
+            HandleError(error as ServerErrorResponse);
+          }
+        },
+        type: "danger",
+      });
+    }
+    open();
+    setRow(row);
   };
   return [
     {
