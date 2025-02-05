@@ -22,6 +22,8 @@ import { useDisclosure } from "@mantine/hooks";
 import ProfileUpload from "./pages/profileimageupload";
 import ManageRoles from "../rolemanagement/roles";
 import Meta from "@/components/shared/meta";
+import { useSocketEvent } from "@/hooks/services/socket.hooks";
+import { USER_EVENTS } from "@/types/enums/event.enums";
 
 const SmallAvatar = styled(IconUpload)(({ theme }) => ({
   width: 25,
@@ -48,6 +50,11 @@ const UserProfilePage: FunctionComponent = () => {
       configs: { headers: { Authorization: `Bearer ${token}` } },
     });
 
+  useSocketEvent(USER_EVENTS.REFETCH_USERS, (data: { userId: string }) => {
+    if (data.userId === userId) {
+      refetch();
+    }
+  });
   useEffect(() => {
     if (!isLoading && !isFetching) {
       setManual(false);

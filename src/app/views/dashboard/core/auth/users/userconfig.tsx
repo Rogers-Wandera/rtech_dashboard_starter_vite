@@ -1,5 +1,6 @@
 import {
   RowMenuItems,
+  TableColumnConfigs,
   TableColumns,
 } from "@/components/tables/configs/mrtconfigs/shared.config";
 import { User } from "@/types/app/core/user.type";
@@ -28,6 +29,46 @@ import { useNavigate } from "react-router";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import { Dispatch, SetStateAction } from "react";
+import MaleImage from "@/assets/images/avatars/01.png";
+import FemaleImage from "@/assets/images/avatars/lady.png";
+import { Avatar, Badge, styled } from "@mui/material";
+import { OutLetContextType } from "@/types/app/app.types";
+import { Badge as MantineBadge } from "@mantine/core";
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: "#44b700",
+    color: "#44b700",
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    "&::after": {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      borderRadius: "50%",
+      animation: "ripple 1.2s infinite ease-in-out",
+      border: "1px solid currentColor",
+      content: '""',
+    },
+  },
+  "@keyframes ripple": {
+    "0%": {
+      transform: "scale(.8)",
+      opacity: 1,
+    },
+    "100%": {
+      transform: "scale(2.4)",
+      opacity: 0,
+    },
+  },
+}));
+
+const SmallAvatar = styled(IconLock)(() => ({
+  width: 22,
+  height: 22,
+  color: "red",
+}));
 
 export const userscolumns: TableColumns<User>[] = [
   { accessorKey: "image", header: "Image", type: "text" },
@@ -208,4 +249,79 @@ export type userformtype = {
   gender: string;
   positionId: string;
   tel: string;
+};
+
+export const MoreTableConfigsData = (
+  state: OutLetContextType,
+  user: IAuthUser | null
+): TableColumnConfigs<User>[] => {
+  return [
+    { accessorKey: "gender", filterSelectOptions: ["Male", "Female"] },
+    {
+      accessorKey: "image",
+      Edit: () => null,
+      Cell: ({ row }) => {
+        const fallbackimage =
+          row.original.gender === "Male" ? MaleImage : FemaleImage;
+        const image = row.original.image ? row.original.image : fallbackimage;
+        const isOnline = state.online.includes(row.original.id);
+        let display = isOnline ? (
+          <StyledBadge
+            overlap="circular"
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            variant="dot"
+          >
+            <Avatar alt={user?.displayName} src={image} />
+          </StyledBadge>
+        ) : (
+          <Avatar alt={user?.displayName} src={image} />
+        );
+        if (row.original.isLocked == 1) {
+          display = (
+            <Badge
+              overlap="circular"
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              badgeContent={<SmallAvatar />}
+            >
+              <Avatar alt={user?.displayName} src={image} />
+            </Badge>
+          );
+        }
+        return display;
+      },
+    },
+    {
+      accessorKey: "last_active",
+      Edit: () => null,
+      Cell: ({ row }) => {
+        const online = state.online?.includes(row.original.id);
+        if (online) {
+          return (
+            <MantineBadge
+              size="md"
+              variant="gradient"
+              gradient={{ from: "green", to: "cyan", deg: 90 }}
+            >
+              Online
+            </MantineBadge>
+          );
+        }
+        const display =
+          row.original.last_active <= 0
+            ? "Today"
+            : row.original.last_active > 1
+            ? `${row.original.last_active} days ago`
+            : `${row.original.last_active} day ago`;
+        return display;
+      },
+    },
+    {
+      accessorKey: "verified",
+      Edit: () => null,
+      Cell: ({ row }) => {
+        const display = row.original.verified === 0 ? "No" : "Yes";
+        return display;
+      },
+    },
+  ];
 };
