@@ -16,6 +16,7 @@ import { MantineTheme } from "../themes/mantine.theme";
 import AppContextProvider from "../context/app/app.context";
 import PermissionProvider from "../context/auth/permission.context";
 import { SocketProvider } from "../context/services/socket";
+import UploadProvider from "../context/auth/upload.context";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
@@ -58,7 +59,9 @@ const Providers = () => {
                         <MRT_TableContextProvider>
                           <AppContextProvider>
                             <PermissionProvider>
-                              <Outlet />
+                              <UploadProvider>
+                                <Outlet />
+                              </UploadProvider>
                             </PermissionProvider>
                           </AppContextProvider>
                         </MRT_TableContextProvider>

@@ -4,6 +4,7 @@ import UnreadNotifications from "./content/unread";
 import { IconBell, IconDots } from "@tabler/icons-react";
 import AllNotifications from "./content/all";
 import UrgentNotifications from "./content/urgent";
+import UploadNotification from "./content/uploads/upload";
 
 const NotificationsPage = () => {
   return (
@@ -27,6 +28,7 @@ const NotificationsPage = () => {
         <UnreadNotifications />
         <AllNotifications />
         <UrgentNotifications />
+        <UploadNotification />
       </NotificationTabs>
     </Card>
   );

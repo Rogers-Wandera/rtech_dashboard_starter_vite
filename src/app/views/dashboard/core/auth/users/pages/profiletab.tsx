@@ -6,7 +6,7 @@ import lady from "@/assets/images/avatars/lady.png";
 import { UserSingleView } from "@/types/app/core/user.type";
 import dayjs from "dayjs";
 import { Avatar, Badge, styled } from "@mui/material";
-import { IconUpload } from "@tabler/icons-react";
+import { IconCamera } from "@tabler/icons-react";
 import { useAuth } from "@/hooks/auth/auth.hooks";
 
 type props = {
@@ -14,10 +14,12 @@ type props = {
   open: () => void;
 };
 
-const SmallAvatar = styled(IconUpload)(({ theme }) => ({
-  width: 25,
-  height: 25,
+const SmallAvatar = styled(IconCamera)(({ theme }) => ({
+  width: 28,
+  height: 28,
   cursor: "pointer",
+  backgroundColor: "#fefe",
+  borderRadius: "5px",
   color: theme.palette.mode === "dark" ? "grey" : "blue",
 }));
 

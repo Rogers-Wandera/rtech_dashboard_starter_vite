@@ -61,12 +61,37 @@ export interface IAuthUser {
   serverroles: ServerRolesType[];
 }
 
+export type UploadProgressType = {
+  progress: number;
+  filename: string;
+  meta: { userId: string; [key: string]: any };
+  completed?: boolean;
+  failed?: boolean;
+};
+
+export type UploadCompleteType = UploadProgressType & {
+  message: string;
+  title: string;
+  date: Date;
+  read?: boolean;
+};
+
+export type UploadErrorType = {
+  error: string;
+  filename: string;
+  meta: { userId: string; [key: string]: any };
+};
+
 export interface IAuthState {
   isLoggedIn: boolean;
   token: string | null;
   user: IAuthUser | null;
   modules: UserModuleRes;
   permissions: User_Permission[];
+  upload: {
+    progress?: UploadProgressType[];
+    error?: UploadErrorType;
+  } | null;
 }
 
 type fetchType<T = any> = {

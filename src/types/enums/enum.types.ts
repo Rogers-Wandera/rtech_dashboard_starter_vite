@@ -25,3 +25,9 @@ export enum USER_GROUP_STATUS {
   ACTIVE = "active",
   INACTIVE = "inactive",
 }
+
+export enum UPLOAD_EVENTS {
+  UPLOAD_PROGRESS = "upload_progress",
+  UPLOAD_ERROR = "upload_error",
+  UPLOAD_SUCCESS = "upload_complete",
+}

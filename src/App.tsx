@@ -19,6 +19,13 @@ const App = () => {
   const theme = useMaterialTheme();
   const { setColorScheme } = useMantineColorScheme({ keepTransitions: true });
 
+  const handleStorageChange = (event: StorageEvent) => {
+    if (event.key === null) {
+      // localStorage has been cleared
+      window.location.reload(); // or any other action
+    }
+  };
+
   useEffect(() => {
     dispatch(setSetting());
   }, []);
@@ -34,6 +41,13 @@ const App = () => {
   useEffect(() => {
     dispatch(setShowSubHeader(true));
   }, [location.pathname]);
+
+  useEffect(() => {
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   return (
     <Box pos="relative">

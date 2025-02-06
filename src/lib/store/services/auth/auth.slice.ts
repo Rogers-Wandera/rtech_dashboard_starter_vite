@@ -1,6 +1,8 @@
 import {
   IAuthState,
   IAuthUser,
+  UploadErrorType,
+  UploadProgressType,
   User_Permission,
 } from "@/types/server/server.main.types";
 import { createSlice } from "@reduxjs/toolkit";
@@ -15,6 +17,7 @@ const initialState: IAuthState = {
   user: null,
   modules: {},
   permissions: [],
+  upload: null,
 };
 
 export const AuthSlice = createSlice({
@@ -38,6 +41,17 @@ export const AuthSlice = createSlice({
     },
     setPermissions(state, action: { payload: User_Permission[] }) {
       state.permissions = action.payload;
+    },
+    setUpload(
+      state,
+      action: {
+        payload: {
+          progress?: UploadProgressType[];
+          error?: UploadErrorType;
+        } | null;
+      }
+    ) {
+      state.upload = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -64,4 +78,4 @@ export const AuthSlice = createSlice({
 });
 
 export const AuthReducer = AuthSlice.reducer;
-export const { setLoggedIn, setToken, logOut } = AuthSlice.actions;
+export const { setLoggedIn, setToken, logOut, setUpload } = AuthSlice.actions;

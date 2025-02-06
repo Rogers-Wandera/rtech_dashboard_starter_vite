@@ -7,6 +7,7 @@ const NotificationTabs = ({ children }: { children: React.ReactNode }) => {
         <Tabs.Tab value="unread">Unread</Tabs.Tab>
         <Tabs.Tab value="all">All</Tabs.Tab>
         <Tabs.Tab value="urgent">Urgent</Tabs.Tab>
+        <Tabs.Tab value="uploads">Uploads</Tabs.Tab>
       </Tabs.List>
       {children}
     </Tabs>

@@ -7,7 +7,7 @@ import ProfileLeft from "./pages/profileleft";
 import ProfileRight from "./pages/profileright";
 import ProfileTab from "./pages/profiletab";
 import { FunctionComponent, useEffect, useState } from "react";
-import { IconArrowLeft, IconUpload } from "@tabler/icons-react";
+import { IconArrowLeft, IconCamera } from "@tabler/icons-react";
 import { Avatar, Badge, styled } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { helpers } from "@/lib/utils/helpers/helper";
@@ -25,10 +25,12 @@ import Meta from "@/components/shared/meta";
 import { useSocketEvent } from "@/hooks/services/socket.hooks";
 import { USER_EVENTS } from "@/types/enums/event.enums";
 
-const SmallAvatar = styled(IconUpload)(({ theme }) => ({
-  width: 25,
-  height: 25,
+const SmallAvatar = styled(IconCamera)(({ theme }) => ({
+  width: 28,
+  height: 28,
   cursor: "pointer",
+  backgroundColor: "#fefe",
+  borderRadius: "5px",
   color: theme.palette.mode === "dark" ? "grey" : "blue",
 }));
 
@@ -55,15 +57,21 @@ const UserProfilePage: FunctionComponent = () => {
       refetch();
     }
   });
+
   useEffect(() => {
     if (!isLoading && !isFetching) {
-      setManual(false);
       dispatch(setLoading(false));
     }
     if (isLoading || isFetching) {
       dispatch(setLoading(true));
     }
   }, [isLoading, isFetching]);
+
+  useEffect(() => {
+    if (data) {
+      setManual(false);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (isError) {
@@ -81,106 +89,110 @@ const UserProfilePage: FunctionComponent = () => {
             header={AuthUser?.id === data.id ? "" : data.userName + "  profile"}
           />
           <Tab.Container defaultActiveKey="first">
-            <ProfileUpload
-              refetch={refetch}
-              user={data}
-              opened={opened}
-              close={close}
-            />
-            <Row>
-              <Col lg="12">
-                <Card>
-                  <Card.Body>
-                    <div className="d-flex flex-wrap align-items-center justify-content-between">
-                      <div className="d-flex flex-wrap align-items-center">
-                        <IconArrowLeft
-                          color="blue"
-                          size={30}
-                          onClick={() => navigate(-1)}
-                          style={{ cursor: "pointer" }}
-                        />
-                        <div className="profile-img position-relative me-3 mb-3 mb-lg-0 profile-logo profile-logo1">
-                          <Badge
-                            overlap="circular"
-                            anchorOrigin={{
-                              vertical: "bottom",
-                              horizontal: "right",
-                            }}
-                            badgeContent={
-                              AuthUser?.id === data.id && (
-                                <SmallAvatar
-                                  onClick={open}
-                                  className="upload-button"
-                                  size={30}
-                                />
-                              )
-                            }
-                          >
-                            <Avatar
-                              sx={{ width: 100, height: 100 }}
-                              alt={data.userName}
-                              src={
-                                data.image
-                                  ? data.image
-                                  : data.gender.toLowerCase() === "female"
-                                  ? lady
-                                  : gent
+            {opened && (
+              <ProfileUpload
+                refetch={refetch}
+                user={data}
+                opened={opened}
+                close={close}
+              />
+            )}
+            {!opened && (
+              <Row>
+                <Col lg="12">
+                  <Card>
+                    <Card.Body>
+                      <div className="d-flex flex-wrap align-items-center justify-content-between">
+                        <div className="d-flex flex-wrap align-items-center">
+                          <IconArrowLeft
+                            color="blue"
+                            size={30}
+                            onClick={() => navigate(-1)}
+                            style={{ cursor: "pointer" }}
+                          />
+                          <div className="profile-img position-relative me-3 mb-3 mb-lg-0 profile-logo profile-logo1">
+                            <Badge
+                              overlap="circular"
+                              anchorOrigin={{
+                                vertical: "bottom",
+                                horizontal: "right",
+                              }}
+                              badgeContent={
+                                AuthUser?.id === data.id && (
+                                  <SmallAvatar
+                                    onClick={open}
+                                    className="upload-button"
+                                    size={30}
+                                  />
+                                )
                               }
-                            />
-                          </Badge>
+                            >
+                              <Avatar
+                                sx={{ width: 100, height: 100 }}
+                                alt={data.userName}
+                                src={
+                                  data.image
+                                    ? data.image
+                                    : data.gender.toLowerCase() === "female"
+                                    ? lady
+                                    : gent
+                                }
+                              />
+                            </Badge>
+                          </div>
+                          <div className="d-flex flex-wrap align-items-center mb-3 mb-sm-0">
+                            <h4 className="me-2 h4">{data.userName}</h4>
+                            <span> - {data.position}</span>
+                          </div>
                         </div>
-                        <div className="d-flex flex-wrap align-items-center mb-3 mb-sm-0">
-                          <h4 className="me-2 h4">{data.userName}</h4>
-                          <span> - {data.position}</span>
-                        </div>
-                      </div>
-                      <Nav
-                        as="ul"
-                        className="d-flex nav-pills mb-0 text-center profile-tab"
-                        data-toggle="slider-tab"
-                        id="profile-pills-tab"
-                        role="tablist"
-                      >
-                        <Nav.Item as="li">
-                          <Nav.Link
-                            eventKey="first"
-                            onClick={() => {
-                              setNewsHide(false);
-                            }}
-                          >
-                            Profile
-                          </Nav.Link>
-                        </Nav.Item>
-                        {AuthUser?.roles.includes(ROLES.ADMIN) && (
+                        <Nav
+                          as="ul"
+                          className="d-flex nav-pills mb-0 text-center profile-tab"
+                          data-toggle="slider-tab"
+                          id="profile-pills-tab"
+                          role="tablist"
+                        >
                           <Nav.Item as="li">
                             <Nav.Link
-                              eventKey="second"
+                              eventKey="first"
                               onClick={() => {
-                                setNewsHide(true);
+                                setNewsHide(false);
                               }}
                             >
-                              Roles
+                              Profile
                             </Nav.Link>
                           </Nav.Item>
-                        )}
-                      </Nav>
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-              {!newsHide && <ProfileLeft user={data} refetch={refetch} />}
-              <Col lg={newsHide ? "9" : "6"}>
-                <Tab.Content>
-                  <ProfileTab open={open} user={data} />
-                  {AuthUser?.roles.includes(ROLES.ADMIN) && (
-                    <Tab.Pane eventKey="second" id="Roles-Management">
-                      <ManageRoles type="user" data={data} />
-                    </Tab.Pane>
-                  )}
-                </Tab.Content>
-              </Col>
-              <ProfileRight user={data} />
-            </Row>
+                          {AuthUser?.roles.includes(ROLES.ADMIN) && (
+                            <Nav.Item as="li">
+                              <Nav.Link
+                                eventKey="second"
+                                onClick={() => {
+                                  setNewsHide(true);
+                                }}
+                              >
+                                Roles
+                              </Nav.Link>
+                            </Nav.Item>
+                          )}
+                        </Nav>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                {!newsHide && <ProfileLeft user={data} refetch={refetch} />}
+                <Col lg={newsHide ? "9" : "6"}>
+                  <Tab.Content>
+                    <ProfileTab open={open} user={data} />
+                    {AuthUser?.roles.includes(ROLES.ADMIN) && (
+                      <Tab.Pane eventKey="second" id="Roles-Management">
+                        <ManageRoles type="user" data={data} />
+                      </Tab.Pane>
+                    )}
+                  </Tab.Content>
+                </Col>
+                <ProfileRight user={data} />
+              </Row>
+            )}
           </Tab.Container>
         </>
       )}

@@ -8,6 +8,7 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
+  createTransform,
 } from "redux-persist";
 import { thunk } from "redux-thunk";
 import SettingReducer from "./settings/dasboardsettings/reducers";
@@ -17,10 +18,36 @@ import storage from "./storage";
 import { AuthApi } from "./services/auth/auth.api";
 import { AuthReducer } from "./services/auth/auth.slice";
 import NotificationReducer from "./services/notifications/index";
+import CryptoJS from "crypto-js";
+
+const encryptionKey = import.meta.env.VITE_LOCAL_ENCRYPTION;
+
+const encryptTransform = createTransform(
+  (inboundState) => {
+    return {
+      data: CryptoJS.AES.encrypt(
+        JSON.stringify(inboundState),
+        encryptionKey
+      ).toString(),
+    };
+  },
+  (outboundState) => {
+    if (!outboundState?.data) return undefined; // Handle missing data
+    try {
+      const bytes = CryptoJS.AES.decrypt(outboundState.data, encryptionKey);
+      return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    } catch (error) {
+      console.error("Decryption failed:", error);
+      return undefined;
+    }
+  },
+  { whitelist: ["authuser", "defaultstate", "notification"] }
+);
 
 const persistConfig = {
   key: "root",
-  storage,
+  storage: storage,
+  transforms: [encryptTransform],
 };
 
 const rootReducers = combineReducers({
@@ -28,7 +55,13 @@ const rootReducers = combineReducers({
   defaultstate: defaultReducer,
   notification: NotificationReducer,
 });
-const persistedReducer = persistReducer(persistConfig, rootReducers);
+
+export type RootReducer = ReturnType<typeof rootReducers>;
+
+const persistedReducer = persistReducer<RootReducer>(
+  persistConfig,
+  rootReducers
+);
 
 export const store = configureStore({
   reducer: {

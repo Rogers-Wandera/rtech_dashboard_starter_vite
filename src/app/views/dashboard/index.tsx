@@ -21,12 +21,16 @@ import { useSocket } from "@/lib/context/services/socket";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { withNotification } from "@/hocs/services/notifications/notification.hoc";
 import { withUserService } from "@/hocs/services/auth/userservice.hoc";
+import UploadProgressShow from "@/components/settings/uploadprogress";
 
 type props = { userstate?: { online: string[] } };
 
 function DashboardLayout({ userstate }: props) {
   const loading = useSelector(
     (state: RootState) => state.appState.defaultstate.isLoading
+  );
+  const upload = useSelector(
+    (state: RootState) => state.appState.authuser.upload
   );
   const state = useSocket();
   const location = useLocation();
@@ -87,6 +91,14 @@ function DashboardLayout({ userstate }: props) {
         <Footer app_name={appName} />
       </main>
       <SettingOffCanvas />
+
+      {upload?.progress && upload.progress.length > 0 && (
+        <div className="btn-download" style={{ top: 10 }}>
+          <Button variant="success py-1 px-1 d-flex gap-0">
+            <UploadProgressShow />
+          </Button>
+        </div>
+      )}
     </Fragment>
   );
 }
