@@ -9,7 +9,7 @@ import { Button } from "react-bootstrap";
 import SubHeader from "@/components/partials/HeaderStyle/sub-header";
 import Sidebar from "@/components/partials/SidebarStyle/sidebar";
 import { RootState } from "@/lib/store/store";
-import { Alert, LoadingOverlay } from "@mantine/core";
+import { Alert, Box, LoadingOverlay } from "@mantine/core";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import WithAuth from "@/hocs/auth/auth.hoc";
 import WithRouteRole from "@/hocs/auth/routerole.hoc";
@@ -19,7 +19,6 @@ import { useAppDispatch } from "@/hooks/store.hooks";
 import { setNextRoute } from "@/lib/store/services/defaults/defaults";
 import { useSocket } from "@/lib/context/services/socket";
 import { IconInfoCircle } from "@tabler/icons-react";
-import { withNotification } from "@/hocs/services/notifications/notification.hoc";
 import { withUserService } from "@/hocs/services/auth/userservice.hoc";
 import UploadProgressShow from "@/components/settings/uploadprogress";
 
@@ -94,9 +93,9 @@ function DashboardLayout({ userstate }: props) {
 
       {upload?.progress && upload.progress.length > 0 && (
         <div className="btn-download" style={{ top: 10 }}>
-          <Button variant="success py-1 px-1 d-flex gap-0">
+          <Box className="py-1 px-1 d-flex gap-0">
             <UploadProgressShow />
-          </Button>
+          </Box>
         </div>
       )}
     </Fragment>
@@ -104,7 +103,7 @@ function DashboardLayout({ userstate }: props) {
 }
 
 const DashBoardWithSession = WithAuth(
-  withUserService(withNotification(WithSession(DashboardLayout)))
+  withUserService(WithSession(DashboardLayout))
 );
 const DashboardWithModules = WithUserModules(DashBoardWithSession);
 const DashboardWithRoles = WithRouteRole(DashboardWithModules);

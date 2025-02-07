@@ -1,8 +1,8 @@
 import { useSocketEvent } from "@/hooks/services/socket.hooks";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setUpload } from "@/lib/store/services/auth/auth.slice";
-import { setUploadNotifications } from "@/lib/store/services/notifications";
 import { RootState } from "@/lib/store/store";
+import { notifier } from "@/lib/utils/notify/notification";
 import { UPLOAD_EVENTS } from "@/types/enums/enum.types";
 import {
   UploadCompleteType,
@@ -53,7 +53,10 @@ const UploadProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useSocketEvent(UPLOAD_EVENTS.UPLOAD_SUCCESS, (data: UploadCompleteType) => {
-    dispatch(setUploadNotifications(data));
+    const alldata = [...(upload?.progress || [])];
+    const filter = alldata.filter((item) => item.filename !== data.filename);
+    dispatch(setUpload({ ...upload, progress: filter }));
+    notifier.success({ title: "Upload complete", message: data.message });
   });
   return (
     <UploadContext.Provider value={upload}>{children}</UploadContext.Provider>

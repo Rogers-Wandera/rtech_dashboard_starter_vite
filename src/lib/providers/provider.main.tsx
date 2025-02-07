@@ -17,6 +17,7 @@ import AppContextProvider from "../context/app/app.context";
 import PermissionProvider from "../context/auth/permission.context";
 import { SocketProvider } from "../context/services/socket";
 import UploadProvider from "../context/auth/upload.context";
+import NotificationContextProvider from "../context/notifications/notification";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
@@ -60,7 +61,9 @@ const Providers = () => {
                           <AppContextProvider>
                             <PermissionProvider>
                               <UploadProvider>
-                                <Outlet />
+                                <NotificationContextProvider>
+                                  <Outlet />
+                                </NotificationContextProvider>
                               </UploadProvider>
                             </PermissionProvider>
                           </AppContextProvider>

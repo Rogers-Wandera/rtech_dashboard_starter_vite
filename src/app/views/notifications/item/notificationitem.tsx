@@ -2,21 +2,34 @@ import { Avatar, Group, Text, Card, Box } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import NotificationDetails from "../details";
 import { SystemNotificationData } from "@/types/notifications/notification.types";
+import TruncatedText from "@/components/shared/truncatedtext";
 
 type props = {
   notification: SystemNotificationData;
   action?: JSX.Element;
   avatar: string;
+  disableOpen?: boolean;
 };
-const NotificationItem = ({ notification, action, avatar }: props) => {
+const NotificationItem = ({
+  notification,
+  action,
+  avatar,
+  disableOpen = false,
+}: props) => {
   const [opened, { open, close }] = useDisclosure(false);
+
+  if (typeof notification.timestamp === "string") {
+    notification.timestamp = new Date(notification.timestamp);
+  }
   return (
     <Box>
-      <NotificationDetails
-        notification={notification}
-        opened={opened}
-        close={close}
-      />
+      {!disableOpen && (
+        <NotificationDetails
+          notification={notification}
+          opened={opened}
+          close={close}
+        />
+      )}
       <Card shadow="md" styles={{ root: { cursor: "pointer" } }} onClick={open}>
         <Group align="start" gap="md" mt="md" mb="md">
           <Avatar src={avatar} radius="xl" size="md" />
@@ -30,9 +43,11 @@ const NotificationItem = ({ notification, action, avatar }: props) => {
           </div>
           {action}
         </Group>
-        <Text size="sm" c="dimmed" mt={4}>
-          {notification.message}
-        </Text>
+        <TruncatedText
+          text={notification.message}
+          maxLength={100}
+          textProps={{ size: "sm", c: "dimmed", mt: 4 }}
+        />
       </Card>
     </Box>
   );

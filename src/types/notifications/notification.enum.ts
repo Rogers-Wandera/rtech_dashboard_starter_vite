@@ -5,5 +5,13 @@ export enum PRIORITY_TYPES {
 }
 
 export enum NOTIFICATION_TYPES {
-  SYSTEM_NOTIFICATION = "SYSTEM_NOTIFICATION",
+  USER_NOTIFICATIONS = "USER_NOTIFICATIONS",
+}
+
+export enum NotificationTypes {
+  INFO = "info",
+  WARNING = "warning",
+  ERROR = "error",
+  SUCCESS = "success",
+  CUSTOM = "custom",
 }

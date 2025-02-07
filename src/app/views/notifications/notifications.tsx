@@ -5,10 +5,12 @@ import { IconBell, IconDots } from "@tabler/icons-react";
 import AllNotifications from "./content/all";
 import UrgentNotifications from "./content/urgent";
 import UploadNotification from "./content/uploads/upload";
+import { useMediaQuery } from "@mantine/hooks";
 
 const NotificationsPage = () => {
+  const matches = useMediaQuery("(max-width: 768px)");
   return (
-    <Card withBorder shadow="sm" radius="md" p="lg" style={{ width: 400 }}>
+    <Card withBorder shadow="sm" radius="md" p="lg" w={matches ? "100%" : 400}>
       <Group
         className="py-3 card-header d-flex justify-content-between bg-primary"
         justify="apart"

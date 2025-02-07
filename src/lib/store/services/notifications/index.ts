@@ -1,7 +1,4 @@
-import {
-  UploadCompleteType,
-  UploadProgressType,
-} from "@/types/server/server.main.types";
+import { UploadCompleteType } from "@/types/server/server.main.types";
 import { createSlice } from "@reduxjs/toolkit";
 
 export type NotificationTypes = {
@@ -21,16 +18,20 @@ const notificationSlice = createSlice({
   reducers: {
     setUploadNotifications: (
       state,
-      action: { payload: UploadProgressType }
+      action: { payload: UploadCompleteType }
     ) => {
+      action.payload["read"] = false;
       const count = state.uploads.data.reduce((acc, curlValue) => {
-        if (curlValue?.read === false) {
+        if (!curlValue?.read) {
           return acc + 1;
         } else {
           return acc;
         }
       }, 0);
-      state.uploads = { ...state.uploads, ...action.payload, count };
+      state.uploads = {
+        data: [...state.uploads.data, action.payload],
+        count: count + 1,
+      };
     },
 
     updateUploadRead: (

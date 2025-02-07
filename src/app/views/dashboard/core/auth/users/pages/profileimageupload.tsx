@@ -89,7 +89,7 @@ const ProfileUpload = ({ close, user, refetch }: props) => {
 
   const HandleClose = () => {
     close();
-    setFiles([]);
+    setFiles([]); 
     setImage(null);
   };
 
