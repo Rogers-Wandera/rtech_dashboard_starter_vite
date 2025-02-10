@@ -1,4 +1,8 @@
-import { NotificationTypes, PRIORITY_TYPES } from "./notification.enum";
+import {
+  NOTIFICATION_STATUS,
+  NotificationTypes,
+  PRIORITY_TYPES,
+} from "./notification.enum";
 
 type mediaTypes = {
   type: "image" | "video" | "audio";
@@ -25,10 +29,15 @@ export type SystemNotification = {
   link?: string;
   resendId?: string;
   createdBy?: string;
+  status: NOTIFICATION_STATUS;
+  id: string;
 };
 
 export type user_system_notifications = {
   uploads: SystemNotification[];
   announcements: SystemNotification[];
   other: SystemNotification[];
+  unread: SystemNotification[];
+  all: SystemNotification[];
+  urgent: SystemNotification[];
 };

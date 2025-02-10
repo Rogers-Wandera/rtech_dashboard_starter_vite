@@ -27,15 +27,12 @@ import NotificationsPage from "@/app/views/notifications/notifications";
 import { useSocketEmit } from "@/hooks/services/socket.hooks";
 import { USER_EVENTS } from "@/types/enums/event.enums";
 import { IconBellFilled, IconMessageFilled } from "@tabler/icons-react";
-import { RootState } from "@/lib/store/store";
 import RingingBellWithBadge from "@/components/shared/ringingbell";
+import { useNotification } from "@/lib/context/notifications/notification";
 
 const Header = memo(() => {
   const combobox = useCombobox();
-  const uploads = useSelector(
-    (state: RootState) => state.appState.notification.uploads
-  );
-  const notificationCount = uploads.count || 0;
+  const { counts } = useNotification();
   const { user } = useAuth();
   const emit = useSocketEmit(USER_EVENTS.LOGOUT);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -290,8 +287,8 @@ const Header = memo(() => {
                   id="notification-drop"
                   data-bs-toggle="dropdown"
                 >
-                  {notificationCount > 0 ? (
-                    <RingingBellWithBadge count={notificationCount} />
+                  {counts.unread > 0 ? (
+                    <RingingBellWithBadge count={counts.unread} />
                   ) : (
                     <IconBellFilled />
                   )}

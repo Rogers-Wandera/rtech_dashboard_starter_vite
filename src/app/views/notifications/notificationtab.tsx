@@ -1,21 +1,29 @@
-import { RootState } from "@/lib/store/store";
+import { useNotification } from "@/lib/context/notifications/notification";
 import { Badge, Group, Tabs } from "@mantine/core";
-import { useSelector } from "react-redux";
 
 const NotificationTabs = ({ children }: { children: React.ReactNode }) => {
-  const uploads = useSelector(
-    (state: RootState) => state.appState.notification.uploads
-  );
-
+  const { counts } = useNotification();
   return (
     <Tabs defaultValue="unread">
       <Tabs.List>
-        <Tabs.Tab value="unread">Unread</Tabs.Tab>
-        <Tabs.Tab value="all">All</Tabs.Tab>
-        <Tabs.Tab value="urgent">Urgent</Tabs.Tab>
+        <Tabs.Tab value="unread">
+          <Group>
+            Unread <Badge color="red">{counts.unread}</Badge>
+          </Group>
+        </Tabs.Tab>
+        <Tabs.Tab value="all">
+          <Group>
+            All <Badge color="red">{counts.all}</Badge>
+          </Group>
+        </Tabs.Tab>
+        <Tabs.Tab value="urgent">
+          <Group>
+            Urgent <Badge color="red">{counts.urgent}</Badge>
+          </Group>
+        </Tabs.Tab>
         <Tabs.Tab value="uploads">
           <Group>
-            Uploads <Badge color="red">{uploads.count}</Badge>
+            Uploads <Badge color="red">{counts.uploads}</Badge>
           </Group>
         </Tabs.Tab>
       </Tabs.List>

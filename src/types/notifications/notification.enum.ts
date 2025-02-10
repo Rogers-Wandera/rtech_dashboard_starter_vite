@@ -6,6 +6,7 @@ export enum PRIORITY_TYPES {
 
 export enum NOTIFICATION_TYPES {
   USER_NOTIFICATIONS = "USER_NOTIFICATIONS",
+  UPDATE_READ = "UPDATE_READ",
 }
 
 export enum NotificationTypes {
@@ -14,4 +15,11 @@ export enum NotificationTypes {
   ERROR = "error",
   SUCCESS = "success",
   CUSTOM = "custom",
+}
+
+export enum NOTIFICATION_STATUS {
+  SENT = "sent",
+  RECIEVED = "recieved",
+  READ = "read",
+  FAILED = "failed",
 }

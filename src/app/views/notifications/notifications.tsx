@@ -10,7 +10,7 @@ import { useMediaQuery } from "@mantine/hooks";
 const NotificationsPage = () => {
   const matches = useMediaQuery("(max-width: 768px)");
   return (
-    <Card withBorder shadow="sm" radius="md" p="lg" w={matches ? "100%" : 400}>
+    <Card withBorder shadow="sm" radius="md" p="lg" w={matches ? "100%" : 450}>
       <Group
         className="py-3 card-header d-flex justify-content-between bg-primary"
         justify="apart"
