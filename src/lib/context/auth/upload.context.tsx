@@ -11,6 +11,9 @@ import {
 } from "@/types/server/server.main.types";
 import { createContext, ReactNode, useContext } from "react";
 import { useSelector } from "react-redux";
+import { useSocket } from "../services/socket";
+import { USER_EVENTS } from "@/types/enums/event.enums";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 
 export type UploadContextType = {
   progress?: UploadProgressType[];
@@ -21,9 +24,11 @@ const UploadContext = createContext<UploadContextType | null>(null);
 
 const UploadProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useAppDispatch();
+  const { user } = useAuth();
   const upload = useSelector(
     (state: RootState) => state.appState.authuser.upload
   );
+  const socket = useSocket();
   useSocketEvent(UPLOAD_EVENTS.UPLOAD_PROGRESS, (data: UploadProgressType) => {
     const updatedData = {
       ...data,
@@ -57,6 +62,9 @@ const UploadProvider = ({ children }: { children: ReactNode }) => {
     const filter = alldata.filter((item) => item.filename !== data.filename);
     dispatch(setUpload({ ...upload, progress: filter }));
     notifier.success({ title: "Upload complete", message: data.message });
+    if (socket?.socket) {
+      socket.socket.emit(USER_EVENTS.UPDATE_SESSION, { userId: user?.id });
+    }
   });
   return (
     <UploadContext.Provider value={upload}>{children}</UploadContext.Provider>

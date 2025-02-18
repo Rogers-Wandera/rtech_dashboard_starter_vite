@@ -1,5 +1,10 @@
+import { useSocketEvent } from "@/hooks/services/socket.hooks";
+import { useAppDispatch } from "@/hooks/store.hooks";
+import { setToken, setUser } from "@/lib/store/services/auth/auth.slice";
 import { RootState } from "@/lib/store/store";
-import { AuthContextState } from "@/types/app/auth/auth.types";
+import { AuthContextState, TypeToken } from "@/types/app/auth/auth.types";
+import { USER_EVENTS } from "@/types/enums/event.enums";
+import { jwtDecode } from "jwt-decode";
 import { createContext } from "react";
 import { useSelector } from "react-redux";
 
@@ -14,6 +19,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isLoggedIn = useSelector(
     (state: RootState) => state.appState.authuser.isLoggedIn
   );
+  const dispatch = useAppDispatch();
   const token = useSelector(
     (state: RootState) => state.appState.authuser.token
   );
@@ -21,6 +27,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const modules = useSelector(
     (state: RootState) => state.appState.authuser.modules
   );
+  useSocketEvent(USER_EVENTS.UPDATE_SESSION, (data: { token: string }) => {
+    dispatch(setToken(data.token));
+    const decodeToken = jwtDecode<TypeToken>(data.token);
+    dispatch(setUser(decodeToken.user));
+  });
+
   return (
     <AuthContext.Provider
       value={{
