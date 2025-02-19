@@ -31,6 +31,8 @@ import { notifier } from "@/lib/utils/notify/notification";
 import { setLoading } from "@/lib/store/services/defaults/defaults";
 import ConfirmModal from "@/components/shared/dialogs/confirm";
 import { ROLES, USE_MUTATE_METHODS } from "@/types/enums/enum.types";
+import { useSocket } from "@/lib/context/services/socket";
+import { USER_EVENTS } from "@/types/enums/event.enums";
 
 type props = {
   user: UserSingleView;
@@ -39,6 +41,8 @@ type props = {
 const ProfileLeft = ({ user, refetch }: props) => {
   const [opened, { open, close }] = useDisclosure(false);
   const dispatch = useAppDispatch();
+  const authUser = useAuth();
+  const socket = useSocket();
   const form = useForm({
     name: "roles",
     initialValues: {
@@ -76,6 +80,9 @@ const ProfileLeft = ({ user, refetch }: props) => {
       notifier.success({ message: response?.msg as string });
       refetch();
       dispatch(setLoading(false));
+      if (socket?.socket) {
+        socket.socket.emit(USER_EVENTS.UPDATE_SESSION, { userId: user.id });
+      }
     } catch (error) {
       dispatch(setLoading(false));
       HandleError(error as ServerErrorResponse);
@@ -105,6 +112,12 @@ const ProfileLeft = ({ user, refetch }: props) => {
           notifier.success({ message: response?.msg as string });
           refetch();
           dispatch(setLoading(false));
+          if (socket?.socket) {
+            socket.socket.emit(USER_EVENTS.UPDATE_SESSION, {
+              userId: user.id,
+              isUser: authUser.user?.id === user.id,
+            });
+          }
         } catch (error) {
           dispatch(setLoading(false));
           HandleError(error as ServerErrorResponse);

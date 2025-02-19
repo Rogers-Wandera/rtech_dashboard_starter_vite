@@ -23,6 +23,8 @@ import { TanStackRefetchType } from "@/types/app/app.types";
 import { ServerRoles } from "@/types/app/auth/auth.types";
 import { USE_MUTATE_METHODS } from "@/types/enums/enum.types";
 import LinkRolePermission from "./permission/permission";
+import { useSocket } from "@/lib/context/services/socket";
+import { USER_EVENTS } from "@/types/enums/event.enums";
 
 type user_roles = {
   type: "user";
@@ -45,6 +47,7 @@ const LinkRolePage = ({ link, refetch, type, data }: props) => {
   const [show, { toggle }] = useDisclosure(false);
   const [checked, setChecked] = useState(link.is_assigned === 1);
   const [isEditing, setEditing] = useState<boolean | null>(null);
+  const socket = useSocket();
   const HandleCreateEdit = async () => {
     if (checked === false) {
       open();
@@ -85,6 +88,12 @@ const LinkRolePage = ({ link, refetch, type, data }: props) => {
       } else {
         payload = {};
       }
+      let infotype = "assigned";
+      if (method === USE_MUTATE_METHODS.PATCH) {
+        infotype = "updated";
+      } else if (method === USE_MUTATE_METHODS.DELETE) {
+        infotype = "removed";
+      }
       const response = await postAsync({
         endPoint: mainurl,
         payload: payload,
@@ -96,6 +105,13 @@ const LinkRolePage = ({ link, refetch, type, data }: props) => {
       close();
       setEditing(null);
       dispatch(setLoading(false));
+      if (socket?.socket) {
+        socket.socket.emit(USER_EVENTS.FETCH_MODULES, {
+          ...datatype,
+          name: link.linkname,
+          infotype,
+        });
+      }
     } catch (error) {
       dispatch(setLoading(false));
       HandleError(error as ServerErrorResponse);

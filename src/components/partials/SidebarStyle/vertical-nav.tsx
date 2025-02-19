@@ -115,7 +115,7 @@ const VerticalNav = memo((_) => {
             {modulekeys.map((module) => {
               const modulelinks = modules[module];
               const getToRender = modulelinks.filter(
-                (link) => link.render === 1
+                (link) => link.render === 1 && link.expired == 0
               );
               if (getToRender.length > 0) {
                 rendered++;

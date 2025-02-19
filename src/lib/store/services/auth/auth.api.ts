@@ -195,6 +195,8 @@ export const AuthApi = createApi({
 export const {
   useLoginMutation,
   useGetUserModulesQuery,
+  useLazyGetUserModulesQuery,
+  useLazyPermissionsQuery,
   useResetPasswordMutation,
   useResetPasswordLinkMutation,
   useFromLinkResetPasswordMutation,
