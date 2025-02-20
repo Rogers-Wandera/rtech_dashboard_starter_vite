@@ -15,6 +15,7 @@ export interface ModuleLinkType extends IBaseTableType {
   moduleId: number;
   linkname: string;
   route: string;
+  default: number;
   position: number;
   released: number;
   render: number;

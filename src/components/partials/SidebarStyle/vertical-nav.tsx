@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/auth/auth.hooks";
-import React, { useState, useContext, memo, Fragment } from "react";
+import React, { useState, useContext, memo, Fragment, useEffect } from "react";
 import {
   Accordion,
   useAccordionButton,
@@ -40,11 +40,21 @@ function CustomToggle({ children, eventKey, onClick }: customtoggleprops) {
 
 const VerticalNav = memo((_) => {
   const [activeMenu, setActiveMenu] = useState(false);
+  const [moduleToRender, setModules] = useState<string[]>([]);
   const [active, setActive] = useState("");
   const { modules } = useAuth();
   const modulekeys = Object.keys(modules);
   const location = useLocation();
-  let rendered = 0;
+
+  useEffect(() => {
+    const moduleToShow = modulekeys.filter((key) => {
+      const hasToRender = modules[key].filter(
+        (item) => item.default != 1 && item.render === 1 && item.expired != 1
+      );
+      return hasToRender.length > 0;
+    });
+    setModules(moduleToShow);
+  }, [modules]);
   return (
     <Fragment>
       <Accordion as="ul" className="navbar-nav iq-main-menu">
@@ -99,12 +109,12 @@ const VerticalNav = memo((_) => {
             <span className="mini-icon">-</span>
           </Link>
         </li>
-        {modulekeys.length <= 0 && (
+        {moduleToRender.length <= 0 && (
           <span style={{ margin: "0 1rem" }}>
             No Assigned Roles Or Expired roles, contact admin
           </span>
         )}
-        {modulekeys.length > 0 && (
+        {moduleToRender.length > 0 && (
           <Accordion.Item
             as="li"
             className={`${activeMenu === true ? "active" : ""}`}
@@ -112,14 +122,9 @@ const VerticalNav = memo((_) => {
             bsPrefix={`nav-item ${active === "special" ? "active" : ""} `}
             onClick={() => setActive("special")}
           >
-            {modulekeys.map((module) => {
+            {moduleToRender.map((module) => {
               const modulelinks = modules[module];
-              const getToRender = modulelinks.filter(
-                (link) => link.render === 1 && link.expired == 0
-              );
-              if (getToRender.length > 0) {
-                rendered++;
-              }
+
               const icon = modulelinks[0].icon;
               const IconComponent = (Icons[icon] ||
                 Icons[
@@ -129,7 +134,7 @@ const VerticalNav = memo((_) => {
               >;
               return (
                 <Fragment key={module}>
-                  {getToRender.length > 0 && (
+                  {modulelinks.length > 0 && (
                     <div>
                       <CustomToggle
                         eventKey={module}
@@ -159,7 +164,7 @@ const VerticalNav = memo((_) => {
                       </CustomToggle>
                       <Accordion.Collapse eventKey={module}>
                         <ul className="sub-nav">
-                          {getToRender.map((link, index) => (
+                          {modulelinks.map((link, index) => (
                             <li
                               className="nav-item"
                               key={`${link.linkname}+${index}`}

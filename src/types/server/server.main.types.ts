@@ -17,6 +17,7 @@ export type ServerModuleRes = {
   expired: number;
   render: number;
   icon: keyof typeof Icons;
+  default: number;
 };
 export type UserModuleRes = {
   [key: string]: ServerModuleRes[];

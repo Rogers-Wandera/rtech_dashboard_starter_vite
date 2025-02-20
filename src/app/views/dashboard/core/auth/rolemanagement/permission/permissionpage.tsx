@@ -18,6 +18,8 @@ import {
 import { ListItem, ListItemIcon, ListItemText, Switch } from "@mui/material";
 import { IconFolder } from "@tabler/icons-react";
 import { useState } from "react";
+import { useSocket } from "@/lib/context/services/socket";
+import { USER_EVENTS } from "@/types/enums/event.enums";
 
 type props = {
   permission: ServerLinkPermission;
@@ -37,6 +39,9 @@ const RolePermissionPage = ({
   const [checked, setChecked] = useState(Number(permission.checked) === 1);
   const dispatch = useAppDispatch();
   const { postAsync } = useMutateData({ queryKey: "user-permissions-assign" });
+  const socket = useSocket();
+  const datatype =
+    type === "user" ? { userId: link.userId } : { groupId: link.groupId };
 
   const HandleAddPermission = () => {
     return ConfirmModal({
@@ -56,11 +61,21 @@ const RolePermissionPage = ({
             Number(permission.checked) === 1
               ? USE_MUTATE_METHODS.DELETE
               : USE_MUTATE_METHODS.POST;
+          let infotype = `The permission ${permission.accessName} has been added to you.`;
+          if (method === USE_MUTATE_METHODS.DELETE) {
+            infotype = `The permission ${permission.accessName} has been removed from you.`;
+          }
           const response = await postAsync({
             endPoint: url,
             payload: {},
             method: method,
           });
+          if (socket?.socket) {
+            socket.socket.emit(USER_EVENTS.FETCH_MODULES, {
+              ...datatype,
+              infotype,
+            });
+          }
           notifier.success({ message: String(response.msg) });
           setChecked(!checked);
           await refetch();

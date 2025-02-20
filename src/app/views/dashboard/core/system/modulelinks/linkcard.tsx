@@ -8,6 +8,8 @@ import {
   IconDeviceProjector,
   IconHomeX,
   IconTransfer,
+  IconThumbUpFilled,
+  IconThumbDownFilled,
 } from "@tabler/icons-react";
 import {
   ActionIcon,
@@ -79,7 +81,7 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
     });
   };
 
-  const UpdateRenderReleased = (type: "render" | "released") => {
+  const UpdateLinkConfigs = (type: "render" | "released" | "default") => {
     return ConfirmModal({
       message:
         `Are you sure you want to ${
@@ -87,9 +89,13 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
             ? link.render === 1
               ? "remove render for"
               : "render"
-            : link.released === 1
-            ? "remove released for"
-            : "enable"
+            : type === "released"
+            ? link.released === 1
+              ? "remove released for"
+              : "enable"
+            : link.default === 1
+            ? "remove default for"
+            : "mark as default for "
         } this link ` + link.linkname,
       type: "danger",
       onConfirm: async () => {
@@ -98,7 +104,9 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
           const tosend =
             type === "render"
               ? { render: link.render === 1 ? 0 : 1 }
-              : { released: link.released === 1 ? 0 : 1 };
+              : type === "released"
+              ? { released: link.released === 1 ? 0 : 1 }
+              : { default: link.default === 1 ? 0 : 1 };
           const response = await postAsync({
             endPoint: "core/system/modulelinks/" + link.id,
             method: USE_MUTATE_METHODS.PATCH,
@@ -119,6 +127,7 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
       },
     });
   };
+
   return (
     <Card withBorder padding="lg" radius="md" style={{ cursor: "pointer" }}>
       <TransferLinkModal
@@ -143,6 +152,7 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
                 <Title order={3}>{link.linkname}</Title>
                 <Badge size="sm" color={link.released === 1 ? "green" : "pink"}>
                   {link.released === 1 ? "Released" : "Not Released"}
+                  {link.default === 1 && " (Default)"}
                 </Badge>
               </Group>
               <Text>{link.route}</Text>
@@ -202,7 +212,7 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
               <Menu.Dropdown>
                 <Menu.Label>Configs</Menu.Label>
                 <Menu.Item
-                  onClick={() => UpdateRenderReleased("released")}
+                  onClick={() => UpdateLinkConfigs("released")}
                   leftSection={
                     link.released === 1 ? (
                       <IconLockFilled
@@ -218,7 +228,23 @@ function LinkCard({ link, setEditData, open, refetch }: props) {
                   {link.released === 1 ? "Unrelease" : "Release"}
                 </Menu.Item>
                 <Menu.Item
-                  onClick={() => UpdateRenderReleased("render")}
+                  onClick={() => UpdateLinkConfigs("default")}
+                  leftSection={
+                    link.default === 1 ? (
+                      <IconThumbDownFilled
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    ) : (
+                      <IconThumbUpFilled
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    )
+                  }
+                >
+                  {link?.default === 0 ? "Mark as default" : "Unmark default"}
+                </Menu.Item>
+                <Menu.Item
+                  onClick={() => UpdateLinkConfigs("render")}
                   leftSection={
                     link.render === 1 ? (
                       <IconHomeX style={{ width: rem(14), height: rem(14) }} />

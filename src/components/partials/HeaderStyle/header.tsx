@@ -29,13 +29,16 @@ import { USER_EVENTS } from "@/types/enums/event.enums";
 import { IconBellFilled, IconMessageFilled } from "@tabler/icons-react";
 import RingingBellWithBadge from "@/components/shared/ringingbell";
 import { useNotification } from "@/lib/context/notifications/notification";
+import { ServerModuleRes } from "@/types/server/server.main.types";
 
 const Header = memo(() => {
   const combobox = useCombobox();
   const { counts } = useNotification();
-  const { user } = useAuth();
+  const { user, modules } = useAuth();
   const emit = useSocketEmit(USER_EVENTS.LOGOUT);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [links, setLinks] = useState<ServerModuleRes[]>([]);
+  const modulelinks = Object.values(modules)?.flat() || [];
   const navbarHide = useSelector(SettingSelector.navbar_show); // array
   const headerNavbar = useSelector(SettingSelector.header_navbar);
   const dispatch = useAppDispatch();
@@ -43,6 +46,25 @@ const Header = memo(() => {
   const minisidebar = () => {
     document.getElementsByTagName("ASIDE")[0].classList.toggle("sidebar-mini");
   };
+
+  const shouldFilterOptions = links.every(
+    (item) => item.linkname !== searchTerm
+  );
+  const filteredOptions = shouldFilterOptions
+    ? links.filter((item) =>
+        item.linkname.toLowerCase().includes(searchTerm.toLowerCase().trim())
+      )
+    : links;
+
+  const options = filteredOptions.map((item, i) => (
+    <Combobox.Option
+      onClick={() => navigate(item.route)}
+      value={item.linkname + i}
+      key={item.linkname + i}
+    >
+      {item.linkname}
+    </Combobox.Option>
+  ));
 
   const HandleLogOut = () => {
     dispatch(logOut());
@@ -64,6 +86,13 @@ const Header = memo(() => {
       };
     }
   });
+
+  useEffect(() => {
+    const filteredlinks = modulelinks.filter(
+      (link) => link.default != 1 && link.render === 1 && link.expired != 1
+    );
+    setLinks(filteredlinks);
+  }, [modules]);
   return (
     <Fragment>
       <Navbar
@@ -136,10 +165,12 @@ const Header = memo(() => {
               </Combobox.Target>
 
               <Combobox.Dropdown>
-                <Combobox.Options>
-                  <Combobox.Option value={"Manage Users"}>
-                    Manage Users
-                  </Combobox.Option>
+                <Combobox.Options mah={100} style={{ overflowY: "auto" }}>
+                  {options.length > 0 ? (
+                    options
+                  ) : (
+                    <Combobox.Empty>Nothing found</Combobox.Empty>
+                  )}
                 </Combobox.Options>
               </Combobox.Dropdown>
             </Combobox>

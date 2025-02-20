@@ -88,11 +88,11 @@ const LinkRolePage = ({ link, refetch, type, data }: props) => {
       } else {
         payload = {};
       }
-      let infotype = "assigned";
+      let infotype = `You now have access to the ${link.linkname} link`;
       if (method === USE_MUTATE_METHODS.PATCH) {
-        infotype = "updated";
+        infotype = `The ${link.linkname} link has been updated for you`;
       } else if (method === USE_MUTATE_METHODS.DELETE) {
-        infotype = "removed";
+        infotype = `The ${link.linkname} link has been removed from you`;
       }
       const response = await postAsync({
         endPoint: mainurl,
@@ -108,7 +108,6 @@ const LinkRolePage = ({ link, refetch, type, data }: props) => {
       if (socket?.socket) {
         socket.socket.emit(USER_EVENTS.FETCH_MODULES, {
           ...datatype,
-          name: link.linkname,
           infotype,
         });
       }
