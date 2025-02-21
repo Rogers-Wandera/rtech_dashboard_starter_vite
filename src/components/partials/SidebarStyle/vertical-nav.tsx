@@ -124,7 +124,10 @@ const VerticalNav = memo((_) => {
           >
             {moduleToRender.map((module) => {
               const modulelinks = modules[module];
-
+              const torender = modulelinks.filter(
+                (item) =>
+                  item.expired != 1 && item.default != 1 && item.render === 1
+              );
               const icon = modulelinks[0].icon;
               const IconComponent = (Icons[icon] ||
                 Icons[
@@ -134,7 +137,7 @@ const VerticalNav = memo((_) => {
               >;
               return (
                 <Fragment key={module}>
-                  {modulelinks.length > 0 && (
+                  {torender.length > 0 && (
                     <div>
                       <CustomToggle
                         eventKey={module}
@@ -164,7 +167,7 @@ const VerticalNav = memo((_) => {
                       </CustomToggle>
                       <Accordion.Collapse eventKey={module}>
                         <ul className="sub-nav">
-                          {modulelinks.map((link, index) => (
+                          {torender.map((link, index) => (
                             <li
                               className="nav-item"
                               key={`${link.linkname}+${index}`}
