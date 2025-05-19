@@ -18,3 +18,10 @@ export const FetchData = async <T = unknown>(
 };
 
 export const validateRequired = (value: string) => value && !!value.length;
+
+export function formatPropertyName(propName: string) {
+  // Step 1: Insert space before capital letters
+  const withSpaces = propName.replace(/([A-Z])/g, " $1");
+  // Step 2: Capitalize the first letter of each word
+  return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
+}

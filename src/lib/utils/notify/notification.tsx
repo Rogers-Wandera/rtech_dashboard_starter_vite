@@ -7,6 +7,7 @@ type NotifierProps = {
   title?: string;
   timer?: number;
 };
+
 export const notifier = {
   success: ({
     message,
