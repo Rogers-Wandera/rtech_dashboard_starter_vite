@@ -18,6 +18,7 @@ export const AuthContext = createContext<AuthContextState>({
   token: null,
   user: null,
   modules: {},
+  sessionId: null,
 });
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -29,6 +30,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const token = useSelector(
     (state: RootState) => state.appState.authuser.token
   );
+  const sessionId = useSelector(
+    (state: RootState) => state.appState.authuser.sessionId
+  );
   const user = useSelector((state: RootState) => state.appState.authuser.user);
   const [getUserModules] = useLazyGetUserModulesQuery();
   const [getPermissions] = useLazyPermissionsQuery();
@@ -36,17 +40,18 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const modules = useSelector(
     (state: RootState) => state.appState.authuser.modules
   );
-  useSocketEvent(
-    USER_EVENTS.UPDATE_SESSION,
-    (data: { token: string; message?: string }) => {
-      dispatch(setToken(data.token));
-      const decodeToken = jwtDecode<TypeToken>(data.token);
-      dispatch(setUser(decodeToken.user));
-      if (data?.message) {
-        notifier.success({ message: data.message });
-      }
+
+  const HandleUpdateSession = (data: { token: string; message?: string }) => {
+    dispatch(setToken(data.token));
+    const decodeToken = jwtDecode<TypeToken>(data.token);
+    dispatch(setUser(decodeToken.user));
+    if (data?.message) {
+      notifier.success({ message: data.message });
     }
-  );
+  };
+  useSocketEvent(USER_EVENTS.UPDATE_SESSION, HandleUpdateSession, {
+    namespace: "user",
+  });
 
   useSocketEvent(
     USER_EVENTS.FETCH_MODULES,
@@ -67,6 +72,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         token,
         user,
         modules,
+        sessionId,
       }}
     >
       {children}

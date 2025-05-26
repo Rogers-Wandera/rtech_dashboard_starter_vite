@@ -1,25 +1,17 @@
-import {
-  connectSocket,
-  disconnectSocket,
-  getSocket,
-} from "@/lib/services/socket/socket.service";
-import { helpers } from "@/lib/utils/helpers/helper";
-import { notifier } from "@/lib/utils/notify/notification";
-import { useInterval } from "@mantine/hooks";
+import { useAuth } from "@/hooks/auth/auth.hooks";
+import { useSocketConnection } from "@/hooks/services/useSocketConnection";
 import React, {
   createContext,
   ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
-import { ManagerOptions, Socket, SocketOptions } from "socket.io-client";
+import { Socket } from "socket.io-client";
 
 export interface SocketProps {
   children: ReactNode;
-  url: string;
-  options?: Partial<ManagerOptions & SocketOptions>;
-  error?: string | null;
 }
 
 interface SocketState {
@@ -28,118 +20,145 @@ interface SocketState {
   isConnected: boolean;
   isReconnecting: boolean;
   retryCount: number;
-  reconnect: boolean;
+  connect: () => void;
+  disconnect: () => void;
+  reconnect: () => void;
 }
 
-const SocketContext = createContext<SocketState | null>(null);
+type SocketContextType = {
+  getSocket: (namespace: string) => SocketState | null;
+  createConnection: (namespace: string, options?: any) => void;
+  removeConnection: (namespace: string) => void;
+  connections: Record<string, SocketState>;
+};
 
-export const SocketProvider: React.FC<SocketProps> = ({
-  children,
-  url,
-  options,
-}) => {
-  const [state, setState] = useState<SocketState>({
-    socket: null,
-    error: null,
-    isConnected: false,
-    isReconnecting: false,
-    retryCount: 0,
-    reconnect: false,
+const SocketContext = createContext<SocketContextType>({
+  getSocket: () => null,
+  createConnection: () => {},
+  removeConnection: () => {},
+  connections: {},
+});
+
+export const SocketProvider: React.FC<SocketProps> = ({ children }) => {
+  const socketToken = import.meta.env.VITE_SOCKET_TOKEN as string;
+  const { user, isLoggedIn, token } = useAuth();
+  const [connections, setConnections] = useState<Record<string, SocketState>>(
+    {}
+  );
+
+  const userAuth = useMemo(
+    () => ({
+      token: socketToken,
+      connectionId: "user:" + user?.id,
+      jwt: token,
+    }),
+    [socketToken, user?.id]
+  );
+  const mainAuth = useMemo(
+    () => ({
+      token: socketToken,
+      connectionId: "main:socket",
+    }),
+    [socketToken]
+  );
+
+  const userSocket = useSocketConnection({
+    enabled: isLoggedIn,
+    namespace: "user",
+    options: { auth: userAuth, reconnectionAttempts: Infinity },
   });
 
-  const interval = useInterval(() => HandleServiceCheck(), 8000);
+  const mainSocket = useSocketConnection({
+    enabled: true,
+    namespace: "",
+    options: { auth: mainAuth, reconnectionAttempts: Infinity },
+  });
 
-  const HandleServiceCheck = () => {
-    const socket = getSocket();
-    if (!state.isConnected && !state.isReconnecting && socket) {
-      if (helpers.checkEnviroment().isDevelopment) {
-        console.log("Service check: Attempting to reconnect...");
+  const createConnection = (namespace: string, options: any = {}) => {
+    if (connections[namespace]) return;
+
+    const newSocket = useSocketConnection({
+      enabled: true,
+      namespace,
+      options: {
+        auth: userAuth,
+        ...options,
+      },
+    });
+
+    setConnections((prev) => ({
+      ...prev,
+      [namespace]: newSocket,
+    }));
+  };
+
+  const removeConnection = (namespace: string) => {
+    setConnections((prev) => {
+      const newConnections = { ...prev };
+      if (newConnections[namespace]) {
+        newConnections[namespace].disconnect();
+        delete newConnections[namespace];
       }
-      socket.connect();
-      setState((prev) => ({ ...prev, reconnect: true }));
-    }
+      return newConnections;
+    });
   };
 
-  const handleConnectionLost = (error: string) => {
-    setState((prevState) => ({
-      ...prevState,
-      socket: null,
-      isReconnecting: prevState.retryCount === 5 ? false : true,
-      isConnected: false,
-      error: error,
-      reconnect: false,
-    }));
-  };
-
-  const retryConnect = (retryCount: number) => {
-    setState((prev) => ({
-      ...prev,
-      isConnected: false,
-      retryCount,
-      error: `Attempting to Retry connection... Attempt ${retryCount}`,
-      isReconnecting: retryCount === 5 ? false : true,
-    }));
-  };
-
-  const onConnect = (socket: Socket | null) => {
-    if (state.reconnect) {
-      notifier.info({
-        message: "Connection restored!",
-        title: "Service Check",
-      });
-    }
-    setState((prev) => ({
-      ...prev,
-      socket: socket,
-      error: null,
-      isConnected: true,
-      isReconnecting: false,
-      retryCount: 0,
-      reconnect: false,
-    }));
-  };
-
-  const onDisconnect = (reason: string) => {
-    setState((prevState) => ({
-      ...prevState,
-      socket: null,
-      error: `Server connection lost: ${reason}`,
-      isConnected: false,
-      reconnect: false,
-    }));
+  const getSocket = (namespace: string) => {
+    return connections[namespace] || null;
   };
 
   useEffect(() => {
-    let isMounted = true;
-    if (isMounted) {
-      connectSocket({
-        url,
-        options,
-        onConnectionLost: handleConnectionLost,
-        onRetry: retryConnect,
-        onConnect,
-        onDisconnect,
+    if (isLoggedIn) {
+      setConnections((prev) => ({
+        ...prev,
+        user: userSocket,
+      }));
+    } else {
+      setConnections((prev) => {
+        const newConnections = { ...prev };
+        delete newConnections?.user;
+        return newConnections;
       });
     }
-    return () => {
-      isMounted = false;
-      disconnectSocket();
-    };
-  }, [url, options]);
+  }, [isLoggedIn, userSocket.isConnected, userSocket.error, userSocket.socket]);
 
   useEffect(() => {
-    interval.start();
-    return () => interval.stop();
-  }, [state]);
+    setConnections((prev) => ({
+      ...prev,
+      main: mainSocket,
+    }));
+  }, [mainSocket.isConnected, mainSocket.error, mainSocket.socket]);
+
+  const contextValue = {
+    getSocket,
+    createConnection,
+    removeConnection,
+    connections,
+  };
+
   return (
-    <SocketContext.Provider value={state}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={contextValue}>
+      {children}
+    </SocketContext.Provider>
   );
 };
 
-export const useSocket = (): SocketState | null => {
+export const useSocket = (namespace = "main"): SocketState | null => {
   const context = useContext(SocketContext);
   if (context === undefined) {
     throw new Error("useSocket must be used within a SocketProvider");
   }
-  return context;
+  return context.getSocket(namespace) || null;
+};
+
+export const useSocketManager = () => {
+  const context = useContext(SocketContext);
+  if (context === undefined) {
+    throw new Error("useSocketManager must be used within a SocketProvider");
+  }
+  return {
+    createConnection: context.createConnection,
+    removeConnection: context.removeConnection,
+    connections: context.connections,
+  };
 };

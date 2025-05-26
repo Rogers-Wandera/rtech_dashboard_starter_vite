@@ -1,57 +1,66 @@
 import { useAuth } from "@/hooks/auth/auth.hooks";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
+import { stopTimer, tick } from "@/lib/store/services/auth/session.slice";
 import { setSession } from "@/lib/store/services/defaults/defaults";
-import { HelperClass } from "@/lib/utils/helpers/helper";
+import { RootState } from "@/lib/store/store";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useInterval } from "@mantine/hooks";
-import React, { useCallback, useEffect } from "react";
-import { useLocation } from "react-router";
+import React, { useCallback, useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 
 function WithSession<P extends Object>(
   Component: React.ComponentType<P>
 ): React.ComponentType<P> {
-  const helper = new HelperClass();
   return function Session(props) {
     const dispatch = useAppDispatch();
-    const { isLoggedIn, token } = useAuth();
-    const location = useLocation();
+    const warnedRef = useRef(false);
+    const { isLoggedIn } = useAuth();
+    const { secondsLeft, isActive } = useSelector(
+      (state: RootState) => state.appState.sessiontimer
+    );
+    const interval = useInterval(() => {
+      if (isActive) {
+        dispatch(tick());
+      }
+    }, 1000);
 
-    const LogUserOut = useCallback(() => {
-      if (helper.isTokenExpired(token) && isLoggedIn) {
+    const logUserOut = useCallback(() => {
+      if (isLoggedIn) {
         dispatch(setSession(false));
         dispatch(logOut());
+        dispatch(stopTimer());
         notifier.success({
           message: "Your session has expired, please login",
           title: "Session Expired",
         });
       }
-    }, [dispatch, token, isLoggedIn]);
+    }, [dispatch, isLoggedIn]);
 
-    const CheckSession = useCallback(() => {
-      if (helper.isTokenToExpire(token) && isLoggedIn) {
-        if (helper.isTokenExpired(token)) {
-          LogUserOut();
-        } else {
-          dispatch(setSession(true));
-          notifier.info({
-            message:
-              "Your session is about to expire. Please update the session.",
-          });
-        }
+    useEffect(() => {
+      if (isActive) {
+        warnedRef.current = false;
+        interval.start();
+      } else {
+        interval.stop();
       }
-    }, [dispatch, token, isLoggedIn, LogUserOut]);
-    // 300000
-
-    const interval = useInterval(CheckSession, 60000, { autoInvoke: true });
-    useEffect(() => {
-      interval.start();
       return () => interval.stop();
-    }, []);
+    }, [isActive]);
 
     useEffect(() => {
-      LogUserOut();
-    }, [location.pathname, LogUserOut]);
+      if (!isActive || secondsLeft == null) return;
+      if (secondsLeft <= 0) {
+        logUserOut();
+      } else if (secondsLeft <= 120 && !warnedRef.current) {
+        warnedRef.current = true;
+        notifier.info({
+          title: "Session Warning",
+          message: `Your session will expire in ${Math.floor(
+            secondsLeft / 60
+          )}m ${secondsLeft % 60}s.`,
+        });
+      }
+    }, [secondsLeft, isActive, logUserOut]);
 
     return <Component {...props} />;
   };

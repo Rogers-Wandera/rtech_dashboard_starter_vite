@@ -20,11 +20,18 @@ import { Alert } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { useSocketEmit } from "@/hooks/services/socket.hooks";
 import { USER_EVENTS } from "@/types/enums/event.enums";
+import { setSessionId } from "@/lib/store/services/auth/auth.slice";
 
 const AuthLogin = () => {
   const helper = new HelperClass();
   const dispatch = useAppDispatch();
-  const emit = useSocketEmit(USER_EVENTS.LOGIN);
+  const emit = useSocketEmit(USER_EVENTS.LOGIN, {
+    namespace: "main",
+    acknowledge: true,
+    acknowledgeCallback: (response) => {
+      dispatch(setSessionId(response.sessionId));
+    },
+  });
   const { isLoggedIn, token } = useAuth();
   const { email, password } = useSelector(
     (state: RootState) => state.appState.defaultstate.rememberMe
@@ -62,7 +69,10 @@ const AuthLogin = () => {
         dispatch(setRememberMe({ ...values }));
       }
       dispatch(setNextRoute(route));
-      emit({ userId: response.data.id });
+      await emit({
+        userId: response.data.id,
+        token: response.data.accessToken,
+      });
       form.reset();
       router("/dashboard");
     } catch (error) {
@@ -81,7 +91,7 @@ const AuthLogin = () => {
   }
   return (
     <>
-      {state?.error && (
+      {state?.error && isLoggedIn && (
         <Alert
           variant="light"
           color="red"

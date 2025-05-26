@@ -3,6 +3,8 @@ import { useSocketEmit } from "@/hooks/services/socket.hooks";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { useSocket } from "@/lib/context/services/socket";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
+import { startTimer, stopTimer } from "@/lib/store/services/auth/session.slice";
+import { setSession } from "@/lib/store/services/defaults/defaults";
 import { notifier } from "@/lib/utils/notify/notification";
 import { ROLES } from "@/types/enums/enum.types";
 import { USER_EVENTS } from "@/types/enums/event.enums";
@@ -19,21 +21,57 @@ export function withUserService<P extends Object>(
     const [userstate, setUserState] = useState<User_Service_State>({
       online: [],
     });
-    const { user } = useAuth();
-    const state = useSocket();
-    const emit = useSocketEmit(USER_EVENTS.LOGOUT);
+    const { user, sessionId } = useAuth();
+    const state = useSocket("user");
+    const main = useSocket("main");
+    const logOutEvent = useSocketEmit(USER_EVENTS.LOGOUT);
     const dispatch = useAppDispatch();
 
     const HandleOnlineUsers = (data: string[]) => {
       setUserState((prev) => ({ ...prev, online: data }));
     };
 
-    const HandleLogUserOut = (data: { message?: string }) => {
+    const handleSessionAlert = (data: {
+      sessionId: string;
+      secondsLeft: number;
+    }) => {
+      if (data.sessionId === sessionId) {
+        dispatch(startTimer(data));
+        dispatch(setSession(true));
+      }
+    };
+
+    const handleSessionExpired = (data: { sessionId: string }) => {
+      if (data.sessionId === sessionId) {
+        main?.socket?.emit(USER_EVENTS.LOGOUT, {
+          userId: user?.id,
+          sessionId,
+        });
+        dispatch(logOut());
+        dispatch(stopTimer());
+        dispatch(setSession(false));
+      }
+    };
+
+    const HandleLogUserOut = async (data: { message?: string }) => {
+      await logOutEvent({ userId: user?.id, sessionId });
       dispatch(logOut());
-      emit({ userId: user?.id });
+      dispatch(stopTimer());
+      dispatch(setSession(false));
       notifier.info({
         message: data?.message || "You have been logged out.",
         timer: 4000,
+      });
+    };
+
+    const HandleForceLogOut = (data: { reason: string; message: string }) => {
+      dispatch(logOut());
+      dispatch(stopTimer());
+      dispatch(setSession(false));
+      notifier.info({
+        message: data?.message || "You have been logged out.",
+        timer: 4000,
+        title: data?.reason || "Force Logout",
       });
     };
 
@@ -48,14 +86,21 @@ export function withUserService<P extends Object>(
       }
 
       state.socket.on(USER_EVENTS.LOG_USER_OUT, HandleLogUserOut);
+      state.socket.on("session_alert", handleSessionAlert);
+      state.socket.on("session_expired", handleSessionExpired);
+      state.socket.on("force_logout", HandleForceLogOut);
 
       return () => {
         state?.socket?.off(USER_EVENTS.IS_LOGGED_IN);
         state?.socket?.off(USER_EVENTS.GET_ONLINE_USERS);
         state?.socket?.off(USER_EVENTS.ONLINE_USERS, HandleOnlineUsers);
         state?.socket?.off(USER_EVENTS.LOG_USER_OUT, HandleLogUserOut);
+        state?.socket?.off("session_alert", handleSessionAlert);
+        state?.socket?.off("session_expired", handleSessionExpired);
+        state?.socket?.off("force_logout", HandleForceLogOut);
       };
     }, [user, state?.socket]);
+
     return <Component {...props} userstate={userstate} />;
   };
 }

@@ -18,6 +18,7 @@ const initialState: IAuthState = {
   modules: {},
   permissions: [],
   upload: null,
+  sessionId: null,
 };
 
 export const AuthSlice = createSlice({
@@ -32,6 +33,9 @@ export const AuthSlice = createSlice({
     },
     setUser: (state, action: { payload: IAuthUser }) => {
       state.user = action.payload;
+    },
+    setSessionId: (state, action: { payload: string }) => {
+      state.sessionId = action.payload;
     },
     setModules: (state, action: { payload: UserModuleRes }) => {
       state.modules = action.payload;
@@ -78,5 +82,11 @@ export const AuthSlice = createSlice({
 });
 
 export const AuthReducer = AuthSlice.reducer;
-export const { setLoggedIn, setToken, logOut, setUpload, setUser } =
-  AuthSlice.actions;
+export const {
+  setLoggedIn,
+  setToken,
+  logOut,
+  setUpload,
+  setUser,
+  setSessionId,
+} = AuthSlice.actions;

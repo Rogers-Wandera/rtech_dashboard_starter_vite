@@ -18,6 +18,7 @@ import storage from "./storage";
 import { AuthApi } from "./services/auth/auth.api";
 import { AuthReducer } from "./services/auth/auth.slice";
 import NotificationReducer from "./services/notifications/index";
+import SessionTimerReducer from "./services/auth/session.slice";
 import CryptoJS from "crypto-js";
 
 const encryptionKey = import.meta.env.VITE_LOCAL_ENCRYPTION;
@@ -41,7 +42,7 @@ const encryptTransform = createTransform(
       return undefined;
     }
   },
-  { whitelist: ["authuser", "defaultstate", "notification"] }
+  { whitelist: ["authuser", "defaultstate", "notification", "sessiontimer"] }
 );
 
 const persistConfig = {
@@ -54,6 +55,7 @@ const rootReducers = combineReducers({
   authuser: AuthReducer,
   defaultstate: defaultReducer,
   notification: NotificationReducer,
+  sessiontimer: SessionTimerReducer,
 });
 
 export type RootReducer = ReturnType<typeof rootReducers>;

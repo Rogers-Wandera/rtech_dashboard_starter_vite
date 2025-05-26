@@ -1,136 +1,155 @@
 import { helpers } from "@/lib/utils/helpers/helper";
 import { io, ManagerOptions, Socket, SocketOptions } from "socket.io-client";
 
-let socket: Socket | null = null;
-let retryCount = 0;
-const maxRetries = 5;
-const retryInterval = 1000;
-
-type connectionProps = {
-  url: string;
-  options?: Partial<ManagerOptions & SocketOptions>;
+type ConnectionCallbacks = {
   onConnectionLost?: (errorMsg: string) => void;
   onRetry?: (attempt: number) => void;
   onAuthError?: (msg: string) => void;
   onConnect?: (socket: Socket | null) => void;
   onDisconnect?: (reason: Socket.DisconnectReason) => void;
+};
+
+type connectionProps = {
+  url: string;
+  namespace?: string;
+  options?: Partial<ManagerOptions & SocketOptions>;
   retryCount?: number;
+} & ConnectionCallbacks;
+
+const MAX_RETRIES = 5;
+const RETRY_INTERVAL = 1000;
+
+let sockets: Map<string, Socket> = new Map();
+
+/**
+ * Get socket instance by URL and namespace
+ */
+export const getSocket = (
+  url: string,
+  namespace: string = ""
+): Socket | null => {
+  const socketKey = createSocketKey(url, namespace);
+  return sockets.get(socketKey) || null;
+};
+
+const createSocketKey = (url: string, namespace: string): string => {
+  return `${url}/${namespace}`.replace(/\/+/g, "/");
+};
+
+const createSocketUrl = (url: string, namespace: string): string => {
+  return `${url}/${namespace}`.replace(/\/+/g, "/");
 };
 
 /**
- * Connect to the WebSocket server with retry logic
- * @param url - The WebSocket server URL
- * @param options - Optional configuration for the connection
- * @param onConnectionLost - Callback for when the connection is lost
- * @param onRetry - Callback for notifying retries
- * @returns The connected socket instance
+ * Connect to WebSocket server with retry logic
  */
 export const connectSocket = (props: connectionProps) => {
+  const { url, namespace = "", options, retryCount = 0 } = props;
+  const socketKey = createSocketKey(url, namespace);
+  const isDev = helpers.checkEnviroment().isDevelopment;
+  const socketUrl = createSocketUrl(url, namespace);
+  let socket = getSocket(url, namespace);
+
+  console.log(socketUrl);
+
   if (!socket) {
-    socket = io(props.url, {
+    socket = io(socketUrl, {
       reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+      reconnectionAttempts: MAX_RETRIES,
+      reconnectionDelay: RETRY_INTERVAL,
       transports: ["websocket"],
-      ...props?.options,
+      ...options,
     });
-    const isDev = helpers.checkEnviroment().isDevelopment;
-
-    socket.on("connect", () => {
-      if (isDev) {
-        console.log("WebSocket connected:", socket?.id);
-      }
-      props?.onConnect?.(socket);
-      retryCount = 0;
-    });
-
-    socket.on("AuthError", (msg: string) => {
-      props?.onAuthError?.(msg);
-    });
-
-    socket.on("connect_error", (err) => {
-      if (isDev) {
-        console.error("Connection error:", err.message);
-      }
-      retryConnection({
-        ...props,
-        onConnectionLost: () => {
-          props?.onConnectionLost?.(
-            "Connection error: " +
-              err.message +
-              " " +
-              `[Max retry attempts reached. Unable to reconnect to the server, service check ongoing.]`
-          );
-        },
-      });
-    });
-
-    socket.on("reconnect_attempt", () => {
-      console.log("Attempting to reconnect...");
-    });
-    socket.on("reconnect_failed", () => {
-      console.warn("Reconnection failed after multiple attempts.");
-    });
-
-    socket.on("disconnect", (reason) => {
-      if (isDev) {
-        console.warn(`Socket disconnected: ${reason}`);
-      }
-      props?.onDisconnect?.(reason);
-      if (reason !== "io client disconnect") {
-        retryConnection({
-          ...props,
-          onConnectionLost: () => {
-            props?.onConnectionLost?.("Connection lost: " + reason);
-          },
-        });
-      }
-    });
+    setupSocketListeners(socket, props, isDev, retryCount);
+    sockets.set(socketKey, socket);
+    sockets.set(props.url, socket);
   }
   return socket;
-};
-
-/**
- * Retry connection to the WebSocket server
- * @param url - The WebSocket server URL
- * @param options - Optional configuration for the connection
- * @param onConnectionLost - Callback for when the connection is lost
- * @param onRetry - Callback for notifying retries
- */
-const retryConnection = (props: connectionProps) => {
-  retryCount = props?.retryCount ? props.retryCount : retryCount;
-  if (retryCount < maxRetries) {
-    retryCount++;
-    props?.onRetry?.(retryCount);
-
-    setTimeout(() => {
-      connectSocket(props);
-    }, retryInterval);
-  } else {
-    props?.onConnectionLost?.(
-      "Max retry attempts reached. Unable to reconnect."
-    );
-  }
 };
 
 /**
  * Disconnect the socket
  */
 
-export const disconnectSocket = (): void => {
+export const disconnectSocket = (url: string, namespace: string = ""): void => {
+  const socket = getSocket(url, namespace);
+  const key = `${url}/${namespace}`;
   if (socket) {
     if (helpers.checkEnviroment().isDevelopment) {
       console.log("Disconnecting socket:", socket.id);
     }
     socket.removeAllListeners();
     socket.disconnect();
-    socket = null;
+    sockets.delete(key);
   }
 };
 
-export const getSocket = (): Socket | null => {
-  if (!socket) {
-    console.warn("Socket not connected!");
+const handleConnectionError = (
+  callbacks: ConnectionCallbacks,
+  error: string,
+  retryCount: number
+): void => {
+  const { onConnectionLost, onRetry } = callbacks;
+  const attempts = retryCount || 0;
+
+  if (attempts < MAX_RETRIES) {
+    onRetry?.(attempts + 1);
+  } else {
+    const errorMsg = `Max retry attempts reached. Unable to reconnect to the server. ${error}`;
+    onConnectionLost?.(errorMsg);
   }
-  return socket;
+};
+
+const setupSocketListeners = (
+  socket: Socket,
+  callbacks: ConnectionCallbacks,
+  isDev: boolean,
+  retryCount: number
+): void => {
+  const { onConnect, onAuthError, onConnectionLost, onDisconnect, onRetry } =
+    callbacks;
+
+  socket.on("connect", () => {
+    if (isDev) {
+      console.log("WebSocket connected:", socket.id);
+    }
+    onConnect?.(socket);
+    retryCount = 0;
+  });
+
+  socket.on("AuthError", (msg: string) => {
+    onAuthError?.(msg);
+  });
+
+  socket.on("connect_error", (err) => {
+    if (isDev) {
+      console.error("Connection error:", err.message);
+    }
+    handleConnectionError(callbacks, err.message, retryCount);
+  });
+
+  socket.on("reconnect_attempt", () => {
+    if (isDev) {
+      console.log("Attempting to reconnect...");
+    }
+    onRetry?.(retryCount || 0);
+  });
+
+  socket.on("reconnect_failed", () => {
+    if (isDev) {
+      console.warn("Reconnection failed after multiple attempts.");
+    }
+    onConnectionLost?.("Reconnection failed after multiple attempts.");
+  });
+
+  socket.on("disconnect", (reason) => {
+    if (isDev) {
+      console.warn(`Socket disconnected: ${reason}`);
+    }
+    onDisconnect?.(reason);
+
+    if (reason !== "io client disconnect") {
+      handleConnectionError(callbacks, reason, retryCount);
+    }
+  });
 };

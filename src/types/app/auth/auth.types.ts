@@ -26,6 +26,7 @@ export type AuthContextState = {
   token: string | null;
   user: IAuthUser | null;
   modules: UserModuleRes;
+  sessionId: string | null;
 };
 
 export interface TypeToken {

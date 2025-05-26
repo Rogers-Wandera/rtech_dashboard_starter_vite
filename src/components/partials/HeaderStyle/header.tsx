@@ -30,12 +30,14 @@ import { IconBellFilled, IconMessageFilled } from "@tabler/icons-react";
 import RingingBellWithBadge from "@/components/shared/ringingbell";
 import { useNotification } from "@/lib/context/notifications/notification";
 import { ServerModuleRes } from "@/types/server/server.main.types";
+import { stopTimer } from "@/lib/store/services/auth/session.slice";
+import { setSession } from "@/lib/store/services/defaults/defaults";
 
 const Header = memo(() => {
   const combobox = useCombobox();
   const { counts } = useNotification();
-  const { user, modules } = useAuth();
-  const emit = useSocketEmit(USER_EVENTS.LOGOUT);
+  const { user, modules, sessionId } = useAuth();
+  const emit = useSocketEmit(USER_EVENTS.LOGOUT, { namespace: "user" });
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [links, setLinks] = useState<ServerModuleRes[]>([]);
   const modulelinks = Object.values(modules)?.flat() || [];
@@ -66,9 +68,11 @@ const Header = memo(() => {
     </Combobox.Option>
   ));
 
-  const HandleLogOut = () => {
+  const HandleLogOut = async () => {
+    await emit({ userId: user?.id, sessionId });
     dispatch(logOut());
-    emit({ userId: user?.id });
+    dispatch(stopTimer());
+    dispatch(setSession(false));
     notifier.success({ message: "Logout Successful" });
   };
   const image = (user?.image && helpers.decrypt(user.image)) || avatars1;

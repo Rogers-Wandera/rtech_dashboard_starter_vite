@@ -22,38 +22,34 @@ import NotificationContextProvider from "../context/notifications/notification";
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
   const Mantine_Theme = MantineTheme();
-  const socketUrl = import.meta.env.VITE_SERVER_URL;
-  const socketToken = import.meta.env.VITE_SOCKET_TOKEN;
   return (
     <>
-      <SocketProvider
-        url={socketUrl}
-        options={{ auth: { token: socketToken } }}
-      >
-        <ThemeProvider theme={MaterialTheme}>
-          <MantineProvider theme={Mantine_Theme}>
-            <Suspense
-              fallback={
-                <div className="centered-loader">
-                  <Loader type="bars" color="blue" />
-                </div>
-              }
-            >
-              <PersistGate
-                persistor={persistor}
-                loading={
+      <AuthProvider>
+        <SocketProvider>
+          <ThemeProvider theme={MaterialTheme}>
+            <MantineProvider theme={Mantine_Theme}>
+              <Suspense
+                fallback={
                   <div className="centered-loader">
                     <Loader type="bars" color="blue" />
                   </div>
                 }
               >
-                <Notifications
-                  position="top-right"
-                  zIndex={1000}
-                  limit={5}
-                  autoClose={4000}
-                />
-                <AuthProvider>
+                <PersistGate
+                  persistor={persistor}
+                  loading={
+                    <div className="centered-loader">
+                      <Loader type="bars" color="blue" />
+                    </div>
+                  }
+                >
+                  <Notifications
+                    position="top-right"
+                    zIndex={1000}
+                    limit={5}
+                    autoClose={4000}
+                  />
+
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <ModalsProvider>
                       <PaginateProvider>
@@ -71,12 +67,12 @@ const Providers = () => {
                       </PaginateProvider>
                     </ModalsProvider>
                   </LocalizationProvider>
-                </AuthProvider>
-              </PersistGate>
-            </Suspense>
-          </MantineProvider>
-        </ThemeProvider>
-      </SocketProvider>
+                </PersistGate>
+              </Suspense>
+            </MantineProvider>
+          </ThemeProvider>
+        </SocketProvider>
+      </AuthProvider>
     </>
   );
 };

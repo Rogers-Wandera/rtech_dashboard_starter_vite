@@ -9,7 +9,7 @@ import { Button } from "react-bootstrap";
 import SubHeader from "@/components/partials/HeaderStyle/sub-header";
 import Sidebar from "@/components/partials/SidebarStyle/sidebar";
 import { RootState } from "@/lib/store/store";
-import { Alert, Box, LoadingOverlay } from "@mantine/core";
+import { Box, LoadingOverlay } from "@mantine/core";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import WithAuth from "@/hocs/auth/auth.hoc";
 import WithRouteRole from "@/hocs/auth/routerole.hoc";
@@ -17,10 +17,11 @@ import WithSession from "@/hocs/auth/session.hoc";
 import WithUserModules from "@/hocs/auth/withmodules.hoc";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setNextRoute } from "@/lib/store/services/defaults/defaults";
-import { useSocket } from "@/lib/context/services/socket";
-import { IconInfoCircle } from "@tabler/icons-react";
+// import { useSocket } from "@/lib/context/services/socket";
+// import { IconInfoCircle } from "@tabler/icons-react";
 import { withUserService } from "@/hocs/services/auth/userservice.hoc";
 import UploadProgressShow from "@/components/settings/uploadprogress";
+import { SessionTimer } from "@/components/shared/session/session";
 
 type props = { userstate?: { online: string[] } };
 
@@ -31,7 +32,7 @@ function DashboardLayout({ userstate }: props) {
   const upload = useSelector(
     (state: RootState) => state.appState.authuser.upload
   );
-  const state = useSocket();
+  // const state = useSocket();
   const location = useLocation();
   const navigate = useNavigate();
   const showSubHeader = useSelector(
@@ -64,15 +65,16 @@ function DashboardLayout({ userstate }: props) {
       <Sidebar app_name={appName} />
       <main className="main-content">
         <div className="position-relative">
-          {state?.error && (
+          {/* {state?.error && (
             <Alert
               variant="light"
               color="red"
               title={`Server connection error: ${state?.error}`}
               icon={<IconInfoCircle />}
             />
-          )}
-          {!state?.error && <Header />}
+          )} */}
+          {/* {!state?.error && <Header />} */}
+          <Header />
           <SubHeader />
         </div>
         <div
@@ -81,6 +83,7 @@ function DashboardLayout({ userstate }: props) {
           }`}
         >
           <Outlet context={{ online: userstate?.online || [] }} />
+          <SessionTimer />
         </div>
         <div className="btn-download">
           <Button variant="success py-1 px-1 d-flex gap-0">

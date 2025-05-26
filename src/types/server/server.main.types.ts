@@ -89,6 +89,7 @@ export interface IAuthState {
   user: IAuthUser | null;
   modules: UserModuleRes;
   permissions: User_Permission[];
+  sessionId: string | null;
   upload: {
     progress?: UploadProgressType[];
     error?: UploadErrorType;
