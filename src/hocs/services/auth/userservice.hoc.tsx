@@ -77,8 +77,6 @@ export function withUserService<P extends Object>(
 
     useEffect(() => {
       if (!user || !state?.socket) return;
-      state.socket.emit(USER_EVENTS.IS_LOGGED_IN, { userId: user?.id });
-
       //admin user events
       if (user.roles.includes(ROLES.ADMIN)) {
         state.socket.emit(USER_EVENTS.GET_ONLINE_USERS, { userId: user?.id });
@@ -91,9 +89,12 @@ export function withUserService<P extends Object>(
       state.socket.on("force_logout", HandleForceLogOut);
 
       return () => {
-        state?.socket?.off(USER_EVENTS.IS_LOGGED_IN);
-        state?.socket?.off(USER_EVENTS.GET_ONLINE_USERS);
-        state?.socket?.off(USER_EVENTS.ONLINE_USERS, HandleOnlineUsers);
+        if (user?.roles?.includes(ROLES.ADMIN)) {
+          state?.socket?.emit(USER_EVENTS.GET_ONLINE_USERS, {
+            userId: user?.id,
+          });
+          state?.socket?.off(USER_EVENTS.ONLINE_USERS, HandleOnlineUsers);
+        }
         state?.socket?.off(USER_EVENTS.LOG_USER_OUT, HandleLogUserOut);
         state?.socket?.off("session_alert", handleSessionAlert);
         state?.socket?.off("session_expired", handleSessionExpired);

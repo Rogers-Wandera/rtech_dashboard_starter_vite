@@ -1,38 +1,30 @@
 import { useAuth } from "@/hooks/auth/auth.hooks";
-import { useSocketConnection } from "@/hooks/services/useSocketConnection";
+import {
+  SocketConnection,
+  useSocketConnection,
+} from "@/hooks/services/useSocketConnection";
 import React, {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import { Socket } from "socket.io-client";
 
 export interface SocketProps {
   children: ReactNode;
 }
 
-interface SocketState {
-  socket: Socket | null;
-  error: string | null;
-  isConnected: boolean;
-  isReconnecting: boolean;
-  retryCount: number;
-  connect: () => void;
-  disconnect: () => void;
-  reconnect: () => void;
-}
-
 type SocketContextType = {
-  getSocket: (namespace: string) => SocketState | null;
+  getSocket: (namespace: string) => SocketConnection | null;
   createConnection: (namespace: string, options?: any) => void;
   removeConnection: (namespace: string) => void;
-  connections: Record<string, SocketState>;
+  connections: Record<string, SocketConnection>;
 };
 
-const SocketContext = createContext<SocketContextType>({
+export const SocketContext = createContext<SocketContextType>({
   getSocket: () => null,
   createConnection: () => {},
   removeConnection: () => {},
@@ -41,10 +33,10 @@ const SocketContext = createContext<SocketContextType>({
 
 export const SocketProvider: React.FC<SocketProps> = ({ children }) => {
   const socketToken = import.meta.env.VITE_SOCKET_TOKEN as string;
-  const { user, isLoggedIn, token } = useAuth();
-  const [connections, setConnections] = useState<Record<string, SocketState>>(
-    {}
-  );
+  const { user, isLoggedIn, token, sessionId } = useAuth();
+  const [connections, setConnections] = useState<
+    Record<string, SocketConnection>
+  >({});
 
   const userAuth = useMemo(
     () => ({
@@ -62,33 +54,50 @@ export const SocketProvider: React.FC<SocketProps> = ({ children }) => {
     [socketToken]
   );
 
-  const userSocket = useSocketConnection({
-    enabled: isLoggedIn,
-    namespace: "user",
-    options: { auth: userAuth, reconnectionAttempts: Infinity },
-  });
-
   const mainSocket = useSocketConnection({
     enabled: true,
     namespace: "",
     options: { auth: mainAuth, reconnectionAttempts: Infinity },
+    callbacks: {
+      onConnect: (socket) => {
+        if (socket.connected) {
+          console.log("Main socket connected");
+          socket.on("call_connection", () => {
+            if (user) {
+              if (!userSocket?.socket?.connected) {
+                userSocket.connect();
+              }
+            }
+          });
+        }
+      },
+    },
   });
 
-  const createConnection = (namespace: string, options: any = {}) => {
-    if (connections[namespace]) return;
-
-    const newSocket = useSocketConnection({
-      enabled: true,
-      namespace,
-      options: {
-        auth: userAuth,
-        ...options,
+  const userSocket = useSocketConnection({
+    enabled: isLoggedIn,
+    namespace: "user",
+    options: { auth: userAuth, reconnectionAttempts: Infinity },
+    callbacks: {
+      afterConnect: (socket) => {
+        if (socket.connected) {
+          console.log("User socket connected");
+          mainSocket?.socket?.emit("socket_session", {
+            sessionId,
+          });
+        }
       },
-    });
+    },
+  });
 
+  const createConnection = (
+    namespace: string,
+    connection: SocketConnection
+  ) => {
+    if (connections[namespace]) return;
     setConnections((prev) => ({
       ...prev,
-      [namespace]: newSocket,
+      [namespace]: connection,
     }));
   };
 
@@ -103,9 +112,17 @@ export const SocketProvider: React.FC<SocketProps> = ({ children }) => {
     });
   };
 
-  const getSocket = (namespace: string) => {
-    return connections[namespace] || null;
-  };
+  const getSocket = useCallback(
+    (namespace: string): SocketConnection | null => {
+      if (namespace === "main") {
+        return mainSocket;
+      } else if (namespace === "user") {
+        return userSocket;
+      }
+      return connections[namespace] || null;
+    },
+    [connections, mainSocket, userSocket]
+  );
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -143,7 +160,7 @@ export const SocketProvider: React.FC<SocketProps> = ({ children }) => {
   );
 };
 
-export const useSocket = (namespace = "main"): SocketState | null => {
+export const useSocket = (namespace = "main"): SocketConnection | null => {
   const context = useContext(SocketContext);
   if (context === undefined) {
     throw new Error("useSocket must be used within a SocketProvider");
@@ -160,5 +177,7 @@ export const useSocketManager = () => {
     createConnection: context.createConnection,
     removeConnection: context.removeConnection,
     connections: context.connections,
+    getSocket: context.getSocket,
+    getMainSocket: () => context.getSocket("main"),
   };
 };

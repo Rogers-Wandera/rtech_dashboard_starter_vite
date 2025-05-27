@@ -8,23 +8,26 @@ import { ILoginValues } from "@/types/app/auth/auth.types";
 import { Navigate, useLocation, useNavigate } from "react-router";
 import { ServerErrorResponse } from "@/types/server/server.main.types";
 import { useAuth } from "@/hooks/auth/auth.hooks";
-import { useEffect, useState } from "react";
 import { HelperClass } from "@/lib/utils/helpers/helper";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import {
   setNextRoute,
   setRememberMe,
+  setSession,
 } from "@/lib/store/services/defaults/defaults";
-import { useSocket } from "@/lib/context/services/socket";
+import { useSocket, useSocketManager } from "@/lib/context/services/socket";
 import { Alert } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { useSocketEmit } from "@/hooks/services/socket.hooks";
 import { USER_EVENTS } from "@/types/enums/event.enums";
-import { setSessionId } from "@/lib/store/services/auth/auth.slice";
+import { logOut, setSessionId } from "@/lib/store/services/auth/auth.slice";
+import { stopTimer } from "@/lib/store/services/auth/session.slice";
+import { useEffect, useState } from "react";
 
 const AuthLogin = () => {
   const helper = new HelperClass();
   const dispatch = useAppDispatch();
+  const socketstate = useSocketManager();
   const emit = useSocketEmit(USER_EVENTS.LOGIN, {
     namespace: "main",
     acknowledge: true,
@@ -61,6 +64,13 @@ const AuthLogin = () => {
   );
   const handleSubmit = async (values: ILoginValues) => {
     try {
+      const mainSocket = socketstate.getSocket("main");
+      if (!mainSocket) {
+        dispatch(logOut());
+        dispatch(stopTimer());
+        dispatch(setSession(false));
+        throw new Error("Please reload the page");
+      }
       const response = await Login(values);
       if (response.error) {
         throw response.error;

@@ -57,7 +57,7 @@ export const useSocketEmit = <T = unknown>(
 
   const emit = useCallback(
     (data: T) => {
-      if (!state?.socket?.connected || !state.socket) {
+      if (!state?.socket) {
         console.error(`Socket not connected. Cannot emit ${eventName}`);
         return acknowledge
           ? Promise.reject(new Error("Socket not connected"))

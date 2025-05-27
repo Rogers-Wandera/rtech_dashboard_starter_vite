@@ -7,6 +7,12 @@ export interface SocketProps {
   error?: string | null;
   enabled?: boolean;
   dependencies?: any[];
+  callbacks?: {
+    onConnect?: (socket: Socket) => void;
+    onDisconnect?: (reason: string) => void;
+    onError?: (error: string) => void;
+    afterConnect?: (socket: Socket) => void;
+  };
 }
 
 interface SocketState {
@@ -15,7 +21,6 @@ interface SocketState {
   isConnected: boolean;
   isReconnecting: boolean;
   retryCount: number;
-  reconnect: boolean;
 }
 
 const initialState: SocketState = {
@@ -24,16 +29,26 @@ const initialState: SocketState = {
   isConnected: false,
   isReconnecting: false,
   retryCount: 0,
-  reconnect: false,
 };
 
-export const useSocketConnection = (props: SocketProps) => {
+export type SocketConnection = SocketState & {
+  connect: () => (() => void) | undefined;
+  disconnect: () => void;
+  reconnect: () => void;
+};
+
+export const useSocketConnection = (props: SocketProps): SocketConnection => {
   const {
     namespace: initialNamespace = "",
     options,
     enabled = true,
     dependencies = [],
+    callbacks = {},
   } = props;
+  const onConnect = callbacks?.onConnect || (() => {});
+  const onDisconnect = callbacks?.onDisconnect || (() => {});
+  const onError = callbacks?.onError || (() => {});
+  const afterConnect = callbacks?.afterConnect || (() => {});
 
   const namespace = initialNamespace.replace("/", "");
   const socketUrl = `${import.meta.env.VITE_SERVER_URL}`;
@@ -54,6 +69,7 @@ export const useSocketConnection = (props: SocketProps) => {
         isReconnecting: false,
         error: "Disconnected by client",
       }));
+      onDisconnect("Disconnected by client");
     }
   }, []);
 
@@ -82,6 +98,7 @@ export const useSocketConnection = (props: SocketProps) => {
         retryCount: 0,
         error: null,
       }));
+      onConnect(socket);
     });
     socket.on("connect_error", (err) => {
       setState((prev) => ({
@@ -89,6 +106,7 @@ export const useSocketConnection = (props: SocketProps) => {
         error: err.message,
         isConnected: false,
       }));
+      onError(err.message);
     });
 
     socket.on("custom-ping", (data) => {
@@ -104,6 +122,7 @@ export const useSocketConnection = (props: SocketProps) => {
         error:
           reason === "io server disconnect" ? "Disconnected by server" : null,
       }));
+      onDisconnect(reason);
     });
 
     socket.on("reconnect_attempt", (attempt) => {
@@ -157,6 +176,12 @@ export const useSocketConnection = (props: SocketProps) => {
       connect();
     }
   }, [manualReconnectAttempt, connect]);
+
+  useEffect(() => {
+    if (state.isConnected && socketRef.current) {
+      afterConnect(socketRef.current);
+    }
+  }, [state.isConnected, socketRef]);
 
   return {
     ...state,
