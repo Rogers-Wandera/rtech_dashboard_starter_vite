@@ -5,10 +5,12 @@ import { useSocket } from "@/lib/context/services/socket";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { startTimer, stopTimer } from "@/lib/store/services/auth/session.slice";
 import { setSession } from "@/lib/store/services/defaults/defaults";
+import { helpers } from "@/lib/utils/helpers/helper";
 import { notifier } from "@/lib/utils/notify/notification";
 import { ROLES } from "@/types/enums/enum.types";
 import { USER_EVENTS } from "@/types/enums/event.enums";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 
 export type User_Service_State = {
   online: string[];
@@ -21,7 +23,8 @@ export function withUserService<P extends Object>(
     const [userstate, setUserState] = useState<User_Service_State>({
       online: [],
     });
-    const { user, sessionId } = useAuth();
+    const location = useLocation();
+    const { user, sessionId, token } = useAuth();
     const state = useSocket("user");
     const main = useSocket("main");
     const logOutEvent = useSocketEmit(USER_EVENTS.LOGOUT);
@@ -101,6 +104,23 @@ export function withUserService<P extends Object>(
         state?.socket?.off("force_logout", HandleForceLogOut);
       };
     }, [user, state?.socket]);
+
+    useEffect(() => {
+      if (token && main?.socket && user?.id && sessionId) {
+        if (helpers.isTokenExpired(token)) {
+          main?.socket?.emit(USER_EVENTS.LOGOUT, {
+            userId: user?.id,
+            sessionId,
+          });
+          dispatch(logOut());
+          dispatch(stopTimer());
+          dispatch(setSession(false));
+          notifier.info({
+            message: "Your token has expired, please login again.",
+          });
+        }
+      }
+    }, [location.pathname, main?.socket, user?.id, sessionId]);
 
     return <Component {...props} userstate={userstate} />;
   };

@@ -26,12 +26,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import ConfirmModalReason from "@/components/shared/dialogs/confirmreason";
 import { MRT_Row } from "material-react-table";
 import { notifier } from "@/lib/utils/notify/notification";
-import { useSocketEvent } from "@/hooks/services/socket.hooks";
+import { useSocketEmit, useSocketEvent } from "@/hooks/services/socket.hooks";
 import { USER_EVENTS } from "@/types/enums/event.enums";
+import { useSocket } from "@/lib/context/services/socket";
 
 const ManageUsers = () => {
   const { user } = useAuth();
   const state = useOutletContext<OutLetContextType>();
+  const userSocket = useSocket("user");
+  const getOnlineUsers = useSocketEmit(USER_EVENTS.GET_ONLINE_USERS, {
+    namespace: "user",
+  });
 
   let msg = "";
   if (user) {
@@ -81,7 +86,11 @@ const ManageUsers = () => {
     [state.online]
   );
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (userSocket?.socket) {
+      getOnlineUsers({ userId: user?.id });
+    }
+  }, [userSocket?.socket]);
 
   return (
     <div>
