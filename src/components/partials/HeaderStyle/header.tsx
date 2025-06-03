@@ -32,6 +32,7 @@ import { useNotification } from "@/lib/context/notifications/notification";
 import { ServerModuleRes } from "@/types/server/server.main.types";
 import { stopTimer } from "@/lib/store/services/auth/session.slice";
 import { setSession } from "@/lib/store/services/defaults/defaults";
+import NotificationDropdown from "@/app/views/notifications_new/notifcations";
 
 const Header = memo(() => {
   const combobox = useCombobox();
@@ -315,7 +316,7 @@ const Header = memo(() => {
                 </Dropdown.Menu>
               </Dropdown>
               <Dropdown as="li" className="nav-item">
-                <Dropdown.Toggle
+                {/* <Dropdown.Toggle
                   as={CustomToggle}
                   href="#"
                   variant=" nav-link"
@@ -329,13 +330,14 @@ const Header = memo(() => {
                   )}
 
                   <span className="bg-danger dots"></span>
-                </Dropdown.Toggle>
+                </Dropdown.Toggle> */}
+                <NotificationDropdown />
                 <Dropdown.Menu
                   className="p-0 sub-drop dropdown-menu-end"
                   aria-labelledby="notification-drop"
                 >
                   <div className="m-0 shadow-none card">
-                    <NotificationsPage />
+                    {/* <NotificationsPage /> */}
                   </div>
                 </Dropdown.Menu>
               </Dropdown>

@@ -11,7 +11,7 @@ import { useSocket } from "@/lib/context/services/socket";
 import { useAuth } from "@/hooks/auth/auth.hooks";
 
 type props = {
-  action?: JSX.Element;
+  action?: React.JSX.Element;
   avatar: string;
   disableOpen?: boolean;
   data: SystemNotification;

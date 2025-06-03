@@ -12,6 +12,8 @@ import { useMRTTableContext } from "@/lib/context/table/mrttable.context";
 import _ from "lodash";
 import { useAppContext } from "@/lib/context/app/app.context";
 import Meta from "@/components/shared/meta";
+import NotificationSystem from "@/components/not/notifications";
+import NotificationPage from "@/app/views/notifications_new";
 
 function validateData(data: ModuleType) {
   return {
@@ -30,7 +32,7 @@ const Modules = () => {
   });
   return (
     <div>
-      <Meta title="Modules" header="Manage Modules" />
+      {/* <Meta title="Modules" header="Manage Modules" />
       <MRT_ServerTable
         title="Module"
         tablecolumns={ModuleColumns}
@@ -57,7 +59,8 @@ const Modules = () => {
         }}
         validateData={validateData}
         menuitems={menuitems}
-      />
+      /> */}
+      <NotificationPage />
     </div>
   );
 };

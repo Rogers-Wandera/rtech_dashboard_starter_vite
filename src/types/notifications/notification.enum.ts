@@ -23,3 +23,5 @@ export enum NOTIFICATION_STATUS {
   READ = "read",
   FAILED = "failed",
 }
+
+export type NotificationType = "unread" | "read" | "sent" | "urgent" | "system";

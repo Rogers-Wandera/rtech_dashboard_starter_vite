@@ -10,16 +10,16 @@ import {
   REGISTER,
   createTransform,
 } from "redux-persist";
-import { thunk } from "redux-thunk";
 import SettingReducer from "./settings/dasboardsettings/reducers";
 import { defaultReducer } from "./services/defaults/defaults";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import storage from "./storage";
 import { AuthApi } from "./services/auth/auth.api";
+import { notificationApi } from "./services/notifications/notification.api";
 import { AuthReducer } from "./services/auth/auth.slice";
-import NotificationReducer from "./services/notifications/index";
 import SessionTimerReducer from "./services/auth/session.slice";
 import CryptoJS from "crypto-js";
+import { notificationReducer } from "./services/notifications/notification.slice";
 
 const encryptionKey = import.meta.env.VITE_LOCAL_ENCRYPTION;
 
@@ -54,7 +54,7 @@ const persistConfig = {
 const rootReducers = combineReducers({
   authuser: AuthReducer,
   defaultstate: defaultReducer,
-  notification: NotificationReducer,
+  notification: notificationReducer,
   sessiontimer: SessionTimerReducer,
 });
 
@@ -70,15 +70,16 @@ export const store = configureStore({
     setting: SettingReducer,
     appState: persistedReducer,
     [AuthApi.reducerPath]: AuthApi.reducer,
+    [notificationApi.reducerPath]: notificationApi.reducer,
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({
-      serializableCheck: false,
-      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      immutableCheck: false,
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
     })
-      .concat(thunk)
-      .concat(AuthApi.middleware);
+      .concat(AuthApi.middleware)
+      .concat(notificationApi.middleware);
   },
 });
 

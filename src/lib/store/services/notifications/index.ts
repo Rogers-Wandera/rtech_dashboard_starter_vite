@@ -13,7 +13,7 @@ const initialState: NotificationTypes = {
 };
 
 const notificationSlice = createSlice({
-  name: "notification",
+  name: "upload_notification",
   initialState: initialState,
   reducers: {
     setUploadNotifications: (

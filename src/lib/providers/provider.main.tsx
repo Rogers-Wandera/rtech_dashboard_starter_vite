@@ -18,6 +18,7 @@ import PermissionProvider from "../context/auth/permission.context";
 import { SocketProvider } from "../context/services/socket";
 import UploadProvider from "../context/auth/upload.context";
 import NotificationContextProvider from "../context/notifications/notification";
+import { emotionTransform, MantineEmotionProvider } from "@mantine/emotion";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
@@ -27,48 +28,53 @@ const Providers = () => {
       <AuthProvider>
         <SocketProvider>
           <ThemeProvider theme={MaterialTheme}>
-            <MantineProvider theme={Mantine_Theme}>
-              <Suspense
-                fallback={
-                  <div className="centered-loader">
-                    <Loader type="bars" color="blue" />
-                  </div>
-                }
-              >
-                <PersistGate
-                  persistor={persistor}
-                  loading={
+            <MantineProvider
+              theme={Mantine_Theme}
+              stylesTransform={emotionTransform}
+            >
+              <MantineEmotionProvider>
+                <Suspense
+                  fallback={
                     <div className="centered-loader">
                       <Loader type="bars" color="blue" />
                     </div>
                   }
                 >
-                  <Notifications
-                    position="top-right"
-                    zIndex={1000}
-                    limit={5}
-                    autoClose={4000}
-                  />
+                  <PersistGate
+                    persistor={persistor}
+                    loading={
+                      <div className="centered-loader">
+                        <Loader type="bars" color="blue" />
+                      </div>
+                    }
+                  >
+                    <Notifications
+                      position="top-right"
+                      zIndex={1000}
+                      limit={5}
+                      autoClose={4000}
+                    />
 
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <ModalsProvider>
-                      <PaginateProvider>
-                        <MRT_TableContextProvider>
-                          <AppContextProvider>
-                            <PermissionProvider>
-                              <UploadProvider>
-                                <NotificationContextProvider>
-                                  <Outlet />
-                                </NotificationContextProvider>
-                              </UploadProvider>
-                            </PermissionProvider>
-                          </AppContextProvider>
-                        </MRT_TableContextProvider>
-                      </PaginateProvider>
-                    </ModalsProvider>
-                  </LocalizationProvider>
-                </PersistGate>
-              </Suspense>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <ModalsProvider>
+                        <PaginateProvider>
+                          <MRT_TableContextProvider>
+                            <AppContextProvider>
+                              <PermissionProvider>
+                                <UploadProvider>
+                                  <NotificationContextProvider>
+                                    <Outlet />
+                                  </NotificationContextProvider>
+                                </UploadProvider>
+                              </PermissionProvider>
+                            </AppContextProvider>
+                          </MRT_TableContextProvider>
+                        </PaginateProvider>
+                      </ModalsProvider>
+                    </LocalizationProvider>
+                  </PersistGate>
+                </Suspense>
+              </MantineEmotionProvider>
             </MantineProvider>
           </ThemeProvider>
         </SocketProvider>

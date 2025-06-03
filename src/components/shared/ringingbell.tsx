@@ -4,7 +4,7 @@ import { Badge } from "@mui/material";
 
 const RingingBellWithBadge = ({ count = 1 }) => {
   return (
-    <div className="relative w-fit">
+    <div className="relative w-fit" style={{ cursor: "pointer" }}>
       <motion.div
         animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
         transition={{ repeat: Infinity, duration: 0.5, ease: "easeInOut" }}

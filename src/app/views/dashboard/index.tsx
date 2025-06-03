@@ -17,11 +17,10 @@ import WithSession from "@/hocs/auth/session.hoc";
 import WithUserModules from "@/hocs/auth/withmodules.hoc";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setNextRoute } from "@/lib/store/services/defaults/defaults";
-// import { useSocket } from "@/lib/context/services/socket";
-// import { IconInfoCircle } from "@tabler/icons-react";
 import { withUserService } from "@/hocs/services/auth/userservice.hoc";
 import UploadProgressShow from "@/components/settings/uploadprogress";
 import { SessionTimer } from "@/components/shared/session/session";
+import withNotifications from "@/hocs/auth/withNotifications";
 
 type props = { userstate?: { online: string[] } };
 
@@ -110,4 +109,5 @@ const DashBoardWithSession = WithAuth(
 );
 const DashboardWithModules = WithUserModules(DashBoardWithSession);
 const DashboardWithRoles = WithRouteRole(DashboardWithModules);
-export default DashboardWithRoles;
+const DashboardWithNotification = withNotifications(DashboardWithRoles);
+export default DashboardWithNotification;

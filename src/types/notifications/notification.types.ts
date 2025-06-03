@@ -1,5 +1,6 @@
 import {
   NOTIFICATION_STATUS,
+  NotificationType,
   NotificationTypes,
   PRIORITY_TYPES,
 } from "./notification.enum";
@@ -41,3 +42,34 @@ export type user_system_notifications = {
   all: SystemNotification[];
   urgent: SystemNotification[];
 };
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  timestamp: Date;
+  sender?: {
+    name: string;
+    avatar?: string;
+  };
+  imageUrl?: string;
+  videoUrl?: string;
+  body?: string;
+  actions?: {
+    label: string;
+    onClick: () => void;
+    variant?: "primary" | "secondary" | "danger";
+  }[];
+}
+
+export enum NotificationStatus {
+  QUEUED = "queued",
+  SENT = "sent",
+  DELIVERED = "delivered",
+  FAILED = "failed",
+  PARTIAL = "partial",
+  PROCESSING = "processing",
+  SCHEDULED = "scheduled",
+  CANCELLED = "cancelled",
+}
