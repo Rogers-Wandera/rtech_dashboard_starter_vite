@@ -32,7 +32,7 @@ const Modules = () => {
   });
   return (
     <div>
-      {/* <Meta title="Modules" header="Manage Modules" />
+      <Meta title="Modules" header="Manage Modules" />
       <MRT_ServerTable
         title="Module"
         tablecolumns={ModuleColumns}
@@ -59,7 +59,7 @@ const Modules = () => {
         }}
         validateData={validateData}
         menuitems={menuitems}
-      /> */}
+      />
       <NotificationPage />
     </div>
   );

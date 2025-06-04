@@ -1,5 +1,9 @@
 import * as Icons from "@tabler/icons-react";
 import { METHODS, ROLES } from "../enums/enum.types";
+import {
+  NotificationEntity,
+  NotificationRecipient,
+} from "./notifications/entity.types";
 
 export type ServerRolesType = {
   roleName: string;
@@ -160,3 +164,16 @@ export interface User_Permission {
   days_left: number | null;
   roleName: string;
 }
+
+export type Notifications = {
+  sent: PaginateResponse<NotificationEntity>;
+  failed: PaginateResponse<NotificationEntity>;
+  read: PaginateResponse<NotificationRecipient>;
+  unread: PaginateResponse<NotificationRecipient>;
+  system: PaginateResponse<NotificationRecipient>;
+  schedule: PaginateResponse<NotificationEntity>;
+  all: PaginateResponse<NotificationEntity>;
+  urgent: PaginateResponse<NotificationRecipient>;
+  expired: PaginateResponse<NotificationEntity>;
+  annoucements: PaginateResponse<NotificationRecipient>;
+};

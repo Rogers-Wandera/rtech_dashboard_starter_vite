@@ -23,9 +23,7 @@ export const router = createBrowserRouter(
       ],
     },
   ],
-  {
-    future: {
-      v7_startTransition: true,
-    },
-  }
+  // {
+  //   future: { v7_startTransition: true },
+  // }
 );
