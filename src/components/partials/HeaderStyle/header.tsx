@@ -23,20 +23,18 @@ import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { notifier } from "@/lib/utils/notify/notification";
 import { useAuth } from "@/hooks/auth/auth.hooks";
 import { helpers } from "@/lib/utils/helpers/helper";
-import NotificationsPage from "@/app/views/notifications/notifications";
 import { useSocketEmit } from "@/hooks/services/socket.hooks";
 import { USER_EVENTS } from "@/types/enums/event.enums";
-import { IconBellFilled, IconMessageFilled } from "@tabler/icons-react";
-import RingingBellWithBadge from "@/components/shared/ringingbell";
+import { IconMessageFilled } from "@tabler/icons-react";
 import { useNotification } from "@/lib/context/notifications/notification";
 import { ServerModuleRes } from "@/types/server/server.main.types";
 import { stopTimer } from "@/lib/store/services/auth/session.slice";
 import { setSession } from "@/lib/store/services/defaults/defaults";
-import NotificationDropdown from "@/app/views/notifications_new/notifcations";
+import NotificationDropdown from "@/app/views/notifications/notifcations";
 
 const Header = memo(() => {
   const combobox = useCombobox();
-  const { counts } = useNotification();
+  const { reset } = useNotification();
   const { user, modules, sessionId } = useAuth();
   const emit = useSocketEmit(USER_EVENTS.LOGOUT, { namespace: "user" });
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -74,6 +72,7 @@ const Header = memo(() => {
     dispatch(logOut());
     dispatch(stopTimer());
     dispatch(setSession(false));
+    reset();
     notifier.success({ message: "Logout Successful" });
   };
   const image = (user?.image && helpers.decrypt(user.image)) || avatars1;
@@ -316,21 +315,6 @@ const Header = memo(() => {
                 </Dropdown.Menu>
               </Dropdown>
               <Dropdown as="li" className="nav-item">
-                {/* <Dropdown.Toggle
-                  as={CustomToggle}
-                  href="#"
-                  variant=" nav-link"
-                  id="notification-drop"
-                  data-bs-toggle="dropdown"
-                >
-                  {counts.unread > 0 ? (
-                    <RingingBellWithBadge count={counts.unread} />
-                  ) : (
-                    <IconBellFilled />
-                  )}
-
-                  <span className="bg-danger dots"></span>
-                </Dropdown.Toggle> */}
                 <NotificationDropdown />
                 <Dropdown.Menu
                   className="p-0 sub-drop dropdown-menu-end"

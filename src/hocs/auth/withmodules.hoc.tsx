@@ -18,7 +18,7 @@ function WithUserModules<P extends Object>(
         skip: !isLoggedIn,
       }
     );
-    // console.log(user?.roles);
+
     const {
       refetch: refetchPermissions,
       isLoading: isLoadingPermissions,

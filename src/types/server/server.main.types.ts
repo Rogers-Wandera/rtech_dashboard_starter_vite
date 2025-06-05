@@ -165,15 +165,12 @@ export interface User_Permission {
   roleName: string;
 }
 
-export type Notifications = {
-  sent: PaginateResponse<NotificationEntity>;
-  failed: PaginateResponse<NotificationEntity>;
-  read: PaginateResponse<NotificationRecipient>;
-  unread: PaginateResponse<NotificationRecipient>;
-  system: PaginateResponse<NotificationRecipient>;
-  schedule: PaginateResponse<NotificationEntity>;
-  all: PaginateResponse<NotificationEntity>;
-  urgent: PaginateResponse<NotificationRecipient>;
-  expired: PaginateResponse<NotificationEntity>;
-  annoucements: PaginateResponse<NotificationRecipient>;
-};
+export interface NotificationResponse<T extends Record<string, any>> {
+  category: string;
+  count: number;
+  items: T[];
+}
+
+export type Notifications = NotificationResponse<NotificationRecipient>[];
+
+export type MainNotifications = NotificationResponse<NotificationEntity>[];

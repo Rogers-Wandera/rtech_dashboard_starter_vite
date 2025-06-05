@@ -47,7 +47,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { NotificationType } from "@/types/notifications/notification.enum";
-import { notifications_data } from "@/app/views/notifications_new/notifications_data";
+import { notifications_data } from "@/app/views/notifications/notifications_data";
 
 interface Notification {
   id: string;

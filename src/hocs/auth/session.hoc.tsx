@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/auth/auth.hooks";
 import { useAppDispatch } from "@/hooks/store.hooks";
+import { useNotification } from "@/lib/context/notifications/notification";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { stopTimer, tick } from "@/lib/store/services/auth/session.slice";
 import { setSession } from "@/lib/store/services/defaults/defaults";
@@ -19,6 +20,7 @@ function WithSession<P extends Object>(
     const { secondsLeft, isActive } = useSelector(
       (state: RootState) => state.appState.sessiontimer
     );
+    const { reset } = useNotification();
     const interval = useInterval(() => {
       if (isActive) {
         dispatch(tick());
@@ -30,6 +32,7 @@ function WithSession<P extends Object>(
         dispatch(setSession(false));
         dispatch(logOut());
         dispatch(stopTimer());
+        reset();
         notifier.success({
           message: "Your session has expired, please login",
           title: "Session Expired",

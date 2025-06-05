@@ -20,7 +20,7 @@ import { setNextRoute } from "@/lib/store/services/defaults/defaults";
 import { withUserService } from "@/hocs/services/auth/userservice.hoc";
 import UploadProgressShow from "@/components/settings/uploadprogress";
 import { SessionTimer } from "@/components/shared/session/session";
-import withNotifications from "@/hocs/auth/withNotifications";
+import SocketConnectionNotifier from "@/app/components/connection/server.connection";
 
 type props = { userstate?: { online: string[] } };
 
@@ -83,6 +83,7 @@ function DashboardLayout({ userstate }: props) {
         >
           <Outlet context={{ online: userstate?.online || [] }} />
           <SessionTimer />
+          <SocketConnectionNotifier />
         </div>
         <div className="btn-download">
           <Button variant="success py-1 px-1 d-flex gap-0">
@@ -109,5 +110,4 @@ const DashBoardWithSession = WithAuth(
 );
 const DashboardWithModules = WithUserModules(DashBoardWithSession);
 const DashboardWithRoles = WithRouteRole(DashboardWithModules);
-const DashboardWithNotification = withNotifications(DashboardWithRoles);
-export default DashboardWithNotification;
+export default DashboardWithRoles;

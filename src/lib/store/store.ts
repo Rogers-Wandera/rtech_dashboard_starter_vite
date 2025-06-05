@@ -19,7 +19,6 @@ import { notificationApi } from "./services/notifications/notification.api";
 import { AuthReducer } from "./services/auth/auth.slice";
 import SessionTimerReducer from "./services/auth/session.slice";
 import CryptoJS from "crypto-js";
-import { notificationReducer } from "./services/notifications/notification.slice";
 
 const encryptionKey = import.meta.env.VITE_LOCAL_ENCRYPTION;
 
@@ -38,11 +37,10 @@ const encryptTransform = createTransform(
       const bytes = CryptoJS.AES.decrypt(outboundState.data, encryptionKey);
       return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     } catch (error) {
-      console.error("Decryption failed:", error);
       return undefined;
     }
   },
-  { whitelist: ["authuser", "defaultstate", "notification", "sessiontimer"] }
+  { whitelist: ["authuser"] }
 );
 
 const persistConfig = {
@@ -54,7 +52,6 @@ const persistConfig = {
 const rootReducers = combineReducers({
   authuser: AuthReducer,
   defaultstate: defaultReducer,
-  notification: notificationReducer,
   sessiontimer: SessionTimerReducer,
 });
 

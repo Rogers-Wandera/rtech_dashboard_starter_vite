@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/auth/auth.hooks";
 import { useSocketEmit } from "@/hooks/services/socket.hooks";
 import { useAppDispatch } from "@/hooks/store.hooks";
+import { useNotification } from "@/lib/context/notifications/notification";
 import { useSocket } from "@/lib/context/services/socket";
 import { logOut } from "@/lib/store/services/auth/auth.slice";
 import { startTimer, stopTimer } from "@/lib/store/services/auth/session.slice";
@@ -25,6 +26,7 @@ export function withUserService<P extends Object>(
     });
     const location = useLocation();
     const { user, sessionId, token } = useAuth();
+    const { reset } = useNotification();
     const state = useSocket("user");
     const main = useSocket("main");
     const logOutEvent = useSocketEmit(USER_EVENTS.LOGOUT);
@@ -53,6 +55,7 @@ export function withUserService<P extends Object>(
         dispatch(logOut());
         dispatch(stopTimer());
         dispatch(setSession(false));
+        reset();
       }
     };
 
@@ -61,6 +64,7 @@ export function withUserService<P extends Object>(
       dispatch(logOut());
       dispatch(stopTimer());
       dispatch(setSession(false));
+      reset();
       notifier.info({
         message: data?.message || "You have been logged out.",
         timer: 4000,
@@ -71,6 +75,7 @@ export function withUserService<P extends Object>(
       dispatch(logOut());
       dispatch(stopTimer());
       dispatch(setSession(false));
+      reset();
       notifier.info({
         message: data?.message || "You have been logged out.",
         timer: 4000,
@@ -115,6 +120,7 @@ export function withUserService<P extends Object>(
           dispatch(logOut());
           dispatch(stopTimer());
           dispatch(setSession(false));
+          reset();
           notifier.info({
             message: "Your token has expired, please login again.",
           });

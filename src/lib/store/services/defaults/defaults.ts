@@ -11,6 +11,7 @@ export interface DefaultState {
   nextRoute: null | string;
   rememberMe: { email: string; password: string };
   showSubHeader: boolean;
+  shouldNotificationRing: boolean;
 }
 
 const defaultState: DefaultState = {
@@ -20,6 +21,7 @@ const defaultState: DefaultState = {
   nextRoute: null,
   rememberMe: { email: "", password: "" },
   showSubHeader: true,
+  shouldNotificationRing: true,
 };
 
 const defaultSlice = createSlice({
@@ -48,6 +50,9 @@ const defaultSlice = createSlice({
         password: password != "" ? helper.encrypt(password) : "",
         email: email != "" ? helper.encrypt(email) : "",
       };
+    },
+    setShouldNotificationRing: (state, action: { payload: boolean }) => {
+      state.shouldNotificationRing = action.payload;
     },
   },
   extraReducers: (builder) =>
@@ -79,4 +84,5 @@ export const {
   setRememberMe,
   setNextRoute,
   setShowSubHeader,
+  setShouldNotificationRing,
 } = defaultSlice.actions;

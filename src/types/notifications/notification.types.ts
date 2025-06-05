@@ -1,10 +1,3 @@
-import {
-  NOTIFICATION_STATUS,
-  NotificationType,
-  NotificationTypes,
-  PRIORITY_TYPES,
-} from "./notification.enum";
-
 type mediaTypes = {
   type: "image" | "video" | "audio";
   imageUrl: string;
@@ -20,34 +13,11 @@ export type SystemNotificationData = {
 
 export type NotificationTags = { name: string; link?: string };
 
-export type SystemNotification = {
-  pattern: string;
-  priority: PRIORITY_TYPES;
-  type: NotificationTypes;
-  data: SystemNotificationData;
-  recipients: { to: string; priority?: PRIORITY_TYPES }[];
-  tags?: NotificationTags;
-  link?: string;
-  resendId?: string;
-  createdBy?: string;
-  status: NOTIFICATION_STATUS;
-  id: string;
-};
-
-export type user_system_notifications = {
-  uploads: SystemNotification[];
-  announcements: SystemNotification[];
-  other: SystemNotification[];
-  unread: SystemNotification[];
-  all: SystemNotification[];
-  urgent: SystemNotification[];
-};
-
 export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: NotificationType;
+  type: string;
   timestamp: Date;
   sender?: {
     name: string;

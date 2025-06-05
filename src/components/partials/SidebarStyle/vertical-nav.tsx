@@ -8,6 +8,8 @@ import {
 import { Link, useLocation } from "react-router";
 import * as Icons from "@tabler/icons-react";
 import { Icon, IconProps } from "@tabler/icons-react";
+import { useNotificationType } from "@/lib/context/notifications/notification";
+import RingingBellWithBadge from "@/components/shared/ringingbell";
 
 type customtoggleprops = {
   eventKey: string;
@@ -45,6 +47,9 @@ const VerticalNav = memo((_) => {
   const { modules } = useAuth();
   const modulekeys = Object.keys(modules);
   const location = useLocation();
+
+  const notification = useNotificationType({ type: "user", category: "ALL" });
+  const countUnRead = notification?.count || 0;
 
   useEffect(() => {
     const moduleToShow = modulekeys.filter((key) => {
@@ -124,6 +129,8 @@ const VerticalNav = memo((_) => {
           >
             {moduleToRender.map((module) => {
               const modulelinks = modules[module];
+              const isNotification = module.startsWith("Notifications");
+
               const torender = modulelinks.filter(
                 (item) =>
                   item.expired != 1 && item.default != 1 && item.render === 1
@@ -135,6 +142,19 @@ const VerticalNav = memo((_) => {
                 ]) as React.ForwardRefExoticComponent<
                 IconProps & React.RefAttributes<Icon>
               >;
+
+              let toShow: any =
+                IconComponent && React.createElement(IconComponent);
+
+              if (isNotification && countUnRead > 0) {
+                toShow = (
+                  <RingingBellWithBadge
+                    count={countUnRead}
+                    iconProps={{ size: 25 }}
+                    shouldRing={false}
+                  />
+                );
+              }
               return (
                 <Fragment key={module}>
                   {torender.length > 0 && (
@@ -143,10 +163,7 @@ const VerticalNav = memo((_) => {
                         eventKey={module}
                         onClick={(activeKey) => setActiveMenu(activeKey.state)}
                       >
-                        <i className="icon">
-                          {" "}
-                          {IconComponent && React.createElement(IconComponent)}
-                        </i>
+                        <i className="icon">{toShow}</i>
                         <span className="item-name">{module}</span>
                         <i className="right-icon">
                           <svg

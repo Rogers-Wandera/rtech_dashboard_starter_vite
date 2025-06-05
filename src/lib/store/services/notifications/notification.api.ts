@@ -7,6 +7,7 @@ import { RootState } from "../../store";
 import { NotificationEndPoint } from "@/lib/endpoints/server.core.endpoints";
 import {
   IPaginate,
+  MainNotifications,
   Notifications,
   ServerErrorResponse,
 } from "@/types/server/server.main.types";
@@ -67,7 +68,7 @@ export const notificationApi = createApi({
         return error;
       },
 
-      transformResponse: (response: Partial<Notifications>) => {
+      transformResponse: (response: Notifications) => {
         return response;
       },
     }),
@@ -111,7 +112,7 @@ export const notificationApi = createApi({
         return error;
       },
 
-      transformResponse: (response: Partial<Notifications>) => {
+      transformResponse: (response: MainNotifications) => {
         return response;
       },
     }),
