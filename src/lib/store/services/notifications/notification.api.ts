@@ -37,7 +37,10 @@ export const notificationApi = createApi({
         sortBy = undefined,
         filters = undefined,
         conditions = undefined,
-      }: Partial<IPaginate<any>> & { userId: string }) => {
+        dateFilter = undefined,
+      }: Partial<IPaginate<any>> & { userId: string } & {
+        dateFilter?: { from?: string | null; to?: string | null };
+      }) => {
         const params = new URLSearchParams();
         if (globalFilter) {
           params.set("globalFilter", globalFilter);
@@ -54,6 +57,9 @@ export const notificationApi = createApi({
         }
         if (conditions) {
           params.append("conditions", JSON.stringify(conditions));
+        }
+        if (dateFilter) {
+          params.append("dateFilter", JSON.stringify(dateFilter));
         }
         params.set("limit", limit.toString());
         params.set("page", page.toString());
@@ -81,7 +87,10 @@ export const notificationApi = createApi({
         sortBy = undefined,
         filters = undefined,
         conditions = undefined,
-      }: Partial<IPaginate<any>> & { userId: string }) => {
+        dateFilter = undefined,
+      }: Partial<IPaginate<any>> & { userId: string } & {
+        dateFilter?: { from?: string | null; to?: string | null };
+      }) => {
         const params = new URLSearchParams();
         if (globalFilter) {
           params.set("globalFilter", globalFilter);
@@ -98,6 +107,9 @@ export const notificationApi = createApi({
         }
         if (conditions) {
           params.append("conditions", JSON.stringify(conditions));
+        }
+        if (dateFilter) {
+          params.append("dateFilter", JSON.stringify(dateFilter));
         }
         params.set("limit", limit.toString());
         params.set("page", page.toString());

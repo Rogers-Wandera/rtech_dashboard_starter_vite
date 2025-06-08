@@ -177,6 +177,71 @@ const useStyles = createStyles((theme) => {
     formContainer: {
       padding: theme.spacing.md,
     },
+    mobileFilterItem: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%",
+    },
+
+    mobileFilterCount: {
+      backgroundColor: theme.colors.blue[6],
+      color: theme.white,
+      borderRadius: theme.radius.sm,
+      padding: "2px 8px",
+      fontSize: theme.fontSizes.xs,
+    },
+
+    activeFilterItem: {
+      backgroundColor: theme.colors.blue[0],
+    },
+
+    searchInput: {
+      "& input": {
+        backgroundColor: theme.white,
+      },
+    },
+
+    dateRangeInput: {
+      "& input": {
+        backgroundColor: theme.white,
+      },
+    },
+
+    mobileFilterInputs: {
+      backgroundColor: theme.white,
+      padding: theme.spacing.sm,
+    },
+
+    loadingContainer: {
+      height: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    errorContainer: {
+      height: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: theme.spacing.md,
+    },
+
+    errorAlert: {
+      maxWidth: 500,
+      width: "100%",
+    },
+
+    listContainer: {
+      padding: "8px 0",
+    },
+    listItem: {
+      padding: "8px 0",
+      "&:not(:last-child)": {
+        marginBottom: "8px",
+      },
+    },
   };
 });
 

@@ -12,7 +12,7 @@ export const useSocketEvent = <T = any>(
   callback: (data: T) => void,
   options: SocketEventOptions = {}
 ) => {
-  const { enabled = true, namespace, onError } = options;
+  const { enabled = true, namespace = "main", onError } = options;
   const state = useSocket(namespace);
   const callbackRef = useRef(callback);
 

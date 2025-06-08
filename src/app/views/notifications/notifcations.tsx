@@ -1,38 +1,26 @@
 import RingingBellWithBadge from "@/components/shared/ringingbell";
-import TruncatedHtml from "@/components/shared/truncatedHtml";
 import { useAppDispatch } from "@/hooks/store.hooks";
-import {
-  useNotification,
-  useNotificationType,
-} from "@/lib/context/notifications/notification";
+import { useNotificationType } from "@/lib/context/notifications/notification";
 import { setShouldNotificationRing } from "@/lib/store/services/defaults/defaults";
 import { RootState } from "@/lib/store/store";
 import {
   Group,
   Text,
-  Avatar,
-  Paper,
   Badge,
   Menu,
-  ScrollArea,
   Button,
   Box,
-  useMantineTheme,
   ActionIcon,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import {
-  IconMessage,
-  IconHeart,
-  IconBellFilled,
-  IconThumbUpFilled,
-  IconX,
-} from "@tabler/icons-react";
+import { IconBellFilled, IconX } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
-import FallbackAvatar from "@/assets/images/avatars/01.png";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useNavigate } from "react-router";
+import { useRef } from "react";
+import { VariableSizeList } from "react-window";
+import NotificationDropDownItem from "./components/itemmenu";
 
 dayjs.extend(relativeTime);
 
@@ -41,6 +29,9 @@ const NotificationDropdown = () => {
   const isOpened = useSelector(
     (state: RootState) => state.appState.defaultstate.shouldNotificationRing
   );
+
+  const listRef = useRef<VariableSizeList>(null);
+  const rowHeights = useRef<Record<number, number>>({});
 
   const navigate = useNavigate();
 
@@ -51,21 +42,20 @@ const NotificationDropdown = () => {
     category: "UNREAD",
   });
 
-  const { markAsRead } = useNotification();
-
   const unreadCount = notification?.count || 0;
-
-  const theme = useMantineTheme();
 
   const HandleOpen = () => {
     dispatch(setShouldNotificationRing(false));
     toggle();
   };
 
-  const getTimeStamp = (timestamp: string) => {
-    const date = dayjs(timestamp);
-    const now = dayjs();
-    return date.from(now);
+  const getItemSize = (index: number) => {
+    return rowHeights.current[index] || 120;
+  };
+
+  const setRowHeight = (index: number, height: number) => {
+    listRef.current?.resetAfterIndex(0);
+    rowHeights.current = { ...rowHeights.current, [index]: height };
   };
 
   return (
@@ -98,7 +88,7 @@ const NotificationDropdown = () => {
                 Notifications
               </Text>
               <Badge variant="light" color="blue" size="sm">
-                {unreadCount &&
+                {unreadCount > 0 &&
                   `${unreadCount >= 100 ? "99+" : unreadCount} new`}
                 {unreadCount <= 0 && "No new notifications"}
               </Badge>
@@ -109,88 +99,26 @@ const NotificationDropdown = () => {
           </Group>
         </Menu.Label>
 
-        {notification && notification?.items?.length && (
-          <ScrollArea.Autosize mah={300} type="scroll">
-            {notification.items.slice(0, 5).map((notification) => (
-              <Menu.Item key={notification.id}>
-                <Paper p="sm" withBorder>
-                  <Group wrap="nowrap" align="flex-start" gap="sm">
-                    {notification.notification.data?.avatar && (
-                      <Avatar
-                        src={notification.notification.data.avatar.avatar}
-                        size="md"
-                        radius="xl"
-                        color="blue"
-                      >
-                        {notification.notification.data.avatar.name}
-                      </Avatar>
-                    )}
-                    {/* fallback */}
-                    {!notification.notification.data?.avatar && (
-                      <Avatar
-                        src={FallbackAvatar}
-                        size="md"
-                        radius="xl"
-                        color="blue"
-                      >
-                        {notification.notification.data.channel}
-                      </Avatar>
-                    )}
-                    <Box sx={{ flex: 1 }}>
-                      <Group gap={4}>
-                        <Text size="sm" fw={600}>
-                          {notification.notification.data?.avatar &&
-                            notification.notification.data.avatar.name}
-                          {!notification.notification.data?.avatar &&
-                            notification.notification.data.subject}
-                        </Text>
-                        {notification.notification.data?.avatar && (
-                          <IconMessage size={16} color={theme.colors.blue[5]} />
-                        )}
-                        {!notification.notification.data?.avatar && (
-                          <IconHeart size={16} color={theme.colors.blue[5]} />
-                        )}
-                        <Text size="sm" c="dimmed">
-                          {notification.priority}
-                        </Text>
-                      </Group>
-
-                      {notification.notification.data.body && (
-                        <TruncatedHtml
-                          html={notification.notification.data.body}
-                          textProps={{ size: "sm", mt: 4 }}
-                          length={100}
-                          withToggle={true}
-                        />
-                      )}
-
-                      <Text size="xs" c="dimmed" mt={4}>
-                        {getTimeStamp(String(notification.creationDate))}
-                      </Text>
-                      {notification.notification.data?.alertType === "custom" &&
-                        notification.readStatus !== "read" && (
-                          <Group justify="flex-end">
-                            <Button
-                              size="xs"
-                              leftSection={<IconThumbUpFilled />}
-                              variant="light"
-                              disabled={
-                                notification.notification.data.alertType !==
-                                "custom"
-                              }
-                              mt={4}
-                              onClick={() => markAsRead(notification.id)}
-                            >
-                              Mark as read
-                            </Button>
-                          </Group>
-                        )}
-                    </Box>
-                  </Group>
-                </Paper>
-              </Menu.Item>
-            ))}
-          </ScrollArea.Autosize>
+        {notification && notification?.items?.length > 0 && (
+          <div style={{ height: 300, width: "100%" }}>
+            <VariableSizeList
+              ref={listRef}
+              height={300}
+              itemCount={notification.items.length}
+              itemSize={getItemSize}
+              width="100%"
+              overscanCount={3}
+            >
+              {({ index, style }) => (
+                <div style={style}>
+                  <NotificationDropDownItem
+                    notification={notification.items[index]}
+                    setHeight={(height) => setRowHeight(index, height)}
+                  />
+                </div>
+              )}
+            </VariableSizeList>
+          </div>
         )}
 
         {(!notification || notification?.items?.length === 0) && (

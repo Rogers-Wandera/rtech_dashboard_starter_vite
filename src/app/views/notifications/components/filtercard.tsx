@@ -1,4 +1,5 @@
 import { Badge, Box, Card, Group, Text } from "@mantine/core";
+import { useEffect, useRef } from "react";
 
 const NotificationFilterCard = ({
   icon,
@@ -8,6 +9,7 @@ const NotificationFilterCard = ({
   onClick,
   cx,
   classes,
+  setHeight,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -16,9 +18,19 @@ const NotificationFilterCard = ({
   onClick: () => void;
   cx: (...args: any) => string;
   classes: Record<string, any>;
+  setHeight?: (height: number) => void;
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current && setHeight) {
+      setHeight(ref.current.clientHeight);
+    }
+  }, [setHeight]);
+
   return (
     <Card
+      ref={ref}
       withBorder
       p="sm"
       mb="sm"

@@ -2,7 +2,6 @@ import {
   ActionIcon,
   Avatar,
   Box,
-  Button,
   Divider,
   Group,
   Modal,
@@ -14,31 +13,75 @@ import {
 } from "@mantine/core";
 import { IconClock, IconX } from "@tabler/icons-react";
 import NotificationBadge from "../badge";
-import { Notification } from "@/types/notifications/notification.types";
+import {
+  NotificationEntity,
+  NotificationRecipient,
+} from "@/types/server/notifications/entity.types";
+import { AlertType } from "@/types/server/notifications/notification.types";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import FallbackAvatar from "@/assets/images/avatars/01.png";
+import TruncatedHtml from "@/components/shared/truncatedHtml";
+import { Button } from "@mantine/core";
+
+dayjs.extend(relativeTime);
 
 const NotificationDetails = ({
-  notification,
+  item,
   opened,
   onClose,
   classes,
 }: {
-  notification: Notification | null;
+  item: NotificationRecipient | NotificationEntity | null;
   opened: boolean;
   onClose: () => void;
   classes: Record<string, any>;
 }) => {
   const theme = useMantineTheme();
 
-  if (!notification) return null;
+  if (!item) return null;
+
+  const getTimeStamp = (timestamp: string) => {
+    const date = dayjs(timestamp);
+    const now = dayjs();
+    return date.from(now);
+  };
+
+  const notification = "notification" in item ? item.notification : item;
+  const hasRead = "readStatus" in item && item.readStatus === "unread";
+
+  const { data } = notification;
+
+  const getType = () => {
+    if ("readStatus" in item && data?.alertType === AlertType.CUSTOM) {
+      if (item.readStatus === "read") {
+        return "read";
+      } else if (item.readStatus === "unread" && item.priority === "high") {
+        return "urgent";
+      } else if (item.readStatus === "unread") {
+        return "unread";
+      }
+    } else if (
+      data?.alertType === AlertType.ANNOUCEMENT ||
+      data?.alertType === AlertType.SYSTEM
+    ) {
+      return "system";
+    } else if (data?.alertType === AlertType.MAINTENANCE) {
+      return "urgent";
+    } else {
+      return "none";
+    }
+  };
 
   return (
     <Modal
       opened={opened}
       onClose={onClose}
-      size="lg"
+      size="xl"
       padding={0}
       withCloseButton={false}
       centered
+      zIndex={1000}
       radius="md"
       overlayProps={{
         blur: 3,
@@ -59,35 +102,34 @@ const NotificationDetails = ({
       <Box p="xl" pb="md">
         <Stack gap="xs">
           <Group justify="space-between" align="flex-start" wrap="nowrap">
-            <Text className={classes.detailsTitle}>{notification.title}</Text>
-            <NotificationBadge type={notification.type} classes={classes} />
+            <Text className={classes.detailsTitle}>{data.subject}</Text>
+            <NotificationBadge type={getType() || "none"} classes={classes} />
           </Group>
 
           <div className={classes.timestamp}>
             <IconClock size={14} />
-            <Text size="sm">
-              {notification.timestamp.toLocaleString([], {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </Text>
+            <Text size="sm">{getTimeStamp(String(item.creationDate))}</Text>
           </div>
 
-          {notification.sender && (
+          {data?.avatar && (
             <Group gap="xs" mt="sm">
               <Avatar
-                src={notification.sender.avatar}
+                src={data.avatar.avatar || data.avatar.name.charAt(0)}
                 size="sm"
                 color="blue"
                 radius="xl"
               >
-                {notification.sender.name[0]}
+                {data.avatar.name}
               </Avatar>
-              <Text fw={500}>{notification.sender.name}</Text>
+              <Text fw={500}> {data.avatar.name}</Text>
+            </Group>
+          )}
+          {!data?.avatar && (
+            <Group gap="xs" mt="sm">
+              <Avatar src={FallbackAvatar} size="md" radius="xl" color="blue">
+                {data.channel}
+              </Avatar>
+              <Text fw={500}> {data.alertType}</Text>
             </Group>
           )}
         </Stack>
@@ -97,64 +139,32 @@ const NotificationDetails = ({
 
       <ScrollArea.Autosize mah={rem(400)}>
         <Box p="xl">
-          <div
-            className={classes.detailsBody}
-            dangerouslySetInnerHTML={{
-              __html: notification.body || notification.message,
-            }}
+          <TruncatedHtml
+            html={data.body}
+            textProps={{ className: classes.detailsBody }}
           />
 
-          {(notification.imageUrl || notification.videoUrl) && (
-            <Box className={classes.mediaContainer} mt="md">
-              {notification.imageUrl ? (
+          {data.channel === "push" &&
+            data.provider === "socket" &&
+            data?.coverImage && (
+              <Box className={classes.mediaContainer} mt="md">
                 <img
-                  src={notification.imageUrl}
-                  alt="Content"
+                  src={data.coverImage}
+                  alt={data.subject}
                   style={{ width: "100%", borderRadius: theme.radius.md }}
                 />
-              ) : notification.videoUrl ? (
-                <video
-                  controls
-                  style={{ width: "100%", borderRadius: theme.radius.md }}
-                >
-                  <source src={notification.videoUrl} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              ) : null}
-            </Box>
-          )}
+              </Box>
+            )}
         </Box>
       </ScrollArea.Autosize>
 
-      {notification.actions && notification.actions.length > 0 && (
+      {hasRead && (
         <>
           <Divider />
           <Group gap="md" p="md">
-            {notification.actions.map((action, index) => (
-              <Button
-                key={index}
-                variant={
-                  action.variant === "danger"
-                    ? "filled"
-                    : action.variant === "primary"
-                    ? "filled"
-                    : "default"
-                }
-                color={
-                  action.variant === "danger"
-                    ? "red"
-                    : action.variant === "primary"
-                    ? "blue"
-                    : undefined
-                }
-                onClick={() => {
-                  action.onClick();
-                  onClose();
-                }}
-              >
-                {action.label}
-              </Button>
-            ))}
+            <Button variant={"default"} color={"blue"} onClick={() => {}}>
+              Mark as read
+            </Button>
           </Group>
         </>
       )}

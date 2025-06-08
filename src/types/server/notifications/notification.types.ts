@@ -304,3 +304,7 @@ export enum RecipientRead {
   // for untracked providers
   UNKNOWN = "unknown",
 }
+
+export enum NOTIFICATION_PATTERN {
+  GET_NOTIFICATIONS = "get_notifications",
+}

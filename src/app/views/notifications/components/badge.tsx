@@ -1,8 +1,8 @@
-import { NotificationType } from "@/types/notifications/notification.enum";
 import { Badge } from "@mantine/core";
 import {
   IconAlertCircle,
   IconCircleCheck,
+  IconInfoOctagon,
   IconMail,
   IconSend,
 } from "@tabler/icons-react";
@@ -11,7 +11,7 @@ const NotificationBadge = ({
   type,
   classes,
 }: {
-  type: NotificationType;
+  type: string;
   classes: Record<string, any>;
 }) => {
   const getIcon = () => {
@@ -25,7 +25,7 @@ const NotificationBadge = ({
       case "system":
         return <IconCircleCheck size={14} className={classes.badgeIcon} />;
       default:
-        return null;
+        return <IconInfoOctagon size={14} className={classes.badgeIcon} />;
     }
   };
 
