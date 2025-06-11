@@ -52,6 +52,7 @@ export type NotificationContextType = {
   dateRange: [string | null, string | null];
   setDateRange: Dispatch<SetStateAction<[string | null, string | null]>>;
   readItems: string[];
+  setRefetch: (value: SetStateAction<boolean>) => void;
 };
 
 export enum UserNotificationCategory {
@@ -103,9 +104,11 @@ const NotificationContextProvider = ({
     queryKey: "update_notification_read",
   });
 
+  const [refetch, setRefetch] = useState(false);
+
   const [debouncedSearch] = useDebouncedValue(searchQuery, 300);
 
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const dispatch = useAppDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -205,13 +208,14 @@ const NotificationContextProvider = ({
         debouncedSearch?.length > 0 &&
         (filteredUserNotifications.some((c) => c.items.length > 0) ||
           filteredMainNotifications.some((c) => c.items.length > 0));
-      if (!hasClientResults) {
+      if (!hasClientResults && isLoggedIn) {
+        console.log("Processing....");
         await Promise.all([
           getNotifications({
             userId: String(user.id),
             globalFilter: debouncedSearch,
             dateFilter: { from: dateRange[0], to: dateRange[1] },
-          }),
+          }).unwrap(),
           user?.roles.includes(ROLES.ADMIN) ||
           permissions?.some(
             (p) => p.roleName === "Get main notifications" && p.method === "GET"
@@ -220,21 +224,23 @@ const NotificationContextProvider = ({
                 userId: String(user.id),
                 globalFilter: debouncedSearch,
                 dateFilter: { from: dateRange[0], to: dateRange[1] },
-              })
+              }).unwrap()
             : Promise.resolve(),
         ]);
+        console.log("end");
         setReadItems(new Set());
       }
     } catch (err) {
       setError(err);
     } finally {
       setIsLoading(false);
+      setRefetch(false);
     }
   }, 500);
 
   useEffect(() => {
     fetchNotifications();
-  }, [user?.id, debouncedSearch, dateRange, permissions]);
+  }, [user, debouncedSearch, dateRange, permissions, isLoggedIn]);
 
   useEffect(() => {
     if (data) setUserNotifications(data);
@@ -250,6 +256,12 @@ const NotificationContextProvider = ({
       }
     }
   );
+
+  useEffect(() => {
+    if (refetch) {
+      fetchNotifications();
+    }
+  }, [refetch]);
 
   return (
     <NotificationContext.Provider
@@ -267,6 +279,7 @@ const NotificationContextProvider = ({
         dateRange,
         setDateRange,
         readItems: Array.from(readItems),
+        setRefetch,
       }}
     >
       {children}

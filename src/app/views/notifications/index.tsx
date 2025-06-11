@@ -72,6 +72,7 @@ const NotificationPage = () => {
     isLoading,
     error,
     reset,
+    setRefetch,
   } = useNotification();
 
   const allNotifications = useNotificationType({
@@ -121,6 +122,10 @@ const NotificationPage = () => {
       data: allNotifications,
     });
   }, [allNotifications]);
+
+  useEffect(() => {
+    setRefetch(true);
+  }, []);
 
   if (createModalOpen) {
     return <CreateNotification />;

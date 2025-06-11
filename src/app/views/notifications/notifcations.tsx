@@ -1,6 +1,9 @@
 import RingingBellWithBadge from "@/components/shared/ringingbell";
 import { useAppDispatch } from "@/hooks/store.hooks";
-import { useNotificationType } from "@/lib/context/notifications/notification";
+import {
+  useNotification,
+  useNotificationType,
+} from "@/lib/context/notifications/notification";
 import { setShouldNotificationRing } from "@/lib/store/services/defaults/defaults";
 import { RootState } from "@/lib/store/store";
 import {
@@ -18,7 +21,7 @@ import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useNavigate } from "react-router";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { VariableSizeList } from "react-window";
 import NotificationDropDownItem from "./components/itemmenu";
 
@@ -36,6 +39,8 @@ const NotificationDropdown = () => {
   const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
+
+  const { setRefetch } = useNotification();
 
   const notification = useNotificationType({
     type: "user",
@@ -57,6 +62,10 @@ const NotificationDropdown = () => {
     listRef.current?.resetAfterIndex(0);
     rowHeights.current = { ...rowHeights.current, [index]: height };
   };
+
+  useEffect(() => {
+    setRefetch(true);
+  }, []);
 
   return (
     <Menu
