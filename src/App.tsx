@@ -8,13 +8,15 @@ import { Outlet, useLocation } from "react-router";
 import { useMaterialTheme } from "./lib/themes/material.theme";
 import { setShowSubHeader } from "./lib/store/services/defaults/defaults";
 import ErrorBoundary from "./lib/utils/errorhandler/error.boundary";
+import { useLoader } from "./lib/context/app/app.loader.context";
+import CustomLoader from "./app/components/loaders/loading";
+import { AnimatePresence } from "framer-motion";
 
 const App = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const loading = useSelector(
-    (state: RootState) => state.appState.defaultstate.isLoading
-  );
+
+  const { loaderConfigs, loading } = useLoader();
 
   const theme = useMaterialTheme();
   const { setColorScheme } = useMantineColorScheme({ keepTransitions: true });
@@ -52,12 +54,24 @@ const App = () => {
   return (
     <Box pos="relative">
       <ErrorBoundary>
-        <LoadingOverlay
+        {/* <LoadingOverlay
           visible={loading}
           zIndex={1000}
           overlayProps={{ radius: "sm", blur: 2 }}
           loaderProps={{ color: "blue", type: "bars" }}
-        />
+        /> */}
+        <AnimatePresence>
+          {loading && (
+            <div className="tw:absolute tw:inset-0 tw:z-50 tw:backdrop-blur-sm tw:bg-white/80 tw:flex tw:items-center tw:justify-center">
+              <CustomLoader
+                size={loaderConfigs.size}
+                color={loaderConfigs.color}
+                text={loaderConfigs.loadingText}
+                fullScreen={loaderConfigs.fullScreen}
+              />
+            </div>
+          )}
+        </AnimatePresence>
         <Outlet />
       </ErrorBoundary>
     </Box>

@@ -23,6 +23,7 @@ export interface NotificationEntity extends IBaseTableType {
   completedAt?: Date;
   recipients: NotificationRecipient[];
   expireDate?: Date;
+  seenBy?: string[];
 }
 
 export interface NotificationRecipient extends IBaseTableType {

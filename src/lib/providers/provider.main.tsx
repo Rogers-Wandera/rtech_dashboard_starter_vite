@@ -19,6 +19,7 @@ import { SocketProvider } from "../context/services/socket";
 import UploadProvider from "../context/auth/upload.context";
 import NotificationContextProvider from "../context/notifications/notification";
 import { emotionTransform, MantineEmotionProvider } from "@mantine/emotion";
+import { AppLoaderProvider } from "../context/app/app.loader.context";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
@@ -62,9 +63,11 @@ const Providers = () => {
                             <AppContextProvider>
                               <PermissionProvider>
                                 <UploadProvider>
-                                  <NotificationContextProvider>
-                                    <Outlet />
-                                  </NotificationContextProvider>
+                                  <AppLoaderProvider>
+                                    <NotificationContextProvider>
+                                      <Outlet />
+                                    </NotificationContextProvider>
+                                  </AppLoaderProvider>
                                 </UploadProvider>
                               </PermissionProvider>
                             </AppContextProvider>

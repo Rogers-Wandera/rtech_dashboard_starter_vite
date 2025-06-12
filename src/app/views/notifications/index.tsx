@@ -25,7 +25,6 @@ import {
   RecipientRead,
 } from "@/types/server/notifications/notification.types";
 import { Alert, Center } from "@mantine/core";
-import { Loader } from "@mantine/core";
 import { IconAlertTriangle, IconReload } from "@tabler/icons-react";
 import { Text } from "@mantine/core";
 import { Button } from "@mantine/core";
@@ -69,7 +68,6 @@ const NotificationPage = () => {
     userCategories,
     mainCategories,
     markAsRead,
-    isLoading,
     error,
     reset,
     setRefetch,
@@ -99,10 +97,13 @@ const NotificationPage = () => {
     setSelectedNotification(notification);
     setDetailsOpen(true);
 
+    const readTypes = [AlertType.CUSTOM, AlertType.ERROR, AlertType.WARNING];
+
     if ("readStatus" in notification) {
-      if (notification.notification.data.alertType !== AlertType.CUSTOM) return;
-      if (notification.readStatus !== RecipientRead.UNREAD) return;
-      markAsRead(notification.id);
+      if (readTypes.includes(notification.notification.data.alertType)) {
+        if (notification.readStatus !== RecipientRead.UNREAD) return;
+        markAsRead(notification.id);
+      }
     }
   };
 
@@ -129,14 +130,6 @@ const NotificationPage = () => {
 
   if (createModalOpen) {
     return <CreateNotification />;
-  }
-
-  if (isLoading) {
-    return (
-      <Center className={classes.loadingContainer}>
-        <Loader size="xl" variant="dots" />
-      </Center>
-    );
   }
 
   if (error) {

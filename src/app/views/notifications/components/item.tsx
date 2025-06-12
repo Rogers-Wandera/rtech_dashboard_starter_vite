@@ -22,6 +22,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import FallbackAvatar from "@/assets/images/avatars/01.png";
 import { useEffect, useRef } from "react";
 import { useNotification } from "@/lib/context/notifications/notification";
+import { useAuth } from "@/hooks/auth/auth.hooks";
 
 type Props = {
   item: NotificationRecipient | NotificationEntity;
@@ -47,6 +48,7 @@ const NotificationItem = ({
   const ref = useRef<HTMLDivElement>(null);
 
   const { markAsRead, readItems } = useNotification();
+  const { user } = useAuth();
 
   const notification = "notification" in item ? item.notification : item;
   const hasRead = "readStatus" in item && item.readStatus === "unread";
@@ -155,7 +157,10 @@ const NotificationItem = ({
                   size="xs"
                   rightSection={<IconArrowRight size={14} />}
                   className={classes.actionButton}
-                  disabled={readItems.includes(item.id)}
+                  disabled={
+                    readItems.includes(item.id) ||
+                    notification?.seenBy?.includes(String(user?.id))
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     markAsRead(item.id);

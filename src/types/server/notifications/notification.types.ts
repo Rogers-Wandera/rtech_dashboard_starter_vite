@@ -177,7 +177,7 @@ export type Notification = {
     avatar?: string;
   };
   data?: Record<string, any>;
-  alertType?: AlertType;
+  alertType: AlertType;
   priority?: Priority;
   scheduledAt?: Date;
   metadata?: {
@@ -307,4 +307,5 @@ export enum RecipientRead {
 
 export enum NOTIFICATION_PATTERN {
   GET_NOTIFICATIONS = "get_notifications",
+  USER_NOTIFICATIONS = "user_notifications",
 }

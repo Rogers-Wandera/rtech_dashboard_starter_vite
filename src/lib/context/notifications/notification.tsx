@@ -32,6 +32,7 @@ import { useSelector } from "react-redux";
 import { NOTIFICATION_PATTERN } from "@/types/server/notifications/notification.types";
 import { useMutateData } from "@/hooks/data/usemutatehook";
 import { useSocketEvent } from "@/hooks/services/socket.hooks";
+import { useLoader } from "../app/app.loader.context";
 
 export type Category = {
   category: string;
@@ -111,7 +112,7 @@ const NotificationContextProvider = ({
   const { user, isLoggedIn } = useAuth();
   const dispatch = useAppDispatch();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { setLoaderConfigs, setLoading, loading } = useLoader();
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([
     null,
     null,
@@ -160,6 +161,9 @@ const NotificationContextProvider = ({
   };
 
   const markAsRead = useCallback(async (recipientId: string | string[]) => {
+    if (!user) {
+      return;
+    }
     const isArray = Array.isArray(recipientId);
     const data = isArray ? recipientId : [recipientId];
     if (data?.length > 0) {
@@ -202,14 +206,14 @@ const NotificationContextProvider = ({
 
   const fetchNotifications = useDebouncedCallback(async () => {
     if (!user?.id) return;
-    setIsLoading(true);
+    setLoading(true);
+    setLoaderConfigs({ loadingText: "Loading notifications..." });
     try {
       const hasClientResults =
         debouncedSearch?.length > 0 &&
         (filteredUserNotifications.some((c) => c.items.length > 0) ||
           filteredMainNotifications.some((c) => c.items.length > 0));
       if (!hasClientResults && isLoggedIn) {
-        console.log("Processing....");
         await Promise.all([
           getNotifications({
             userId: String(user.id),
@@ -227,14 +231,14 @@ const NotificationContextProvider = ({
               }).unwrap()
             : Promise.resolve(),
         ]);
-        console.log("end");
         setReadItems(new Set());
       }
     } catch (err) {
       setError(err);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
       setRefetch(false);
+      setLoaderConfigs({ loadingText: "Loading data..." });
     }
   }, 500);
 
@@ -249,7 +253,7 @@ const NotificationContextProvider = ({
   }, [data, mainNotifications]);
 
   useSocketEvent(
-    NOTIFICATION_PATTERN.GET_NOTIFICATIONS,
+    NOTIFICATION_PATTERN.USER_NOTIFICATIONS,
     (data: { userId: string }) => {
       if (user?.id === data?.userId) {
         fetchNotifications();
@@ -268,7 +272,7 @@ const NotificationContextProvider = ({
       value={{
         userNotifications: filteredUserNotifications,
         mainNotifications: filteredMainNotifications,
-        isLoading,
+        isLoading: loading,
         error,
         reset,
         markAsRead,

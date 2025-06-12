@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import SettingOffCanvas from "@/components/settings/SettingOffCanvas";
 import Footer from "@/components/partials/FooterStyle/footer";
@@ -9,7 +9,7 @@ import { Button } from "react-bootstrap";
 import SubHeader from "@/components/partials/HeaderStyle/sub-header";
 import Sidebar from "@/components/partials/SidebarStyle/sidebar";
 import { RootState } from "@/lib/store/store";
-import { Box, LoadingOverlay } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import WithAuth from "@/hocs/auth/auth.hoc";
 import WithRouteRole from "@/hocs/auth/routerole.hoc";
@@ -21,13 +21,13 @@ import { withUserService } from "@/hocs/services/auth/userservice.hoc";
 import UploadProgressShow from "@/components/settings/uploadprogress";
 import { SessionTimer } from "@/components/shared/session/session";
 import SocketConnectionNotifier from "@/app/components/connection/server.connection";
+import { AnimatePresence } from "framer-motion";
+import CustomLoader from "@/app/components/loaders/loading";
+import { useLoader } from "@/lib/context/app/app.loader.context";
 
 type props = { userstate?: { online: string[] } };
 
 function DashboardLayout({ userstate }: props) {
-  const loading = useSelector(
-    (state: RootState) => state.appState.defaultstate.isLoading
-  );
   const upload = useSelector(
     (state: RootState) => state.appState.authuser.upload
   );
@@ -37,6 +37,7 @@ function DashboardLayout({ userstate }: props) {
   const showSubHeader = useSelector(
     (state: RootState) => state.appState.defaultstate.showSubHeader
   );
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const dispatch = useAppDispatch();
   const appName = useSelector(SettingSelector.app_name);
   const nextroute = useSelector(
@@ -53,53 +54,60 @@ function DashboardLayout({ userstate }: props) {
     HandleNextRoute();
     dispatch(setNextRoute(null));
   }, [nextroute]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoad(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <Fragment>
-      <LoadingOverlay
-        visible={loading}
-        zIndex={1000}
-        overlayProps={{ radius: "sm", blur: 2 }}
-        loaderProps={{ color: "blue", type: "bars" }}
-      />
-      <Sidebar app_name={appName} />
-      <main className="main-content">
-        <div className="position-relative">
-          {/* {state?.error && (
-            <Alert
-              variant="light"
-              color="red"
-              title={`Server connection error: ${state?.error}`}
-              icon={<IconInfoCircle />}
-            />
-          )} */}
-          {/* {!state?.error && <Header />} */}
-          <Header />
-          <SubHeader />
-        </div>
-        <div
-          className={`py-0 conatiner-fluid content-inner mt-${
-            showSubHeader ? "n5" : "4"
-          }`}
-        >
-          <Outlet context={{ online: userstate?.online || [] }} />
-          <SessionTimer />
-          <SocketConnectionNotifier />
-        </div>
-        <div className="btn-download">
-          <Button variant="success py-1 px-1 d-flex gap-0">
-            <SupportAgentIcon />
-          </Button>
-        </div>
-        <Footer app_name={appName} />
-      </main>
-      <SettingOffCanvas />
+      <AnimatePresence>
+        {isInitialLoad && (
+          <CustomLoader
+            size="lg"
+            color="tw:text-indigo-600"
+            text="Preparing your dashboard..."
+          />
+        )}
+      </AnimatePresence>
+      {!isInitialLoad && (
+        <>
+          <Sidebar app_name={appName} />
+          <main className="main-content">
+            <div className="position-relative">
+              <Header />
+              <SubHeader />
+            </div>
+            <div
+              className={`py-0 conatiner-fluid content-inner mt-${
+                showSubHeader ? "n5" : "4"
+              }`}
+            >
+              <Outlet context={{ online: userstate?.online || [] }} />
+              <SessionTimer />
+              <SocketConnectionNotifier />
+            </div>
+            <div className="btn-download">
+              <Button variant="success py-1 px-1 d-flex gap-0">
+                <SupportAgentIcon />
+              </Button>
+            </div>
+            <Footer app_name={appName} />
+          </main>
+          <SettingOffCanvas />
 
-      {upload?.progress && upload.progress.length > 0 && (
-        <div className="btn-download" style={{ top: 10 }}>
-          <Box className="py-1 px-1 d-flex gap-0">
-            <UploadProgressShow />
-          </Box>
-        </div>
+          {upload?.progress && upload.progress.length > 0 && (
+            <div className="btn-download" style={{ top: 10 }}>
+              <Box className="py-1 px-1 d-flex gap-0">
+                <UploadProgressShow />
+              </Box>
+            </div>
+          )}
+        </>
       )}
     </Fragment>
   );
