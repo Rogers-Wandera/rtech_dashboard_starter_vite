@@ -20,12 +20,13 @@ import UploadProvider from "../context/auth/upload.context";
 import NotificationContextProvider from "../context/notifications/notification";
 import { emotionTransform, MantineEmotionProvider } from "@mantine/emotion";
 import { AppLoaderProvider } from "../context/app/app.loader.context";
+import CustomLoader from "@/app/components/loaders/loading";
 
 const Providers = () => {
   const MaterialTheme = useMaterialTheme();
   const Mantine_Theme = MantineTheme();
   return (
-    <>
+    <Suspense fallback={<CustomLoader visible={true} />}>
       <AuthProvider>
         <SocketProvider>
           <ThemeProvider theme={MaterialTheme}>
@@ -34,55 +35,47 @@ const Providers = () => {
               stylesTransform={emotionTransform}
             >
               <MantineEmotionProvider>
-                <Suspense
-                  fallback={
+                <PersistGate
+                  persistor={persistor}
+                  loading={
                     <div className="centered-loader">
                       <Loader type="bars" color="blue" />
                     </div>
                   }
                 >
-                  <PersistGate
-                    persistor={persistor}
-                    loading={
-                      <div className="centered-loader">
-                        <Loader type="bars" color="blue" />
-                      </div>
-                    }
-                  >
-                    <Notifications
-                      position="top-right"
-                      zIndex={1000}
-                      limit={5}
-                      autoClose={4000}
-                    />
+                  <Notifications
+                    position="top-right"
+                    zIndex={1000}
+                    limit={5}
+                    autoClose={4000}
+                  />
 
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <ModalsProvider>
-                        <PaginateProvider>
-                          <MRT_TableContextProvider>
-                            <AppContextProvider>
-                              <PermissionProvider>
-                                <UploadProvider>
-                                  <AppLoaderProvider>
-                                    <NotificationContextProvider>
-                                      <Outlet />
-                                    </NotificationContextProvider>
-                                  </AppLoaderProvider>
-                                </UploadProvider>
-                              </PermissionProvider>
-                            </AppContextProvider>
-                          </MRT_TableContextProvider>
-                        </PaginateProvider>
-                      </ModalsProvider>
-                    </LocalizationProvider>
-                  </PersistGate>
-                </Suspense>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <ModalsProvider>
+                      <PaginateProvider>
+                        <MRT_TableContextProvider>
+                          <AppContextProvider>
+                            <PermissionProvider>
+                              <UploadProvider>
+                                <AppLoaderProvider>
+                                  <NotificationContextProvider>
+                                    <Outlet />
+                                  </NotificationContextProvider>
+                                </AppLoaderProvider>
+                              </UploadProvider>
+                            </PermissionProvider>
+                          </AppContextProvider>
+                        </MRT_TableContextProvider>
+                      </PaginateProvider>
+                    </ModalsProvider>
+                  </LocalizationProvider>
+                </PersistGate>
               </MantineEmotionProvider>
             </MantineProvider>
           </ThemeProvider>
         </SocketProvider>
       </AuthProvider>
-    </>
+    </Suspense>
   );
 };
 

@@ -1,13 +1,17 @@
-import { Fragment, useEffect, useState } from "react";
+import {
+  Fragment,
+  Suspense,
+  useEffect,
+  lazy,
+  useState,
+  useCallback,
+} from "react";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import SettingOffCanvas from "@/components/settings/SettingOffCanvas";
 import Footer from "@/components/partials/FooterStyle/footer";
 import { useSelector } from "react-redux";
 import * as SettingSelector from "@/lib/store/settings/dasboardsettings/selectors";
-import Header from "@/components/partials/HeaderStyle/header";
 import { Button } from "react-bootstrap";
-import SubHeader from "@/components/partials/HeaderStyle/sub-header";
-import Sidebar from "@/components/partials/SidebarStyle/sidebar";
 import { RootState } from "@/lib/store/store";
 import { Box } from "@mantine/core";
 import { Outlet, useLocation, useNavigate } from "react-router";
@@ -21,61 +25,79 @@ import { withUserService } from "@/hocs/services/auth/userservice.hoc";
 import UploadProgressShow from "@/components/settings/uploadprogress";
 import { SessionTimer } from "@/components/shared/session/session";
 import SocketConnectionNotifier from "@/app/components/connection/server.connection";
-import { AnimatePresence } from "framer-motion";
 import CustomLoader from "@/app/components/loaders/loading";
-import { useLoader } from "@/lib/context/app/app.loader.context";
 
-type props = { userstate?: { online: string[] } };
+const SubHeader = lazy(
+  () => import("@/components/partials/HeaderStyle/sub-header")
+);
+const Sidebar = lazy(
+  () => import("@/components/partials/SidebarStyle/sidebar")
+);
+const Header = lazy(() => import("@/components/partials/HeaderStyle/header"));
 
-function DashboardLayout({ userstate }: props) {
+type Props = { userstate?: { online: string[] } };
+
+function DashboardLayout({ userstate }: Props) {
   const upload = useSelector(
     (state: RootState) => state.appState.authuser.upload
   );
-  // const state = useSocket();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   const showSubHeader = useSelector(
     (state: RootState) => state.appState.defaultstate.showSubHeader
   );
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const dispatch = useAppDispatch();
   const appName = useSelector(SettingSelector.app_name);
   const nextroute = useSelector(
     (state: RootState) => state.appState.defaultstate.nextRoute
   );
 
-  const HandleNextRoute = () => {
+  const handleNextRoute = useCallback(() => {
     if (nextroute && nextroute !== location.pathname) {
       navigate(nextroute, { replace: true });
+      dispatch(setNextRoute(null));
     }
-  };
+  }, [nextroute, location.pathname, navigate, dispatch]);
 
   useEffect(() => {
-    HandleNextRoute();
-    dispatch(setNextRoute(null));
-  }, [nextroute]);
+    handleNextRoute();
+  }, [handleNextRoute]);
 
+  // Minimum loading time to prevent flash
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsInitialLoad(false);
-    }, 1000);
-
+      setIsLoading(false);
+    }, 800);
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <Fragment>
-      <AnimatePresence>
-        {isInitialLoad && (
-          <CustomLoader
-            size="lg"
-            color="tw:text-indigo-600"
-            text="Preparing your dashboard..."
-          />
-        )}
-      </AnimatePresence>
-      {!isInitialLoad && (
-        <>
+      {isLoading && (
+        <CustomLoader
+          visible={true}
+          progress={true}
+          message="Loading dashboard..."
+          loaderVariant="dots"
+          loaderColor="teal"
+          progressInterval={80}
+        />
+      )}
+
+      <div style={{ visibility: isLoading ? "hidden" : "visible" }}>
+        <Suspense
+          fallback={
+            <CustomLoader
+              visible={true}
+              progress={true}
+              message="Loading dashboard..."
+              loaderVariant="dots"
+              loaderColor="teal"
+              progressInterval={80}
+            />
+          }
+        >
           <Sidebar app_name={appName} />
           <main className="main-content">
             <div className="position-relative">
@@ -99,7 +121,6 @@ function DashboardLayout({ userstate }: props) {
             <Footer app_name={appName} />
           </main>
           <SettingOffCanvas />
-
           {upload?.progress && upload.progress.length > 0 && (
             <div className="btn-download" style={{ top: 10 }}>
               <Box className="py-1 px-1 d-flex gap-0">
@@ -107,15 +128,15 @@ function DashboardLayout({ userstate }: props) {
               </Box>
             </div>
           )}
-        </>
-      )}
+        </Suspense>
+      </div>
     </Fragment>
   );
 }
-
 const DashBoardWithSession = WithAuth(
   withUserService(WithSession(DashboardLayout))
 );
 const DashboardWithModules = WithUserModules(DashBoardWithSession);
 const DashboardWithRoles = WithRouteRole(DashboardWithModules);
+
 export default DashboardWithRoles;

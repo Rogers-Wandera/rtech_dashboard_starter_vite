@@ -11,10 +11,14 @@ import {
 import { useSelector } from "react-redux";
 
 export type loaderConfigs = {
-  loadingText?: string;
-  color?: string;
-  size?: "sm" | "md" | "lg";
-  fullScreen?: boolean;
+  progress?: boolean;
+  message?: string;
+  loaderVariant?: "bars" | "oval" | "dots";
+  loaderColor?: string;
+  progressInterval?: number;
+  progressDuration?: number;
+  onProgressComplete?: () => void;
+  showPercentage?: boolean;
 };
 export interface AppLoaderContextState {
   setLoading: (loading: boolean) => void;
@@ -34,10 +38,13 @@ const AppLoaderProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const [loaderConfigs, setLoaderConfigs] = useState<loaderConfigs>({
-    loadingText: "Loading data...",
-    color: "tw:text-blue-600",
-    size: "md",
-    fullScreen: false,
+    message: "Loading data...",
+    loaderVariant: "oval",
+    loaderColor: "#2563eb",
+    progress: false,
+    progressDuration: 5000,
+    progressInterval: 100,
+    showPercentage: false,
   });
 
   const setLoad = (loading: boolean) => {

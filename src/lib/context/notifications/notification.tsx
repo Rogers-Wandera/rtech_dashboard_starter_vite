@@ -32,7 +32,6 @@ import { useSelector } from "react-redux";
 import { NOTIFICATION_PATTERN } from "@/types/server/notifications/notification.types";
 import { useMutateData } from "@/hooks/data/usemutatehook";
 import { useSocketEvent } from "@/hooks/services/socket.hooks";
-import { useLoader } from "../app/app.loader.context";
 
 export type Category = {
   category: string;
@@ -112,7 +111,6 @@ const NotificationContextProvider = ({
   const { user, isLoggedIn } = useAuth();
   const dispatch = useAppDispatch();
 
-  const { setLoaderConfigs, setLoading, loading } = useLoader();
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([
     null,
     null,
@@ -206,8 +204,7 @@ const NotificationContextProvider = ({
 
   const fetchNotifications = useDebouncedCallback(async () => {
     if (!user?.id) return;
-    setLoading(true);
-    setLoaderConfigs({ loadingText: "Loading notifications..." });
+    setError(undefined);
     try {
       const hasClientResults =
         debouncedSearch?.length > 0 &&
@@ -236,9 +233,7 @@ const NotificationContextProvider = ({
     } catch (err) {
       setError(err);
     } finally {
-      setLoading(false);
       setRefetch(false);
-      setLoaderConfigs({ loadingText: "Loading data..." });
     }
   }, 500);
 
@@ -272,7 +267,7 @@ const NotificationContextProvider = ({
       value={{
         userNotifications: filteredUserNotifications,
         mainNotifications: filteredMainNotifications,
-        isLoading: loading,
+        isLoading: false,
         error,
         reset,
         markAsRead,
